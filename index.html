@@ -46,6 +46,53 @@ body {
   background-attachment: fixed; 
 }
 </style>
+    <style>
+
+  .iframe-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .iframe-wrapper {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    border: 2px solid white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .iframe-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .close-button {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: red;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+</style>
 <style>
     body {
       margin: 0;
@@ -170,33 +217,99 @@ transform: scale(0.9);
 </head>
 <body>
   <a href="/chat" class="blue-rectangle-button">Chat</a>
-  <a href="/support" class="blue-rectangle-button">Support</a>
-  <a href="https://github.com/tharun9772/tharun9772.github.io" class="blue-rectangle-button">Source Code</a>
-  <p>&nbsp;</p>
+  <button class="rainbow-rectangle-button" onclick="openIframe()">Open Chat In New Window</button>
+  <a href="/support" class="blue-rectangle-button">Support</a> 
+<p>&nbsp;</p>
+    <button class="rainbow-rectangle-button" onclick="supportWindow_open()">Open Support In New Window</button>
     <a href="/developers-servers" class="blue-rectangle-button">Developer's Discord Servers</a>
+    <a href="https://github.com/tharun9772/tharun9772.github.io" class="blue-rectangle-button">Source Code</a>
     <p>&nbsp;</p>
+    <h2>If You Are Finding One That Opens The Game Tab In A Seperate Window, Checkout The Games Tab!</h2>
+    <h3>NOTE: We Recommend NOT Using The Seperate Window Tab For Games. This Might Not Save Your Progress On Some Games That Are Supposed To!</h3>
+<p>&nbsp;</p>
   <a href="/refined-beta/landing" class="blue-rectangle-button">Bloxcraft UBG - Refined Beta</a>
   <a href="https://youtube.com/@bloxcraftstudios" class="blue-rectangle-button">Youtube Channel</a>
   <a href="https://www.roblox.com/communities/35721688/The-Craft-Community" class="blue-rectangle-button">Roblox Commmunity</a>
-  <p>&nbsp;</p>
+<p>&nbsp;</p>
   <a href="/minecraft-tools" class="blue-rectangle-button">Minecraft Tools</a>
-  <a href="/privacy-policy" class="blue-rectangle-button">Privacy Policy</a>
-  <a href="/fetured-games" class="rainbow-rectangle-button">Fetured Games</a>
-    <p>&nbsp;</p>
-    <a href="/bloxy-ai" class="rainbow-rectangle-button">Bloxy AI</a>
-   <p>&nbsp;</p>
-  
-<button class="orange-black-button">FoxProxy</button>
+  <a href="/privacy-policy" class="rainbow-rectangle-button">Privacy Policy</a>
+  <a href="/terms" class="rainbow-rectangle-button">TOS (Terms Of Service)</a>
+      <p>&nbsp;</p>
+  <p>&nbsp;</p>
+
+    <a href="/fetured-games" class="rainbow-rectangle-button">Fetured Games</a>
+    <button class="orange-black-button">FoxProxy</button>
      <span style="background-color:#FF8C00;">
        Created By: Bloxcraft Studios, DVPanel, And Tharun9772Gaming!
    </span>
-    <p>&nbsp;</p>
+  <p>&nbsp;</p>
     <h1>Views:</h1>
   <a href="https://bloxcraft-ubg.pages.dev" target="_blank">
 <img src="https://hitwebcounter.com/counter/counter.php?page=21379887&style=0010&nbdigits=9&type=page&initCount=0" title="Counter Widget" Alt="Visit counter For Websites"   border="0" /></a>                             
 <p>Copyright 2025 Bloxcraft Studios</p>
+    <div id="iframeOverlay" class="iframe-container">
+  <div class="iframe-wrapper">
+    <button class="close-button" onclick="closeIframe()">X</button>
+    <iframe id="dynamicIframe" src=""></iframe>
+  </div>
+</div>
+
+<script>
+function openIframe() {
+  var overlay = document.getElementById("iframeOverlay");
+  var iframe = document.getElementById("dynamicIframe");
+  
+  iframe.src = "/iframe-sites/bloxcraft-ubg-chat"; 
+  
+  overlay.style.display = "flex";
+}
+
+function closeIframe() {
+  var overlay = document.getElementById("iframeOverlay");
+  var iframe = document.getElementById("dynamicIframe");
+  
+  iframe.src = "";
+  
+  overlay.style.display = "none";
+}
+</script>
+    
+
+<div id="supportWindowOverlay" class="iframe-container">
+  <div class="iframe-wrapper">
+    <button class="close-button" onclick="supportWindow_close()">X</button>
+    <iframe id="supportWindowFrame" src=""></iframe>
+  </div>
+</div>
+
+<script>
+function supportWindow_open() {
+  var overlay = document.getElementById("supportWindowOverlay");
+  var iframe = document.getElementById("supportWindowFrame");
+  
+  iframe.src = "/iframe-sites/bloxcraft-ubg-support"; 
+  
+  overlay.style.display = "flex";
+}
+
+function supportWindow_close() {
+  var overlay = document.getElementById("supportWindowOverlay");
+  var iframe = document.getElementById("supportWindowFrame");
+  
+  iframe.src = "";
+  overlay.style.display = "none";
+}
+</script>
+
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 

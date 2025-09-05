@@ -27,6 +27,74 @@ limitations under the License.
 <meta name="theme-color" content="#5555FF"> 
 <meta property="og:description" content="The Unblocked Games Site You Can Play Everyday! It Also has Some Custom Games.">
   <link rel="shortcut icon" type="image/png" href="/bloxcraft.png">
+         <style>
+        .iframe-button {
+            background-color: white; 
+            color: black; 
+            padding: 12px 24px;
+            border: 2px solid black; 
+            border-radius: 4px; 
+            font-size: 18px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            cursor: pointer;
+            transition: transform 0.3s ease; 
+        }
+
+        .iframe-button:hover {
+            background-color: black; 
+            color: white; 
+            transform: scale(0.95); 
+        }
+    </style>
+<style>
+
+  .iframe-container {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .iframe-wrapper {
+    position: relative;
+    width: 80%;
+    height: 80%;
+    border: 2px solid white;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+  }
+
+  .iframe-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .close-button {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    width: 30px;
+    height: 30px;
+    line-height: 30px;
+    text-align: center;
+    background-color: red;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+  }
+</style>
   <style>
 .orange-black-button {
 background: linear-gradient(90deg, #FF6600 0%, #000000 100%);
@@ -115,9 +183,10 @@ body {
 </body>
 </html>
 <h1>Click A Game To Play!</h1>
-<h2>All Games: 26</h2>
+<h2>All Games: 22</h2>
    <a href="/fetured-games" class="rainbow-rectangle-button">Fetured Games</a> 
-<p>We Do Not Own Some Games.</p>
+   <button class="iframe-button" onclick="openIframe()">Open Games Tab In New Window</button>
+<p>We Do Not Own Most Of The Games.</p>
 <html lang="en">
 <head>
   <style>
@@ -159,10 +228,11 @@ body {
 </style>
 </head>
 <body>
+<p>&nbsp;</p>
   <a href="/ultimate-clicker-game" class="green-rectangle-button">Ultimate Clicker Game</a>
   <a href="/basic-farming-game" class="green-rectangle-button">Simple Farming Game</a>
   <a href="/basic-zombie-game" class="green-rectangle-button">Basic Zombie Game</a>
-  <p>&nbsp;</p>
+<p>&nbsp;</p>
   <a href="/tic-tac-toe" class="green-rectangle-button">Tic Tac Toe</a>
   <a href="/idle-mining-clicker" class="green-rectangle-button">Idle Mining Clicker</a>
   <a href="/ultimate-farming-game" class="green-rectangle-button">Ultamate Farming Game</a>
@@ -178,26 +248,51 @@ body {
   <a href="/survival-zombie-game" class="green-rectangle-button">Survival Zombie Game</a>
   <a href="/chrome-dino-game" class="green-rectangle-button">Chrome Dino Game</a>
   <a href="/2048-game" class="green-rectangle-button">2048 (Clone)</a>
-    <p>&nbsp;</p>
-<a href="/tetris-game" class="green-rectangle-button">Tetris (Clone)</a>
-<a href="/block-blast" class="green-rectangle-button">Block Blast</a>
+  <p>&nbsp;</p>
 <a href="/cookie-clicker" class="green-rectangle-button">Cookie Clicker</a>
+<a href="/blocky-snakes" class="green-rectangle-button">Blocky Snakes</a>
+<a href="/bridge-race" class="green-rectangle-button">Bridge Race</a>
   <p>&nbsp;</p>
 <a href="/snake-game" class="green-rectangle-button">Google Snake Game</a>
 <a href="/flappy-bird" class="green-rectangle-button">Flappy Bird (Clone)</a>
 <a href="/planet-clicker" class="green-rectangle-button">Planet Clicker</a>
-   <p>&nbsp;</p>
-<a href="/crossy-road" class="green-rectangle-button">Crossy Road (Clone)</a>
+ <p>&nbsp;</p>
 <a href="/apple-clicker" class="green-rectangle-button">Apple Clicker</a>
-<a href="/blocky-snakes" class="green-rectangle-button">Blocky Snakes</a>
-    <p>&nbsp;</p>
-  <a href="/bridge-race" class="green-rectangle-button">Bridge Race</a>
-  <a href="/bloxy-ai" class="rainbow-rectangle-button">Bloxy AI</a>
+<p>&nbsp;</p>
+  
   
 <h1>Views:</h1>
 <a href="https://bloxcraft-ubg.pages.dev" target="_blank">
 <img src="https://hitwebcounter.com/counter/counter.php?page=21379887&style=0010&nbdigits=9&type=page&initCount=0" title="Counter Widget" Alt="Visit counter For Websites"   border="0" /></a>
+<p>&nbsp;</p>
+    <p>Copyright 2025 Bloxcraft Studios</p>
+    <div id="iframeOverlay" class="iframe-container">
+  <div class="iframe-wrapper">
+    <button class="close-button" onclick="closeIframe()">X</button>
+    <iframe id="dynamicIframe" src=""></iframe>
+  </div>
+</div>
+
+<script>
+function openIframe() {
+  var overlay = document.getElementById("iframeOverlay");
+  var iframe = document.getElementById("dynamicIframe");
+  
+  iframe.src = "PAGE-URL";
+  
+  overlay.style.display = "flex";
+}
+
+function closeIframe() {
+  var overlay = document.getElementById("iframeOverlay");
+  var iframe = document.getElementById("dynamicIframe");
+  
+  iframe.src = "";
+  
+  overlay.style.display = "none";
+}
+</script>
 </body>
 </html>
-<p>Copyright 2025 Bloxcraft Studios</p>
+
 
