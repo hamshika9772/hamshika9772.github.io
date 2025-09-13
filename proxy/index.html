@@ -72,14 +72,39 @@ footer {
   color: #fff;
 }
 </style>
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+.navbar {
+  background-color: #000;
+  overflow: hidden;
+  padding: 10px 20px;
+}
+.navbar a {
+  float: left;
+  color: #fff;
+  text-align: center;
+  padding: 10px 16px;
+  text-decoration: none;
+  font-size: 17px;
+  transition: background 0.3s;
+}
+.navbar a:hover {
+  background-color: #444;
+}
+</style>
 </head>
 <body>
-<h1>Bloxcraft UBG - Proxy Browser</h1>
-<h2>Enter a URL and click "Visit" to browse the site:</h2>
-<p>Bugs? Report Them To The Discord Server!</p>
-<h3>Current Proxy Stations: 3</h3>
-<p>There might be more proxy stations.</p>
 
+<div class="navbar">
+  <a href="/">Home</a>
+  <a href="/games">Games</a>
+  <a href="https://discord.gg/a65hcbpfct">Discord Server</a>
+  <a href="https://docs.google.com/document/d/1UC3Eo6UoPCVlq1SiOFEj0HahQGPqqbadXSho5NKHbQU/edit?tab=t.0">Bloxcraft Unblocked Games List</a>
+</div>
+  
 <button id="home">⌂</button>
 <button id="back">⬅</button>
 <button id="forward">➡</button>
@@ -121,7 +146,8 @@ async function loadUrl(url, pushHistory = true) {
         displayUrl = 'bloxcraft://newtab';
       }
     } else {
-      url = `https://www.bing.com/search?q=${encodeURIComponent(url)}`;
+      url = `https://duckduckgo.com/?q=${encodeURIComponent(url)}`;
+      displayUrl = url;
     }
   }
 
@@ -167,3 +193,4 @@ window.addEventListener('load', () => loadUrl('bloxcraft://newtab', false));
 </footer>
 </body>
 </html>
+
