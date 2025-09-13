@@ -1,0 +1,76 @@
+<!-- Copyright (c) Bloxcraft Studios 2025 -->
+
+<!--
+You need to open this in the proxy because its how this file is coded
+-->
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bloxcraft UBG - Proxy - New Tab</title>
+<link rel="shortcut icon" type="image/png" href="/bloxcraft.png">
+<style>
+body {
+  color: white;
+  background: linear-gradient(to bottom right,#1a1a1a,#3333cc);
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+  margin: 0;
+  height: 100vh;
+}
+h1 { font-size: 48px; margin-bottom: 40px; }
+.app-row {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 300px;
+}
+.app-btn {
+  padding: 12px 20px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.app-btn:hover {
+  background: rgba(255,255,255,0.25);
+  transform: scale(1.05);
+}
+</style>
+</head>
+<body>
+<h1>Bloxcraft UBG New Tab</h1>
+
+<div class="app-row" id="appRow"></div>
+
+<script>
+const apps = [
+  { name: 'YouTube', url: 'https://www.youtube.com' },
+  { name: 'Google', url: 'https://www.google.com' },
+  { name: 'Discord', url: 'https://discord.com' }
+];
+
+const appRow = document.getElementById('appRow');
+
+apps.forEach(app => {
+  const btn = document.createElement('div');
+  btn.className = 'app-btn';
+  btn.textContent = app.name;
+  btn.addEventListener('click', () => {
+    if(window.opener && window.opener.loadUrl) {
+      window.opener.loadUrl(app.url);
+    } else {
+      const worker = 'https://school-static.sweet-dawn-d933.workers.dev/';
+      window.open(`${worker}?url=${encodeURIComponent(app.url)}`, '_blank');
+    }
+  });
+  appRow.appendChild(btn);
+});
+</script>
+</body>
+</html>
