@@ -99,7 +99,19 @@ transition: transform 0.15s;
 transform: scale(0.9);
 }
 </style>
-
+  <style>
+    #searchBox {
+      width: 70%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      
+    .highlight {
+      background-color: yellow;
+    }
+  </style>
 
   <style>
 body {
@@ -165,11 +177,13 @@ body {
     <a href="https://discord.gg/a65hcbpfct">Discord Server</a>
     <a href="https://docs.google.com/document/d/1UC3Eo6UoPCVlq1SiOFEj0HahQGPqqbadXSho5NKHbQU/edit?tab=t.0">Bloxcraft Unblocked Games List</a>
   </div>
+  <p>&nbsp;</p>
+    <input type="text" id="searchBox" placeholder="Search All The Games In Bloxcraft UBG - Games Page">
 
 </body>
 </html>
 <h1>Click A Game To Play!</h1>
-<h2>All Games: 27</h2>
+<h2>All Games: 38</h2>
    <a href="/featured-games" class="rainbow-rectangle-button">Featured Games</a> 
    <button class="iframe-button" onclick="openIframe()">Open Games Tab In New Window</button>
    <a href="/refined-beta" class="rainbow-rectangle-button">Refined Beta</a> 
@@ -272,8 +286,21 @@ body {
 <a href="/apple-clicker" class="green-rectangle-button">Apple Clicker</a>
 <a href="/supermarket-3d" class="green-rectangle-button">Supermarket 3D Game</a>
 <a href="/sprunki" class="green-rectangle-button">Sprunki</a>
-  
-<p>&nbsp;</p>
+   <p>&nbsp;</p>
+<a href="/colour-match" class="green-rectangle-button">Colour Match</a>
+<a href="/rock-paper-scissors" class="green-rectangle-button">Rock, Paper, Scissors</a>
+<a href="/guess-the-words" class="green-rectangle-button">Guess The Words</a>
+     <p>&nbsp;</p>
+<a href="/breakout-game" class="green-rectangle-button">Breakout</a>
+<a href="/connect-four" class="green-rectangle-button">COnnect Four</a>
+<a href="/hangman-game" class="green-rectangle-button">Hang Man</a>
+       <p>&nbsp;</p>
+<a href="/color-memorise" class="green-rectangle-button">Colour Memorise</a>
+<a href="/word-search" class="green-rectangle-button">Word Search</a>
+<a href="/whack-a-mole" class="green-rectangle-button">Hang Man</a>
+    <p>&nbsp;</p>
+
+
   <h1>Refined Beta</h1>
     <a href="/refined-beta/chocolate-clicker" class="blue-rectangle-button">Chocolate Clicker</a>
     <a href="/refined-beta/emoji-guess-game" class="blue-rectangle-button">Guess The Emoji</a>
@@ -281,6 +308,9 @@ body {
     <p>&nbsp;</p>
     <a href="/refined-beta/dodger-game" class="blue-rectangle-button">Dodge The Purple Shapes</a>
     <a href="/refined-beta/clicker-tester-game" class="blue-rectangle-button">Click Tester</a>
+  <p>There Might Not Be Much Games For Refined Beta!</p>
+
+
     <h1>Vote For Bloxcraft UBG</h1>
     <p>&nbsp;</p>
     <a href="https://ubghub.org/?site=Bloxcraft%20UBG&utm_source=https%3A%2F%2Fbloxcraft-ubg.pages.dev" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; background: linear-gradient(135deg, #00ff9d 0%, #00cc7a 100%); color: #1a1a1a; border: none; border-radius: 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; box-shadow: 0 2px 4px rgba(0, 255, 157, 0.2); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0, 255, 157, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0, 255, 157, 0.2)'">
@@ -321,6 +351,31 @@ function closeIframe() {
   overlay.style.display = "none";
 }
 </script>
+    <script>
+    const searchBox = document.getElementById('searchBox');
+    const elements = Array.from(document.querySelectorAll('button, a'));
+    const originalHTML = elements.map(el => el.innerHTML);
+
+    function liveSearchElements() {
+      const query = searchBox.value.toLowerCase().trim();
+
+      elements.forEach((el, i) => {
+        const text = el.textContent.toLowerCase();
+        if (query === "") {
+          el.innerHTML = originalHTML[i];
+          el.style.display = "";
+        } else if (text.includes(query)) {
+          const regex = new RegExp(`(${query})`, 'gi');
+          el.innerHTML = originalHTML[i].replace(regex, '<span class="highlight">$1</span>');
+          el.style.display = "";
+        } else {
+          el.style.display = "none";
+        }
+      });
+    }
+
+    searchBox.addEventListener('input', liveSearchElements);
+  </script>
 </body>
 </html>
 
