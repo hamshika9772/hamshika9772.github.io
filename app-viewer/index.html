@@ -64,7 +64,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     const openNewTab = document.getElementById("openNewTab");
 
     if (gameUrl && gameUrl.startsWith("/")) {
-      viewerFrame.src = gameUrl.replace(/^\/+/, "");
+      viewerFrame.src = gameUrl;
 
    if (gameUrl === "/404") {
         viewerTitle.textContent = "404";
