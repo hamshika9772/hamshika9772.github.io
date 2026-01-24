@@ -67,6 +67,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <a href="/featured-games" class="bloxy-rainbow-btn bloxy-btn">Featured Games</a>
 <a href="/refined-beta" class="bloxy-blue-btn bloxy-btn">Refined Beta</a>
 <a onclick="openIframe()" class="bloxy-orange-btn bloxy-btn">Open Games Tab In New Window</a>
+<a href="javascript:void(0)" class="bloxy-btn" onclick="openIframe()">Open VM</a>
 <a href="https://ubghub.org/?site=Bloxcraft%20UBG&utm_source=https%3A%2F%2Fbloxcraft-ubg.pages.dev" target="_blank" class="bloxy-grn-btn bloxy-btn">
   <svg style="width:16px;height:16px;fill:currentColor;vertical-align:middle;margin-right:6px;" viewBox="0 0 20 20">
     <path d="M3 10l4-4v3h4V2l4 4v14H3V10z"/>
@@ -559,7 +560,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <button class="close-button" onclick="closeIframe()">X</button>
     <iframe id="dynamicIframe" src=""></iframe>
   </div>
-
+      
+<div class="iframe-container" id="iframeContainer">
+  <div class="iframe-wrapper">
+    <div class="close-button" onclick="closeIframe()">×</div>
+    <iframe
+      src="https://vms-link.jamdudelovescakelol.workers.dev/"
+      allow="clipboard-read; clipboard-write; fullscreen; microphone; camera"
+      referrerpolicy="no-referrer"
+    ></iframe>
+  </div>
+</div>
 <script>
 function openIframe() {
   var overlay = document.getElementById("iframeOverlay");
@@ -663,6 +674,17 @@ function closeIframe() {
   }
 
   loadGames();
+</script>
+<script>
+  const iframeContainer = document.getElementById("iframeContainer");
+
+  function openIframe() {
+    iframeContainer.style.display = "flex";
+  }
+
+  function closeIframe() {
+    iframeContainer.style.display = "none";
+  }
 </script>
 <script src="/main-injection.js"></script>
 </body>
