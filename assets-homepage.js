@@ -1,10 +1,10 @@
-document.addEventListener("DOMContentLoaded", async () => {
+async function runVersionCheck() {
   const span = document.getElementById("checkversion");
+  if (!span) return false;
+
   const JSON_URL = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/version-bloxcraft-ubg.json";
 
   try {
-    if (!span) throw new Error();
-
     const versionLine = span.parentElement;
 
     const clone = versionLine.cloneNode(true);
@@ -33,6 +33,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     span.textContent = "(ERROR Fetching JSON API)";
     span.style.color = "yellow";
   }
-});
 
-})();
+  return true;
+}
+
+const interval = setInterval(async () => {
+  const done = await runVersionCheck();
+  if (done) clearInterval(interval);
+}, 300);
