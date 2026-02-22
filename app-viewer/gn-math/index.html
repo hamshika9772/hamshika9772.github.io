@@ -71,14 +71,39 @@
     if (!id) {
       show404();
     } else {
-      const fileUrl = \`https://cdn.jsdelivr.net/gh/gn-math/html@master/\${id}.html\`;
-
-      viewerFrame.src = fileUrl;
+      const fileUrl = `https://cdn.jsdelivr.net/gh/gn-math/html@master/${id}.html`;
       viewerTitle.textContent = id;
 
-      openNewTab.addEventListener("click", (e) => {
+      
+      fetch(fileUrl)
+        .then(res => {
+          if (!res.ok) throw new Error();
+          return res.text();
+        })
+        .then(html => {
+          viewerFrame.srcdoc = html;
+        })
+        .catch(() => show404());
+
+      
+      openNewTab.addEventListener("click", async (e) => {
         e.preventDefault();
-        window.open(fileUrl, "_blank", "noopener,noreferrer");
+        try {
+          const res = await fetch(fileUrl);
+          if (!res.ok) throw new Error();
+
+          const html = await res.text();
+          const newTab = window.open("about:blank", "_blank");
+          if (!newTab) {
+            alert("Popup blocked! Enable popups to open game.");
+            return;
+          }
+          newTab.document.open();
+          newTab.document.write(html);
+          newTab.document.close();
+        } catch {
+          alert("Failed to open in new tab");
+        }
       });
     }
 
