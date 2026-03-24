@@ -1,4 +1,3 @@
-
 <!--
 MIT License
 
@@ -114,7 +113,6 @@ if (!gameUrl) {
     .then(html => {
       viewerFrame.srcdoc = html;
 
-      // NEW TAB FIX (important part)
       openNewTab.addEventListener("click", () => {
         const newTab = window.open(fullUrl, "_blank");
         if (!newTab) {
