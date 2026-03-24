@@ -113,10 +113,28 @@ if (!gameUrl) {
     .then(html => {
       viewerFrame.srcdoc = html;
 
-      openNewTab.addEventListener("click", () => {
-        const newTab = window.open(fullUrl, "_blank");
-        if (!newTab) {
-          alert("Popup blocked! Enable popups.");
+    
+      openNewTab.addEventListener("click", async (e) => {
+        e.preventDefault();
+
+        try {
+          const res = await fetch(fullUrl);
+          if (!res.ok) throw new Error();
+
+          const newHtml = await res.text();
+
+          const newTab = window.open("about:blank", "_blank");
+          if (!newTab) {
+            alert("Popup blocked! Enable popups.");
+            return;
+          }
+
+          newTab.document.open();
+          newTab.document.write(newHtml);
+          newTab.document.close();
+
+        } catch {
+          alert("Failed to open in new tab");
         }
       });
 
@@ -128,5 +146,6 @@ closeViewer.addEventListener("click", () => {
   window.top.location.href = "https://google.com/";
 });
 </script>
+<script src="/main-injection.js"></script>
 </body>
 </html>
