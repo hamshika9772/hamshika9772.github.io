@@ -696,13 +696,80 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <h1>Games (Elite Gamez)</h1>
 <div class="game-grid" id="ELITE-GAMEZ-GEN-GRID"></div>
 </main>
+  <main>
+    <h1>Games (UGS Files)</h1>
+<div class="game-grid" id="UGSSIGMADOCS-output">Fetching...</div>
+</main>
 
         
 <p>&nbsp;</p>
     <p>Copyright (c) 2026 Bloxcraft Studios</p>
 
       
+<script>
+const UGSSIGMADOCS_repos = [
+  "tharun9772/ugs-1",
+  "tharun9772/ugs-2",
+  "tharun9772/ugs-3"
+];
 
+const UGSSIGMADOCS_logo = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png";
+
+let UGSSIGMADOCS_games = [];
+
+const output = document.getElementById("UGSSIGMADOCS-output");
+
+async function UGSSIGMADOCS_loadGames() {
+  UGSSIGMADOCS_games = [];
+
+  for (const repo of UGSSIGMADOCS_repos) {
+    try {
+      const res = await fetch(`https://api.github.com/repos/${repo}/contents/`);
+      const data = await res.json();
+
+      data.forEach(f => {
+        if (
+          f.type === "file" &&
+          f.name.startsWith("cl") &&
+          f.name.endsWith(".html")
+        ) {
+          let rawName = f.html_url.split("/").pop();
+          let gameName = rawName.replace(/^cl/, "").replace(".html", "");
+
+          UGSSIGMADOCS_games.push({
+            name: gameName,
+            file: f.name,
+            repo: repo
+          });
+        }
+      });
+
+    } catch (e) {
+      console.error("error:", repo);
+    }
+  }
+
+  UGSSIGMADOCS_render();
+}
+
+function UGSSIGMADOCS_render() {
+  let html = "";
+
+  UGSSIGMADOCS_games.forEach(g => {
+    html += `
+      <div class="game-card">
+        <img src="${UGSSIGMADOCS_logo}">
+        <h3>${g.name}</h3>
+        <a class="play-btn" href="/app-viewer/ugs-files?view=${g.file}">Play</a>
+      </div>
+    `;
+  });
+
+  output.innerHTML = html;
+}
+
+UGSSIGMADOCS_loadGames();
+</script>
 <script>
   const searchBox = document.getElementById('searchBox');
   const countElement = document.getElementById('gameCount');
