@@ -699,13 +699,72 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
   <main>
     <h1>Games (UGS Files)</h1>
 <div class="game-grid" id="UGSSIGMADOCS-output">Fetching...</div>
+  </main>
+<main>
+  <h1>Sea Bean Games</h1>
+  <div id="seedbeansloadgamesskiddersstopskidding" class="game-grid"></div>
 </main>
-
         
 <p>&nbsp;</p>
     <p>Copyright (c) 2026 Bloxcraft Studios</p>
 
-      
+<script>
+const CONFIG = {
+  json: "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/sde@main/zzz.json",
+  coverBase: "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/",
+  htmlBase: "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/games/"
+};
+
+const container = document.getElementById("seedbeansloadgamesskiddersstopskidding");
+
+async function seedbeansloadgamesskiddersstopskiddinggames() {
+  try {
+    const res = await fetch(CONFIG.json);
+    if (!res.ok) throw new Error("JSON fetch failed");
+
+    const games = await res.json();
+
+    console.log("Loaded games:", games);
+
+    const html = games
+      .map(g => {
+        const name = g?.name || "Unnamed Game";
+        const id = g?.id;
+
+        if (!id) return "";
+
+        const coverRaw = g?.cover || "";
+
+        const coverFile = coverRaw.includes("{COVER_URL}")
+          ? coverRaw.replace("{COVER_URL}/", "")
+          : coverRaw;
+
+        const finalCover = coverFile.startsWith("http")
+          ? coverFile
+          : CONFIG.coverBase + coverFile;
+
+        return `
+          <div class="game-card">
+            <img src="${finalCover}" alt="${name}" onerror="this.src='${CONFIG.coverBase}fallback.png'">
+            <h3>${name}</h3>
+            <a class="play-btn" href="/app-viewer/sea-bean?view=${encodeURIComponent(id)}">
+              Play
+            </a>
+          </div>
+        `;
+      })
+      .join("");
+
+    container.innerHTML = html || "<p>No games found.</p>";
+
+  } catch (err) {
+    console.error("Load failed:", err);
+    container.innerHTML = "<p>Failed to load games (check console).</p>";
+  }
+}
+
+seedbeansloadgamesskiddersstopskiddinggames();
+</script>
 <script>
 const UGSSIGMADOCS_repos = [
   "tharun9772/ugs-1",
