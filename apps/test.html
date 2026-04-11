@@ -37,7 +37,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <div class="topbar">
   <div class="logo">Bloxcraft UBG</div>
-  <input id="search" class="search" placeholder="Search...">
+  <input type="text" id="gameSearch" placeholder="Search..." onkeyup="searchGames()">
   <div id="count" class="count">0</div>
 </div>
 
@@ -179,7 +179,7 @@ function updateGameCount() {
 }
 
 function searchGames() {
-  const input = document.getElementById('search');
+  const input = document.getElementById('gameSearch');
   const filter = input.value.toLowerCase();
   const cards = document.querySelectorAll('.game-card');
 
