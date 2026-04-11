@@ -1,6 +1,6 @@
 :root{
-  --card:#fff;
-  --accent:#4da6ff;
+  --card:#4e4fc2;
+  --accent:#7668ff;
 }
 
 body{
@@ -47,12 +47,20 @@ body{
 }
 
 
-.game-card{
-  background:white;
-  border-radius:12px;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
+.game-card {
+  background: #4e4fc2;
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+  color: white;
+  font-family: sans-serif;
+}
+
+.game-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
 }
 
 
