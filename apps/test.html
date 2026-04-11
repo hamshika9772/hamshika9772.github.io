@@ -175,7 +175,7 @@ function updateGameCount() {
   
   const visibleCards = Array.from(allCards).filter(card => card.style.display !== 'none');
   
-  document.getElementById('gameCounter').innerText = `${visibleCards.length} apps`;
+  document.getElementById('count').innerText = `${visibleCards.length} apps`;
 }
 
 function searchGames() {
