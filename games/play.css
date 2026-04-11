@@ -1,5 +1,4 @@
 :root{
-  --bg:#eaf6ff;
   --card:#fff;
   --accent:#4da6ff;
 }
@@ -7,7 +6,7 @@
 body{
   margin:0;
   font-family:sans-serif;
-  background:var(--bg);
+  background:radial-gradient(circle at top,#0b0f2a,#05060d);
 }
 
 
@@ -75,7 +74,7 @@ body{
   margin:6px;
   padding:5px;
   text-align:center;
-  background:var(--accent);
+  background: #7668ff;
   color:white;
   border-radius:6px;
   text-decoration:none;
