@@ -6,7 +6,9 @@ let DATA = {
   elite: [],
   sea: [],
   ugs: [],
-  seraph: []
+  seraph: [],
+  ckv: [],
+  hydra: []
 };
 
 let CURRENT = [];
@@ -102,20 +104,65 @@ async function loadUGS(){
 async function loadSeraph(){
   if(DATA.seraph.length) return;
 
-  const r = await fetch("https://cdn.jsdelivr.net/gh/DominumNetwork/dominum@main/src/assets/libraries/seraph/games.json");
-  const d = await r.json();
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/DominumNetwork/dominum@main/src/assets/libraries/seraph/games.json");
+    const d = await r.json();
 
-  const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
+    const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
 
-  DATA.seraph = d.map(g => {
-    const remaining = g.url.replace(BASE, "");
+    DATA.seraph = d.map(g => {
+      const remaining = g.url.replace(BASE, "");
 
-    return {
-      name: g.name,
-      img: g.img,
-      url: '/app-viewer/seraph/?view=' + encodeURIComponent(remaining)
-    };
-  });
+      return {
+        name: g.name,
+        img: g.img,
+        url: '/app-viewer/seraph/?view=' + remaining
+      };
+    });
+
+  } catch(e){
+    console.error("Seraph failed:", e);
+  }
+}
+
+async function loadCKV(){
+  if(DATA.ckv.length) return;
+
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/games.json");
+    const d = await r.json();
+
+    DATA.ckv = d.map(g => ({
+      name: g.name || "Unknown",
+      img: g.img
+        ? "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/images/" + g.img
+        : "",
+      url: "/app-viewer/chicken-kings-vault/?view=" + g.html
+    }));
+
+  } catch(e){
+    console.error("CKV failed:", e);
+  }
+}
+
+async function loadHydra(){
+  if(DATA.hydra.length) return;
+
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/gmes.json");
+    const d = await r.json();
+
+    DATA.hydra = d.map(g => ({
+      name: g.title || "Unknown",
+      img: g.thumb
+        ? "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + g.thumb
+        : "",
+      url: "/app-viewer/hydra-network/?view=" + g.file_name
+    }));
+
+  } catch(e){
+    console.error("Hydra failed:", e);
+  }
 }
 
 document.querySelectorAll(".cat").forEach(btn=>{
@@ -132,6 +179,8 @@ document.querySelectorAll(".cat").forEach(btn=>{
     if(cat === "sea") await loadSea();
     if(cat === "ugs") await loadUGS();
     if(cat === "seraph") await loadSeraph();
+    if(cat === "ckv") await loadCKV();
+    if(cat === "hydra") await loadHydra();
 
     if(cat === "all"){
       await Promise.all([
@@ -140,7 +189,9 @@ document.querySelectorAll(".cat").forEach(btn=>{
         loadElite(),
         loadSea(),
         loadUGS(),
-        loadSeraph()
+        loadSeraph(),
+        loadCKV(),
+        loadHydra()
       ]);
 
       CURRENT = Object.values(DATA).flat();
@@ -166,7 +217,7 @@ search.oninput = () => {
 };
 
 function render(){
-  const fallback = "https://via.placeholder.com/300x200?text=Game";
+  const fallback = "/1f3ae.png";
 
   grid.innerHTML = FILTERED
     .filter(g => g && g.name && g.url)
