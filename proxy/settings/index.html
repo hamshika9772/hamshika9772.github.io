@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>BloxProxy Settings</title>
+<style>
+body{background:#07111f;color:#fff;font-family:sans-serif;padding:20px}
+input,button{padding:10px;margin:5px;background:#10233d;border:none;color:#fff}
+</style>
+</head>
+<body>
+
+<h2>Settings</h2>
+
+<h3>Wisp Server</h3>
+<input id="wisp">
+<button onclick="saveWisp()">Save</button>
+
+<h3>Proxy</h3>
+<button onclick="setProxy('scramjet')">Scramjet (Default)</button>
+<button onclick="uv()">Ultraviolet (Unavailable)</button>
+
+<h3>Bookmarks</h3>
+<button onclick="toggleBookmarks()">Toggle Bookmarks</button>
+
+<script>
+const s=JSON.parse(localStorage.getItem("bloxproxy_settings")||"{}")
+document.getElementById("wisp").value=s.wisp||"wss://wisp.classroom.lat/"
+
+function saveWisp(){
+ s.wisp=document.getElementById("wisp").value
+ localStorage.setItem("bloxproxy_settings",JSON.stringify(s))
+ alert("Saved")
+}
+
+function setProxy(p){
+ s.proxy=p
+ localStorage.setItem("bloxproxy_settings",JSON.stringify(s))
+ alert("Set")
+}
+
+function uv(){
+ alert("This option is NOT available")
+}
+
+function toggleBookmarks(){
+ s.bookmarks=!s.bookmarks
+ localStorage.setItem("bloxproxy_settings",JSON.stringify(s))
+}
+</script>
+
+</body>
+</html>
