@@ -17,3 +17,7 @@ https://bloxcraft-ubg.pages.dev/request-dmca/ Visit This Page For More Info On H
 Bloxcraft UBG
 The UBG Site Created By: Bloxcraft Studios & Tharun9772Gaming & Bloxcraft Studios Developers
 ```
+
+----
+
+**We have recently seen people skid, do NOT SKID/Copy/Modify the site code without Bloxy's permission. Anyoen who does so will be shamed.**
