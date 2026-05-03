@@ -9,7 +9,8 @@ let DATA = {
   seraph: [],
   ckv: [],
   hydra: [],
-  ccported: []
+  ccported: [],
+  googleclass: []
 };
 
 let CURRENT = [];
@@ -187,6 +188,24 @@ async function loadCCPorted(){
   }
 }
 
+async function loadGoogleClass(){
+  if(DATA.googleclass.length) return;
+
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/assets/games.json");
+    const d = await r.json();
+
+    DATA.googleclass = d.map(g => ({
+      name: g.name,
+      img: g.img,
+      url: "/app-viewer/google-class/?view=" + encodeURIComponent(g.url)
+    }));
+
+  } catch(e){
+    console.error("GoogleClass failed:", e);
+  }
+}
+
 document.querySelectorAll(".cat").forEach(btn=>{
   btn.onclick = async () => {
 
@@ -204,6 +223,7 @@ document.querySelectorAll(".cat").forEach(btn=>{
     if(cat === "ckv") await loadCKV();
     if(cat === "hydra") await loadHydra();
     if(cat === "ccported") await loadCCPorted();
+    if(cat === "googleclass") await loadGoogleClass();
 
     if(cat === "all"){
       await Promise.all([
@@ -215,7 +235,8 @@ document.querySelectorAll(".cat").forEach(btn=>{
         loadSeraph(),
         loadCKV(),
         loadHydra(),
-        loadCCPorted()
+        loadCCPorted(),
+        loadGoogleClass()
       ]);
 
       CURRENT = Object.values(DATA).flat();
