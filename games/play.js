@@ -1,4 +1,8 @@
 const grid = document.getElementById("grid");
+const search = document.getElementById("search");
+const count = document.getElementById("count");
+
+const PAGE_SIZE = 60;
 
 let DATA = {
   blox: [],
@@ -16,6 +20,11 @@ let DATA = {
 let CURRENT = [];
 let FILTERED = [];
 
+let RENDERED = 0;
+let OBSERVER_SENTINEL = null;
+
+/* -------------------- LOADERS -------------------- */
+
 async function loadBlox(){
   if(DATA.blox.length) return;
   const r = await fetch('/games/games.json');
@@ -31,8 +40,8 @@ async function loadGN(){
   DATA.gn = d
     .filter(g => g.id !== -1 && !g.name.startsWith("[!]"))
     .map(g => ({
-      name: g.name,
-      img: 'https://cdn.jsdelivr.net/gh/freebuisness/covers@main/' + g.cover.replace('{COVER_URL}',''),
+      name: g.name || "Unknown",
+      img: 'https://cdn.jsdelivr.net/gh/freebuisness/covers@main/' + (g.cover || "").replace('{COVER_URL}',''),
       url: '/app-viewer/gn-math/?gn-id=' + g.id
     }));
 }
@@ -44,7 +53,7 @@ async function loadElite(){
   const d = await r.json();
 
   DATA.elite = d.map(g => ({
-    name: g.title,
+    name: g.title || "Unknown",
     img: 'https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/' + g.image,
     url: '/app-viewer/elite-gamez?url=' + encodeURIComponent(g.url)
   }));
@@ -112,14 +121,11 @@ async function loadSeraph(){
 
     const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
 
-    DATA.seraph = d.map(g => {
-      const remaining = g.url.replace(BASE, "");
-      return {
-        name: g.name,
-        img: g.img,
-        url: '/app-viewer/seraph/?view=' + remaining
-      };
-    });
+    DATA.seraph = d.map(g => ({
+      name: g.name || "Unknown",
+      img: g.img,
+      url: '/app-viewer/seraph/?view=' + (g.url ? g.url.replace(BASE, "") : "")
+    }));
 
   } catch(e){
     console.error("Seraph failed:", e);
@@ -177,7 +183,7 @@ async function loadCCPorted(){
       if(!g.base || !g.Id) return null;
 
       return {
-        name: g.name && g.name.trim() ? g.name : "Game " + g.Id,
+        name: (g.name && g.name.trim()) ? g.name : "Game " + g.Id,
         img: g.base + "/thumb.jpg",
         url: "/app-viewer/ccported/?view=" + g.Id
       };
@@ -196,8 +202,8 @@ async function loadGoogleClass(){
     const d = await r.json();
 
     DATA.googleclass = d.map(g => ({
-      name: g.name,
-      img: g.img,
+      name: g.name || "Unknown",
+      img: g.img || "",
       url: "/app-viewer/google-class/?view=" + encodeURIComponent(g.url)
     }));
 
@@ -205,6 +211,8 @@ async function loadGoogleClass(){
     console.error("GoogleClass failed:", e);
   }
 }
+
+
 
 document.querySelectorAll(".cat").forEach(btn=>{
   btn.onclick = async () => {
@@ -241,58 +249,125 @@ document.querySelectorAll(".cat").forEach(btn=>{
 
       CURRENT = Object.values(DATA).flat();
     } else {
-      CURRENT = DATA[cat];
+      CURRENT = DATA[cat] || [];
     }
 
     FILTERED = CURRENT;
+
+    RESET_RENDER();
     updateCount();
-    render();
+    render(true);
   };
 });
+
+
 
 search.oninput = () => {
   const v = search.value.toLowerCase();
 
   FILTERED = CURRENT.filter(g =>
-    g.name.toLowerCase().includes(v)
+    g?.name?.toLowerCase?.().includes(v)
   );
 
+  RESET_RENDER();
   updateCount();
-  render();
+  render(true);
 };
 
-function render(){
+
+
+function render(reset = false){
   const fallback = "/1f3ae.png";
 
-  grid.innerHTML = FILTERED
+  if(reset){
+    grid.innerHTML = "";
+    RENDERED = 0;
+  }
+
+  const slice = FILTERED
     .filter(g => g && g.name && g.url)
-    .map((g,i)=>{
+    .slice(RENDERED, RENDERED + PAGE_SIZE);
 
-      let cls = "game-card";
-      if((i+1)%16 === 0) cls += " big";
+  const frag = document.createDocumentFragment();
 
-      return `
-      <div class="${cls}">
-        <img 
-          loading="lazy"
-          decoding="async"
-          src="${g.img || fallback}"
-          onerror="this.src='${fallback}'"
-        >
-        <h3>${g.name}</h3>
-        <a class="play-btn" href="${g.url}">Play</a>
-      </div>`;
-    }).join("");
+  for(const g of slice){
+
+    const card = document.createElement("div");
+    card.className = "game-card";
+
+    const img = document.createElement("img");
+    img.loading = "lazy";
+    img.decoding = "async";
+    img.src = g.img || fallback;
+    img.onerror = () => img.src = fallback;
+
+    const title = document.createElement("h3");
+    title.textContent = g.name;
+
+    const link = document.createElement("a");
+    link.className = "play-btn";
+    link.href = g.url;
+    link.textContent = "Play";
+
+    card.appendChild(img);
+    card.appendChild(title);
+    card.appendChild(link);
+
+    frag.appendChild(card);
+  }
+
+  grid.appendChild(frag);
+
+  RENDERED += slice.length;
+
+  setupObserver();
+}
+
+
+
+function setupObserver(){
+  if(OBSERVER_SENTINEL) return;
+
+  OBSERVER_SENTINEL = document.createElement("div");
+  OBSERVER_SENTINEL.id = "sentinel";
+  grid.appendChild(OBSERVER_SENTINEL);
+
+  const observer = new IntersectionObserver(entries => {
+    if(entries[0].isIntersecting){
+      OBSERVER_SENTINEL.remove();
+      OBSERVER_SENTINEL = null;
+
+      render(false);
+    }
+  }, {
+    rootMargin: "300px"
+  });
+
+  observer.observe(OBSERVER_SENTINEL);
+}
+
+
+
+function RESET_RENDER(){
+  RENDERED = 0;
+
+  if(OBSERVER_SENTINEL){
+    OBSERVER_SENTINEL.remove();
+    OBSERVER_SENTINEL = null;
+  }
 }
 
 function updateCount(){
   count.textContent = FILTERED.length + " games";
 }
 
+
+
 (async ()=>{
   await loadBlox();
   CURRENT = DATA.blox;
   FILTERED = CURRENT;
+
   updateCount();
-  render();
+  render(true);
 })();
