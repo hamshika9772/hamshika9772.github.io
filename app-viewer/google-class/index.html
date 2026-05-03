@@ -6,27 +6,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link id="favicon" rel="shortcut icon" type="image/png" href="/bloxcraft.png">
   <link rel="stylesheet" href="/app-viewer/app-viewer-default.css">
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-W0KXN0103E"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-W0KXN0103E');
-  </script>
-
-  <script>
-  (function(w,d,s,l,i){
-    w[l]=w[l]||[];
-    w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
-    var f=d.getElementsByTagName(s)[0],
-    j=d.createElement(s),
-    dl=l!='dataLayer'?'&l='+l:'';
-    j.async=true;
-    j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;
-    f.parentNode.insertBefore(j,f);
-  })(window,document,'script','dataLayer','GTM-NQM8XR48');
-  </script>
 </head>
 
 <body>
@@ -39,21 +18,17 @@
     </div>
   </div>
 
-  <iframe id="viewerFrame"></iframe>
-
   <script>
     const params = new URLSearchParams(window.location.search);
     const view = params.get("view");
 
-    const viewerFrame = document.getElementById("viewerFrame");
     const viewerTitle = document.getElementById("viewerTitle");
-    const closeViewer = document.getElementById("closeViewer");
-    const openNewTab = document.getElementById("openNewTab");
 
     const BASE = "https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/";
 
     let gameData = null;
     let finalUrl = null;
+    let aboutWindow = null;
 
     async function loadGame(){
       if(!view){
@@ -62,25 +37,21 @@
       }
 
       try{
-        const res = await fetch("https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/assets/games.json");
+        const res = await fetch(BASE + "assets/games.json");
         const data = await res.json();
 
-     
         gameData = data.find(g => g.url === view);
 
         if(!gameData){
           viewerTitle.textContent = "Game not found";
-          viewerFrame.src = "/404";
           return;
         }
 
         finalUrl = BASE + gameData.url;
 
-     
         viewerTitle.textContent = gameData.name || "Untitled Game";
 
-     
-        viewerFrame.src = finalUrl;
+        openAboutBlank();
 
       } catch(err){
         console.error(err);
@@ -88,22 +59,55 @@
       }
     }
 
+    function openAboutBlank(){
+      if(!finalUrl) return;
+
+ 
+      aboutWindow = window.open("about:blank", "_blank");
+
+      if(!aboutWindow){
+        alert("Popup blocked. Please allow popups.");
+        return;
+      }
+
+      fetch(finalUrl)
+        .then(res => res.text())
+        .then(html => {
+
+          aboutWindow.document.open();
+          aboutWindow.document.write(html);
+          aboutWindow.document.close();
+
+        })
+        .catch(err => {
+          console.error(err);
+          aboutWindow.document.write("<h1>Failed to load game</h1>");
+        });
+    }
+
   
-    openNewTab.addEventListener("click", (e) => {
+    document.getElementById("openNewTab").addEventListener("click", (e) => {
       e.preventDefault();
+
       if(finalUrl){
-        window.open(finalUrl, "_blank", "noopener,noreferrer");
+        const w = window.open("about:blank", "_blank");
+
+        fetch(finalUrl)
+          .then(res => res.text())
+          .then(html => {
+            w.document.open();
+            w.document.write(html);
+            w.document.close();
+          });
       }
     });
 
- 
-    closeViewer.addEventListener("click", () => {
+  
+    document.getElementById("closeViewer").addEventListener("click", () => {
       window.top.location.href = "https://google.com/";
     });
 
     loadGame();
   </script>
-
-  <script src="/main-injection.js"></script>
 </body>
 </html>
