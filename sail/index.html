@@ -375,9 +375,14 @@
         const customWsGroup = document.getElementById("custom-ws-group");
         const customWsInput = document.getElementById("custom-ws");
 
+        let isFocused = false;
         let tabs = [];
         let activeTabId = null;
 
+bar.addEventListener("focus", () => { isFocused = true; });
+bar.addEventListener("blur", () => { isFocused = false; });
+
+        
         const defaultWs = "wss://wisp.classroom.lat/";
 
         let currentWs = localStorage.getItem("proxy-ws") || defaultWs;
@@ -601,25 +606,23 @@
             if (e.key === "Enter") nav();
         });
 
-        setInterval(() => {
-            if (!activeTabId) return;
+setInterval(() => {
+   
+    if (!activeTabId || isFocused) return;
 
-            const frame = document.getElementById("frame-" + activeTabId);
-            if (!frame) return;
+    const frame = document.getElementById("frame-" + activeTabId);
+    if (!frame) return;
 
-            const decoded = decodeProxiedUrl(frame.src);
-
-            if (bar.value !== decoded) {
-                bar.value = decoded;
-            }
-        }, 500);
+    const decoded = decodeProxiedUrl(frame.src);
+    if (bar.value !== decoded) {
+        bar.value = decoded;
+    }
+}, 500);
 
         window.addEventListener("load", () => {
             updateCustomWsVisibility();
             addTab("bloxcraft://newtab");
         });
     </script>
-
 </body>
-
 </html>
