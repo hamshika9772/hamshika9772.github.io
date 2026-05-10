@@ -221,19 +221,21 @@ async function loadTruffled(){
     const d = await r.json();
 
     DATA.truffled = d
-      .filter(g => g && g.name && g.url)
+      .filter(g => g && g.url)
       .map(g => {
 
-        let thumb = g.thumbnail || "";
-
-        thumb = thumb
+        const thumb = (g.thumbnail || "")
           .replace(/^\/+/, "")
           .replace(/^png\/games\//, "");
 
         return {
-          name: g.name.trim() || "Unknown",
-          img: "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb,
-          url: "/sail/embed/#truffled.lol/" + encodeURIComponent(g.url)
+          name: (g.name || "Unknown").trim(),
+
+          img: thumb
+            ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
+            : "/1f3ae.png",
+
+          url: "/sail/embed/#truffled.lol" + g.url
         };
       });
 
@@ -256,17 +258,10 @@ async function loadNowGG(){
         name: (g.name || "Unknown").trim(),
 
         img: g.img
-          ? (
-              g.img.startsWith("http")
-                ? g.img
-                : "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
-            )
+          ? "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
           : "/1f3ae.png",
 
-        url:
-          g.url.startsWith("http")
-            ? "/sail/embed/#nowgg.fun" + g.url
-            : "/sail/embed/#nowgg.fun" + g.url.replace(/^\/+/, "")
+        url: "/sail/embed/#" + g.url
       }));
 
   } catch(e){
