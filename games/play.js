@@ -217,10 +217,11 @@ async function loadTruffled(){
   if(DATA.truffled.length) return;
 
   try {
+
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
     const d = await r.json();
 
-    DATA.truffled = d
+    DATA.truffled = Object.values(d)
       .filter(g => g && g.url)
       .map(g => {
 
@@ -229,13 +230,13 @@ async function loadTruffled(){
           .replace(/^png\/games\//, "");
 
         return {
-          name: (g.name || "Unknown").trim(),
+          name: g.name || "Unknown",
 
           img: thumb
             ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
             : "/1f3ae.png",
 
-          url: "/sail/embed/#truffled.lol" + g.url
+          url: "/sail/embed/#truffled.lol/#" + g.url
         };
       });
 
@@ -248,14 +249,15 @@ async function loadNowGG(){
   if(DATA.nowgg.length) return;
 
   try {
+
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
     const d = await r.json();
 
-    DATA.nowgg = d
+    DATA.nowgg = Object.values(d)
       .filter(g => g && g.url)
       .map(g => ({
 
-        name: (g.name || "Unknown").trim(),
+        name: g.name || "Unknown",
 
         img: g.img
           ? "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
