@@ -216,59 +216,42 @@ async function loadGoogleClass(){
 async function loadTruffled(){
   if(DATA.truffled.length) return;
 
-  try {
+  const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
+  const d = await r.json();
 
-    const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
-    const d = await r.json();
+  DATA.truffled = Object.values(d).map(g => {
 
-    DATA.truffled = Object.values(d)
-      .filter(g => g && g.url)
-      .map(g => {
+    const thumb = (g.thumbnail || "")
+      .replace(/^\/+/, "")
+      .replace(/^png\/games\//, "");
 
-        const thumb = (g.thumbnail || "")
-          .replace(/^\/+/, "")
-          .replace(/^png\/games\//, "");
+    return {
+      name: g.name || "Unknown",
 
-        return {
-          name: g.name || "Unknown",
+      img: thumb
+        ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
+        : "/1f3ae.png",
 
-          img: thumb
-            ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
-            : "/1f3ae.png",
-
-          url: "/sail/embed/#truffled.lol/#" + g.url
-        };
-      });
-
-  } catch(e){
-    console.error("Truffled failed:", e);
-  }
+      url: "/sail/embed/#truffled.lol/#" + g.url
+    };
+  });
 }
 
 async function loadNowGG(){
   if(DATA.nowgg.length) return;
 
-  try {
+  const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
+  const d = await r.json();
 
-    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
-    const d = await r.json();
+  DATA.nowgg = Object.values(d).map(g => ({
+    name: g.name || "Unknown",
 
-    DATA.nowgg = Object.values(d)
-      .filter(g => g && g.url)
-      .map(g => ({
+    img: g.img
+      ? "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
+      : "/1f3ae.png",
 
-        name: g.name || "Unknown",
-
-        img: g.img
-          ? "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
-          : "/1f3ae.png",
-
-        url: "/sail/embed/#" + g.url
-      }));
-
-  } catch(e){
-    console.error("NowGG failed:", e);
-  }
+    url: "/sail/embed/#" + g.url
+  }));
 }
 
 
