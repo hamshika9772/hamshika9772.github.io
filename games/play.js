@@ -14,7 +14,9 @@ let DATA = {
   ckv: [],
   hydra: [],
   ccported: [],
-  googleclass: []
+  googleclass: [],
+  truffled: [],
+  nowgg: []
 };
 
 let CURRENT = [];
@@ -23,7 +25,6 @@ let FILTERED = [];
 let RENDERED = 0;
 let OBSERVER_SENTINEL = null;
 
-/* -------------------- LOADERS -------------------- */
 
 async function loadBlox(){
   if(DATA.blox.length) return;
@@ -212,6 +213,42 @@ async function loadGoogleClass(){
   }
 }
 
+async function loadTruffled(){
+  if(DATA.truffled.length) return;
+
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
+    const d = await r.json();
+
+    DATA.truffled = d.map(g => ({
+      name: g.name || "Unknown",
+      img: "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + (g.thumbnail || "").replace(/^\/?png\/games\//, ""),
+      url: "/sail/embed/#truffled.lol/#" + g.url
+    }));
+
+  } catch(e){
+    console.error("Truffled failed:", e);
+  }
+}
+
+async function loadNowGG(){
+  if(DATA.nowgg.length) return;
+
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
+    const d = await r.json();
+
+    DATA.nowgg = d.map(g => ({
+      name: g.name || "Unknown",
+      img: g.img || "",
+      url: "/sail/embed/#" + g.url
+    }));
+
+  } catch(e){
+    console.error("NowGG failed:", e);
+  }
+}
+
 
 
 document.querySelectorAll(".cat").forEach(btn=>{
@@ -232,6 +269,8 @@ document.querySelectorAll(".cat").forEach(btn=>{
     if(cat === "hydra") await loadHydra();
     if(cat === "ccported") await loadCCPorted();
     if(cat === "googleclass") await loadGoogleClass();
+    if(cat === "truffled") await loadTruffled();
+    if(cat === "nowgg") await loadNowGG();
 
     if(cat === "all"){
       await Promise.all([
@@ -244,7 +283,9 @@ document.querySelectorAll(".cat").forEach(btn=>{
         loadCKV(),
         loadHydra(),
         loadCCPorted(),
-        loadGoogleClass()
+        loadGoogleClass(),
+        loadTruffled(),
+        loadNowGG()
       ]);
 
       CURRENT = Object.values(DATA).flat();
