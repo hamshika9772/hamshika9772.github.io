@@ -220,11 +220,22 @@ async function loadTruffled(){
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
     const d = await r.json();
 
-    DATA.truffled = d.map(g => ({
-      name: g.name || "Unknown",
-      img: "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + (g.thumbnail || "").replace(/^\/?png\/games\//, ""),
-      url: "/sail/embed/#truffled.lol/#" + g.url
-    }));
+    DATA.truffled = d
+      .filter(g => g && g.name && g.url)
+      .map(g => {
+
+        let thumb = g.thumbnail || "";
+
+        thumb = thumb
+          .replace(/^\/+/, "")
+          .replace(/^png\/games\//, "");
+
+        return {
+          name: g.name.trim() || "Unknown",
+          img: "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb,
+          url: "/sail/embed/#truffled.lol/" + encodeURIComponent(g.url)
+        };
+      });
 
   } catch(e){
     console.error("Truffled failed:", e);
@@ -238,11 +249,25 @@ async function loadNowGG(){
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
     const d = await r.json();
 
-    DATA.nowgg = d.map(g => ({
-      name: g.name || "Unknown",
-      img: g.img || "",
-      url: "/sail/embed/#" + g.url
-    }));
+    DATA.nowgg = d
+      .filter(g => g && g.url)
+      .map(g => ({
+
+        name: (g.name || "Unknown").trim(),
+
+        img: g.img
+          ? (
+              g.img.startsWith("http")
+                ? g.img
+                : "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
+            )
+          : "/1f3ae.png",
+
+        url:
+          g.url.startsWith("http")
+            ? "/sail/embed/#nowgg.fun" + g.url
+            : "/sail/embed/#nowgg.fun" + g.url.replace(/^\/+/, "")
+      }));
 
   } catch(e){
     console.error("NowGG failed:", e);
