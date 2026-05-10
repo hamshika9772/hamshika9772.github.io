@@ -30,80 +30,64 @@ function safeArray(v){
   return Array.isArray(v) ? v : [];
 }
 
+function normalizeGame(g){
+  if(!g || !g.name || !g.url) return null;
+  return g;
+}
+
+/* ---------------- LOADERS ---------------- */
+
 async function loadBlox(){
   if(DATA.blox.length) return;
-
-  try{
-    const r = await fetch("/games/games.json");
-    const d = await r.json();
-
-    DATA.blox = safeArray(d);
-  }catch(e){
-    console.error("Blox failed:", e);
-    DATA.blox = [];
-  }
+  const r = await fetch('/games/games.json');
+  DATA.blox = await r.json();
 }
 
 async function loadGN(){
   if(DATA.gn.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/freebuisness/assets/zones.json");
-    const d = await r.json();
+  const r = await fetch('https://cdn.jsdelivr.net/gh/freebuisness/assets/zones.json');
+  const d = await r.json();
 
-    DATA.gn = safeArray(d)
-      .filter(g => g.id !== -1 && !(g.name || "").startsWith("[!]"))
-      .map(g => ({
-        name: g.name || "Unknown",
-        img: "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/" + (g.cover || "").replace("{COVER_URL}", ""),
-        url: "/app-viewer/gn-math/?gn-id=" + g.id
-      }));
-  }catch(e){
-    console.error("GN failed:", e);
-    DATA.gn = [];
-  }
+  DATA.gn = safeArray(d)
+    .filter(g => g.id !== -1 && !g.name.startsWith("[!]"))
+    .map(g => ({
+      name: g.name || "Unknown",
+      img: 'https://cdn.jsdelivr.net/gh/freebuisness/covers@main/' + (g.cover || "").replace('{COVER_URL}',''),
+      url: '/app-viewer/gn-math/?gn-id=' + g.id
+    }));
 }
 
 async function loadElite(){
   if(DATA.elite.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/games.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/games.json");
+  const d = await r.json();
 
-    DATA.elite = safeArray(d).map(g => ({
-      name: g.title || "Unknown",
-      img: "https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/" + g.image,
-      url: "/app-viewer/elite-gamez?url=" + encodeURIComponent(g.url)
-    }));
-  }catch(e){
-    console.error("Elite failed:", e);
-    DATA.elite = [];
-  }
+  DATA.elite = safeArray(d).map(g => ({
+    name: g.title || "Unknown",
+    img: 'https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/' + g.image,
+    url: '/app-viewer/elite-gamez?url=' + encodeURIComponent(g.url)
+  }));
 }
 
 async function loadSea(){
   if(DATA.sea.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/sea-bean-unblocked/sde@main/zzz.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/sea-bean-unblocked/sde@main/zzz.json");
+  const d = await r.json();
 
-    DATA.sea = safeArray(d).map(g => {
-      const cover = (g.cover || "").replace("{COVER_URL}/", "");
+  DATA.sea = safeArray(d).map(g => {
+    const cover = (g.cover || "").replace("{COVER_URL}/", "");
 
-      return {
-        name: g.name || "Unknown",
-        img: cover.startsWith("http")
-          ? cover
-          : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
-        url: "/app-viewer/sea-bean?view=" + encodeURIComponent(g.id)
-      };
-    });
-  }catch(e){
-    console.error("Sea failed:", e);
-    DATA.sea = [];
-  }
+    return {
+      name: g.name || "Unknown",
+      img: cover.startsWith("http")
+        ? cover
+        : 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/' + cover,
+      url: '/app-viewer/sea-bean?view=' + encodeURIComponent(g.id)
+    };
+  });
 }
 
 async function loadUGS(){
@@ -125,16 +109,14 @@ async function loadUGS(){
       safeArray(d).forEach(f => {
         if(f.type === "file" && f.name.startsWith("cl") && f.name.endsWith(".html")){
           games.push({
-            name: f.name.replace(/^cl/, "").replace(".html", ""),
+            name: f.name.replace(/^cl/,"").replace(".html",""),
             img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
-            url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
+            url: '/app-viewer/ugs-files?view=' + encodeURIComponent(f.name)
           });
         }
       });
 
-    }catch(e){
-      console.warn("UGS failed:", repo, e);
-    }
+    }catch(e){}
   }
 
   DATA.ugs = games;
@@ -143,164 +125,117 @@ async function loadUGS(){
 async function loadSeraph(){
   if(DATA.seraph.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/DominumNetwork/dominum@main/src/assets/libraries/seraph/games.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/DominumNetwork/dominum@main/src/assets/libraries/seraph/games.json");
+  const d = await r.json();
 
-    const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
+  const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
 
-    DATA.seraph = safeArray(d).map(g => ({
-      name: g.name || "Unknown",
-      img: g.img || "",
-      url: "/app-viewer/seraph/?view=" + (g.url ? g.url.replace(BASE, "") : "")
-    }));
-
-  }catch(e){
-    console.error("Seraph failed:", e);
-    DATA.seraph = [];
-  }
+  DATA.seraph = safeArray(d).map(g => ({
+    name: g.name || "Unknown",
+    img: g.img || "",
+    url: '/app-viewer/seraph/?view=' + (g.url ? g.url.replace(BASE, "") : "")
+  }));
 }
 
 async function loadCKV(){
   if(DATA.ckv.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/games.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/games.json");
+  const d = await r.json();
 
-    DATA.ckv = safeArray(d).map(g => ({
-      name: g.name || "Unknown",
-      img: g.img
-        ? "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/images/" + g.img
-        : "",
-      url: "/app-viewer/chicken-kings-vault/?view=" + g.html
-    }));
-
-  }catch(e){
-    console.error("CKV failed:", e);
-    DATA.ckv = [];
-  }
+  DATA.ckv = safeArray(d).map(g => ({
+    name: g.name || "Unknown",
+    img: g.img ? "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/images/" + g.img : "",
+    url: "/app-viewer/chicken-kings-vault/?view=" + g.html
+  }));
 }
 
 async function loadHydra(){
   if(DATA.hydra.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/gmes.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/gmes.json");
+  const d = await r.json();
 
-    DATA.hydra = safeArray(d).map(g => ({
-      name: g.title || "Unknown",
-      img: g.thumb
-        ? "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + g.thumb
-        : "",
-      url: "/app-viewer/hydra-network/?view=" + g.file_name
-    }));
-
-  }catch(e){
-    console.error("Hydra failed:", e);
-    DATA.hydra = [];
-  }
+  DATA.hydra = safeArray(d).map(g => ({
+    name: g.title || "Unknown",
+    img: g.thumb ? "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + g.thumb : "",
+    url: "/app-viewer/hydra-network/?view=" + g.file_name
+  }));
 }
 
 async function loadCCPorted(){
   if(DATA.ccported.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/ccported-stupid-game-lib.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/ccported-stupid-game-lib.json");
+  const d = await r.json();
 
-    DATA.ccported = safeArray(d).map(g => {
-      if(!g.base || !g.Id) return null;
-
-      return {
-        name: (g.name && g.name.trim()) ? g.name : "Game " + g.Id,
-        img: g.base + "/thumb.jpg",
-        url: "/app-viewer/ccported/?view=" + g.Id
-      };
-    }).filter(Boolean);
-
-  }catch(e){
-    console.error("CCPorted failed:", e);
-    DATA.ccported = [];
-  }
+  DATA.ccported = safeArray(d)
+    .map(g => g && g.base && g.Id ? ({
+      name: (g.name && g.name.trim()) ? g.name : "Game " + g.Id,
+      img: g.base + "/thumb.jpg",
+      url: "/app-viewer/ccported/?view=" + g.Id
+    }) : null)
+    .filter(Boolean);
 }
 
 async function loadGoogleClass(){
   if(DATA.googleclass.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/assets/games.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/assets/games.json");
+  const d = await r.json();
 
-    DATA.googleclass = safeArray(d).map(g => ({
-      name: g.name || "Unknown",
-      img: g.img || "",
-      url: "/app-viewer/google-class/?view=" + encodeURIComponent(g.url)
-    }));
-
-  }catch(e){
-    console.error("GoogleClass failed:", e);
-    DATA.googleclass = [];
-  }
+  DATA.googleclass = safeArray(d).map(g => ({
+    name: g.name || "Unknown",
+    img: g.img || "",
+    url: "/app-viewer/google-class/?view=" + encodeURIComponent(g.url)
+  }));
 }
 
 async function loadTruffled(){
   if(DATA.truffled.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
+  const d = await r.json();
 
-    DATA.truffled = Object.values(d || {}).map(g => {
+  DATA.truffled = safeArray(d)
+    .map(g => {
 
       const thumb = (g.thumbnail || "")
         .replace(/^\/+/, "")
         .replace(/^png\/games\//, "");
 
-      return {
-        name: g.name || "Unknown",
-
+      return normalizeGame({
+        name: g.name,
         img: thumb
           ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
           : "/1f3ae.png",
-
         url: g.url
           ? "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
-          : ""
-      };
-    }).filter(g => g.url);
+          : null
+      });
 
-  }catch(e){
-    console.error("Truffled failed:", e);
-    DATA.truffled = [];
-  }
+    })
+    .filter(Boolean);
 }
 
 async function loadNowGG(){
   if(DATA.nowgg.length) return;
 
-  try{
-    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
-    const d = await r.json();
+  const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
+  const d = await r.json();
 
-    DATA.nowgg = Object.values(d || {}).map(g => ({
-      name: g.name || "Unknown",
-
+  DATA.nowgg = safeArray(d)
+    .map(g => normalizeGame({
+      name: g.name,
       img: g.img
         ? "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
         : "/1f3ae.png",
-
-      url: g.url
-        ? "/sail/embed/#" + g.url
-        : ""
-    })).filter(g => g.url);
-
-  }catch(e){
-    console.error("NowGG failed:", e);
-    DATA.nowgg = [];
-  }
+      url: g.url ? "/sail/embed/#" + g.url : null
+    }))
+    .filter(Boolean);
 }
+
+
 
 document.querySelectorAll(".cat").forEach(btn => {
   btn.onclick = async () => {
@@ -310,52 +245,50 @@ document.querySelectorAll(".cat").forEach(btn => {
 
     const cat = btn.dataset.cat;
 
-    try{
+    if(cat === "blox") await loadBlox();
+    if(cat === "gn") await loadGN();
+    if(cat === "elite") await loadElite();
+    if(cat === "sea") await loadSea();
+    if(cat === "ugs") await loadUGS();
+    if(cat === "seraph") await loadSeraph();
+    if(cat === "ckv") await loadCKV();
+    if(cat === "hydra") await loadHydra();
+    if(cat === "ccported") await loadCCPorted();
+    if(cat === "googleclass") await loadGoogleClass();
+    if(cat === "truffled") await loadTruffled();
+    if(cat === "nowgg") await loadNowGG();
 
-      if(cat === "blox") await loadBlox();
-      if(cat === "gn") await loadGN();
-      if(cat === "elite") await loadElite();
-      if(cat === "sea") await loadSea();
-      if(cat === "ugs") await loadUGS();
-      if(cat === "seraph") await loadSeraph();
-      if(cat === "ckv") await loadCKV();
-      if(cat === "hydra") await loadHydra();
-      if(cat === "ccported") await loadCCPorted();
-      if(cat === "googleclass") await loadGoogleClass();
-      if(cat === "truffled") await loadTruffled();
-      if(cat === "nowgg") await loadNowGG();
+    if(cat === "all"){
 
-      if(cat === "all"){
-        await Promise.all([
-          loadBlox(),
-          loadGN(),
-          loadElite(),
-          loadSea(),
-          loadUGS(),
-          loadSeraph(),
-          loadCKV(),
-          loadHydra(),
-          loadCCPorted(),
-          loadGoogleClass(),
-          loadTruffled(),
-          loadNowGG()
-        ]);
+      await Promise.all([
+        loadBlox(),
+        loadGN(),
+        loadElite(),
+        loadSea(),
+        loadUGS(),
+        loadSeraph(),
+        loadCKV(),
+        loadHydra(),
+        loadCCPorted(),
+        loadGoogleClass(),
+        loadTruffled(),
+        loadNowGG()
+      ]);
 
-        CURRENT = Object.values(DATA).flat().filter(Boolean);
+      CURRENT = Object.values(DATA)
+        .flat()
+        .map(normalizeGame)
+        .filter(Boolean);
 
-      }else{
-        CURRENT = DATA[cat] || [];
-      }
-
-      FILTERED = CURRENT;
-
-      RESET_RENDER();
-      updateCount();
-      render(true);
-
-    }catch(e){
-      console.error("Category failed:", cat, e);
+    } else {
+      CURRENT = DATA[cat] || [];
     }
+
+    FILTERED = CURRENT;
+
+    RESET_RENDER();
+    updateCount();
+    render(true);
   };
 });
 
@@ -363,15 +296,15 @@ search.oninput = () => {
   const v = search.value.toLowerCase();
 
   FILTERED = CURRENT.filter(g =>
-    g &&
-    g.name &&
-    g.name.toLowerCase().includes(v)
+    g?.name?.toLowerCase?.().includes(v)
   );
 
   RESET_RENDER();
   updateCount();
   render(true);
 };
+
+
 
 function render(reset = false){
   const fallback = "/1f3ae.png";
@@ -381,13 +314,8 @@ function render(reset = false){
     RENDERED = 0;
   }
 
-  const validGames = FILTERED.filter(g =>
-    g &&
-    g.name &&
-    g.url
-  );
-
-  const slice = validGames.slice(RENDERED, RENDERED + PAGE_SIZE);
+  const valid = FILTERED.filter(normalizeGame);
+  const slice = valid.slice(RENDERED, RENDERED + PAGE_SIZE);
 
   const frag = document.createDocumentFragment();
 
@@ -398,12 +326,8 @@ function render(reset = false){
 
     const img = document.createElement("img");
     img.loading = "lazy";
-    img.decoding = "async";
     img.src = g.img || fallback;
-    img.onerror = () => {
-      img.onerror = null;
-      img.src = fallback;
-    };
+    img.onerror = () => img.src = fallback;
 
     const title = document.createElement("h3");
     title.textContent = g.name;
@@ -424,69 +348,46 @@ function render(reset = false){
 
   RENDERED += slice.length;
 
-  if(RENDERED < validGames.length){
-    setupObserver();
-  }
+  if(RENDERED < valid.length) setupObserver();
 }
 
 function setupObserver(){
-
   if(OBSERVER_SENTINEL) return;
 
   OBSERVER_SENTINEL = document.createElement("div");
-  OBSERVER_SENTINEL.id = "sentinel";
-
   grid.appendChild(OBSERVER_SENTINEL);
 
-  if(OBSERVER){
-    OBSERVER.disconnect();
-  }
+  if(OBSERVER) OBSERVER.disconnect();
 
   OBSERVER = new IntersectionObserver(entries => {
-
     if(entries[0].isIntersecting){
-
-      if(OBSERVER_SENTINEL){
-        OBSERVER_SENTINEL.remove();
-        OBSERVER_SENTINEL = null;
-      }
-
+      OBSERVER_SENTINEL.remove();
+      OBSERVER_SENTINEL = null;
       render(false);
     }
-
-  }, {
-    rootMargin: "300px"
-  });
+  }, { rootMargin: "300px" });
 
   OBSERVER.observe(OBSERVER_SENTINEL);
 }
 
 function RESET_RENDER(){
   RENDERED = 0;
-
-  if(OBSERVER){
-    OBSERVER.disconnect();
-    OBSERVER = null;
-  }
-
-  if(OBSERVER_SENTINEL){
-    OBSERVER_SENTINEL.remove();
-    OBSERVER_SENTINEL = null;
-  }
+  if(OBSERVER) OBSERVER.disconnect();
+  OBSERVER = null;
+  if(OBSERVER_SENTINEL) OBSERVER_SENTINEL.remove();
+  OBSERVER_SENTINEL = null;
 }
 
 function updateCount(){
   count.textContent = FILTERED.length + " games";
 }
 
+
+
 (async () => {
-
   await loadBlox();
-
   CURRENT = DATA.blox;
   FILTERED = CURRENT;
-
   updateCount();
   render(true);
-
 })();
