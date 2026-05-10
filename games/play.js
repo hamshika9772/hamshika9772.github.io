@@ -191,18 +191,27 @@ async function loadNowGG() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
     const d = await r.json();
-    DATA.nowgg = safeArray(d).map(g => {
-      let finalUrl = g.url || "";
-      if (finalUrl && !finalUrl.startsWith("http")) {
-        finalUrl = "https://" + finalUrl;
-      }
-      return normalize({
+    
+   
+    const rawData = safeArray(d);
+    
+    DATA.nowgg = rawData.map(g => {
+      if (!g.name || !g.url) return null;
+
+    
+      let rawUrl = g.url.trim();
+      let cleanUrl = rawUrl.startsWith("http") ? rawUrl : "https://" + rawUrl;
+      
+      return {
         name: g.name,
         img: g.img || "/1f3ae.png",
-        url: finalUrl ? "/sail/embed/#" + finalUrl : null
-      });
+        url: "/sail/embed/#" + cleanUrl
+      };
     }).filter(Boolean);
-  } catch (e) {}
+
+  } catch (e) {
+    console.error("NowGG load error:", e);
+  }
 }
 
 document.querySelectorAll(".cat").forEach(btn => {
