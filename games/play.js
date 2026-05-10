@@ -174,7 +174,8 @@ async function loadTruffled() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
     const d = await r.json();
-    DATA.truffled = safeArray(d).map(g => {
+    const games = safeArray(d.games);
+    DATA.truffled = games.map(g => {
       const thumb = (g.thumbnail || "").replace(/^\/+/, "").replace(/^png\/games\//, "");
       return normalize({
         name: g.name,
@@ -190,11 +191,17 @@ async function loadNowGG() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
     const d = await r.json();
-    DATA.nowgg = safeArray(d).map(g => normalize({
-      name: g.name,
-      img: g.img ? "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "") : "/1f3ae.png",
-      url: g.url ? "/sail/embed/#" + g.url : null
-    })).filter(Boolean);
+    DATA.nowgg = safeArray(d).map(g => {
+      let finalUrl = g.url || "";
+      if (finalUrl && !finalUrl.startsWith("http")) {
+        finalUrl = "https://" + finalUrl;
+      }
+      return normalize({
+        name: g.name,
+        img: g.img || "/1f3ae.png",
+        url: finalUrl ? "/sail/embed/#" + finalUrl : null
+      });
+    }).filter(Boolean);
   } catch (e) {}
 }
 
