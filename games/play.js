@@ -30,31 +30,33 @@ function safeArray(v){
   return Array.isArray(v) ? v : [];
 }
 
-function normalizeGame(g){
+function normalize(g){
   if(!g || !g.name || !g.url) return null;
-  return g;
+  return {
+    name: g.name,
+    img: g.img || "/1f3ae.png",
+    url: g.url
+  };
 }
-
-/* ---------------- LOADERS ---------------- */
 
 async function loadBlox(){
   if(DATA.blox.length) return;
-  const r = await fetch('/games/games.json');
-  DATA.blox = await r.json();
+  const r = await fetch("/games/games.json");
+  DATA.blox = safeArray(await r.json());
 }
 
 async function loadGN(){
   if(DATA.gn.length) return;
 
-  const r = await fetch('https://cdn.jsdelivr.net/gh/freebuisness/assets/zones.json');
+  const r = await fetch("https://cdn.jsdelivr.net/gh/freebuisness/assets/zones.json");
   const d = await r.json();
 
   DATA.gn = safeArray(d)
-    .filter(g => g.id !== -1 && !g.name.startsWith("[!]"))
+    .filter(g => g.id !== -1 && g.name && !g.name.startsWith("[!]"))
     .map(g => ({
-      name: g.name || "Unknown",
-      img: 'https://cdn.jsdelivr.net/gh/freebuisness/covers@main/' + (g.cover || "").replace('{COVER_URL}',''),
-      url: '/app-viewer/gn-math/?gn-id=' + g.id
+      name: g.name,
+      img: "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/" + (g.cover || "").replace("{COVER_URL}", ""),
+      url: "/app-viewer/gn-math/?gn-id=" + g.id
     }));
 }
 
@@ -66,8 +68,8 @@ async function loadElite(){
 
   DATA.elite = safeArray(d).map(g => ({
     name: g.title || "Unknown",
-    img: 'https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/' + g.image,
-    url: '/app-viewer/elite-gamez?url=' + encodeURIComponent(g.url)
+    img: "https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/" + g.image,
+    url: "/app-viewer/elite-gamez?url=" + encodeURIComponent(g.url)
   }));
 }
 
@@ -84,8 +86,8 @@ async function loadSea(){
       name: g.name || "Unknown",
       img: cover.startsWith("http")
         ? cover
-        : 'https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/' + cover,
-      url: '/app-viewer/sea-bean?view=' + encodeURIComponent(g.id)
+        : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
+      url: "/app-viewer/sea-bean?view=" + encodeURIComponent(g.id)
     };
   });
 }
@@ -107,11 +109,11 @@ async function loadUGS(){
       const d = await r.json();
 
       safeArray(d).forEach(f => {
-        if(f.type === "file" && f.name.startsWith("cl") && f.name.endsWith(".html")){
+        if(f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html")){
           games.push({
             name: f.name.replace(/^cl/,"").replace(".html",""),
             img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
-            url: '/app-viewer/ugs-files?view=' + encodeURIComponent(f.name)
+            url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
           });
         }
       });
@@ -133,7 +135,7 @@ async function loadSeraph(){
   DATA.seraph = safeArray(d).map(g => ({
     name: g.name || "Unknown",
     img: g.img || "",
-    url: '/app-viewer/seraph/?view=' + (g.url ? g.url.replace(BASE, "") : "")
+    url: "/app-viewer/seraph/?view=" + (g.url ? g.url.replace(BASE, "") : "")
   }));
 }
 
@@ -170,8 +172,8 @@ async function loadCCPorted(){
   const d = await r.json();
 
   DATA.ccported = safeArray(d)
-    .map(g => g && g.base && g.Id ? ({
-      name: (g.name && g.name.trim()) ? g.name : "Game " + g.Id,
+    .map(g => g?.base && g?.Id ? ({
+      name: g.name || ("Game " + g.Id),
       img: g.base + "/thumb.jpg",
       url: "/app-viewer/ccported/?view=" + g.Id
     }) : null)
@@ -199,12 +201,11 @@ async function loadTruffled(){
 
   DATA.truffled = safeArray(d)
     .map(g => {
-
       const thumb = (g.thumbnail || "")
         .replace(/^\/+/, "")
         .replace(/^png\/games\//, "");
 
-      return normalizeGame({
+      return normalize({
         name: g.name,
         img: thumb
           ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
@@ -213,7 +214,6 @@ async function loadTruffled(){
           ? "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
           : null
       });
-
     })
     .filter(Boolean);
 }
@@ -225,7 +225,7 @@ async function loadNowGG(){
   const d = await r.json();
 
   DATA.nowgg = safeArray(d)
-    .map(g => normalizeGame({
+    .map(g => normalize({
       name: g.name,
       img: g.img
         ? "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/" + g.img.replace(/^\/+/, "")
@@ -234,8 +234,6 @@ async function loadNowGG(){
     }))
     .filter(Boolean);
 }
-
-
 
 document.querySelectorAll(".cat").forEach(btn => {
   btn.onclick = async () => {
@@ -259,7 +257,6 @@ document.querySelectorAll(".cat").forEach(btn => {
     if(cat === "nowgg") await loadNowGG();
 
     if(cat === "all"){
-
       await Promise.all([
         loadBlox(),
         loadGN(),
@@ -275,11 +272,7 @@ document.querySelectorAll(".cat").forEach(btn => {
         loadNowGG()
       ]);
 
-      CURRENT = Object.values(DATA)
-        .flat()
-        .map(normalizeGame)
-        .filter(Boolean);
-
+      CURRENT = Object.values(DATA).flat().filter(Boolean).map(normalize).filter(Boolean);
     } else {
       CURRENT = DATA[cat] || [];
     }
@@ -304,8 +297,6 @@ search.oninput = () => {
   render(true);
 };
 
-
-
 function render(reset = false){
   const fallback = "/1f3ae.png";
 
@@ -314,7 +305,7 @@ function render(reset = false){
     RENDERED = 0;
   }
 
-  const valid = FILTERED.filter(normalizeGame);
+  const valid = FILTERED.filter(g => g && g.name && g.url);
   const slice = valid.slice(RENDERED, RENDERED + PAGE_SIZE);
 
   const frag = document.createDocumentFragment();
@@ -381,8 +372,6 @@ function RESET_RENDER(){
 function updateCount(){
   count.textContent = FILTERED.length + " games";
 }
-
-
 
 (async () => {
   await loadBlox();
