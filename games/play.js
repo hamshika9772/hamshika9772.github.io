@@ -258,7 +258,7 @@ async function loadAlexrworlds() {
     DATA.alexrworlds = safeArray(d).map(g => ({
       name: g.title || "Unknown",
       img: g.img || "/1f3ae.png",
-      url: "/app-viewer/alexrsworld/?view=" + encodeURIComponent(g.title)
+      url: "/app-viewer/alexr-world-s/?view=" + encodeURIComponent(g.title)
     }));
 
   } catch (e) {
