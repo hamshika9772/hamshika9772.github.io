@@ -1,6 +1,8 @@
 (() => {
-    const originalHTML = document.documentElement.innerHTML;
 
+    const originalHTML = document.documentElement.outerHTML;
+
+ 
     document.open();
     document.write(`
 <!DOCTYPE html>
@@ -82,9 +84,11 @@ p{
     `);
     document.close();
 
+
     setTimeout(() => {
+
         document.open();
         document.write(originalHTML);
         document.close();
-    }, 1);
+    }, 100);
 })();
