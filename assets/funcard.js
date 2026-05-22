@@ -1,5 +1,5 @@
 
-    const key = 'bloxcraft_key_funcard_847599277577499887583948582';
+    const key = 'funcard_bloxcraftubg_43857438957498572768576820gh589ty40fhu43hf0q5y_localcookies';
     const messages = [
 "New Games Are Added Oftem, Check Back Soon!",
 "Tip: Bookmark Bloxcraft UBG So You Never Lose It!",
@@ -358,7 +358,45 @@
 "Make sure to read the Privacy Policy and the Terms Of Service!",
 "Bloxcraft UBG is even more fun at home!",
 "This project started in July 30, 2025!",
-"This message is from may 22, 2026!"
+"This message is from may 22, 2026!",
+"If your seeing this, you are tuff.",
+"Flux Unblocker sucks.",
+"Bloxcraft UBG will be singlefile soon.",
+"Bloxcraft UBG's github repo is tharun9772/Bloxcraft-UBG!",
+"Have a great day!",
+"Also, remember toplay Roblox, Fortnight, or Minecraft on Bloxcraft UBG!",
+"Soon Bloxcraft UBG will be a chrome extenstion!",
+"If you made a link for Bloxcraft UBG, remember to update it once in a while (weekly or monthly)!",
+"The singlefile version may be auto updated.",
+"If you are seeing old content, try CTRL + SHIFT + R, If it does not work try clearing cookies and localstorage!",
+"We got Balatro!",
+"We have There Is No Game!",
+"We have way morw games then Cool Math Games!",
+"Enjoy!",
+"If you are seeing this message on your first visit you are a very lucky person.",
+"Play krypton frfr",
+"You can use anyw ebsite on Bloxcraft UBG with the proxy!",
+"Bloxcraft UBG is a massive unblocked gaming platform featuring an extensive library of over 8,000 different games.",
+"To help users bypass network restrictions and maintain access, Bloxcraft UBG operates using at least two different proxies.",
+"Major game titles, including both Minecraft and Roblox, are available to play directly through Bloxcraft UBG.",
+"Unblocked game sites frequently host their content on educational or developer domains like Google Sites and GitHub Pages to avoid firewall filters.",
+"The transition from Flash to HTML5 revolutionized unblocked gaming, allowing complex interactive media to run smoothly on modern browsers without plugins.",
+"Many unblocked platforms rely on WebGL technology to render hardware-accelerated 2D and 3D graphics directly within the web page.",
+"A proxy acts as a middleman for unblocked games, fetching the game data so the local network's firewall doesn't recognize the actual gaming URL.",
+"IO games, such as Slither.io and Agar.io, exploded in popularity on unblocked sites because they are incredibly lightweight and support instant multiplayer.",
+"Most unblocked game sites save your progress using your web browser's local storage, meaning your game data will disappear if you clear your browser history.",
+"To avoid detection by teachers, many of these sites utilize 'tab cloaking' techniques, making the website tab icon and title look like a Google Doc or a search engine.",
+"Educational games and typing trainers are frequently mixed into the catalogs of these sites to make them appear academically focused to automated web crawlers.",
+"Thanks to JavaScript-based emulators, unblocked sites can seamlessly host classic console games from the NES, SNES, Sega Genesis, and Game Boy eras.",
+"A surprising number of these gaming websites are created, hosted, and maintained by tech-savvy students as a way to practice web development and networking.",
+"The official discontinuation of Adobe Flash Player in 2020 forced unblocked sites to adapt by using open-source emulators like Ruffle to keep older games alive.",
+"Because school IT administrators constantly update their blocklists, unblocked game sites frequently cycle through new URLs and create multiple 'mirror' sites.",
+"Physics-based puzzle games, endless runners, and side-scrolling platformers remain the most consistently played genres on unblocked platforms.",
+"Many modern multiplayer unblocked games utilize WebSocket connections, allowing students from entirely different school districts to play together in real-time.",
+"While the games themselves are usually harmless, unblocked game platforms often rely on heavy banner advertising to pay for their high server hosting costs.",
+"Modern game engines like Unity and Godot feature robust HTML5 export options, making it easier than ever for indie developers to distribute their games to unblocked sites.",
+"The dynamic between school IT departments and unblocked game sites is an endless cat-and-mouse game of blocking domains and spinning up new proxies.",
+"Do people even read these?"
     
         
     ];
