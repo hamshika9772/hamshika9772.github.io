@@ -27,15 +27,41 @@ if(!view){
 
       fetch(fullUrl)
         .then(r=>r.text())
-        .then(html=>{
-          viewerFrame.srcdoc = html;
-        });
+        .then(async (html)=>{
+         
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(html, "text/html");
+          const gameFrame = doc.querySelector("#frameWrapper #gameFrame");
 
-      openNewTab.onclick = async () => {
-        const html = await fetch(fullUrl).then(r=>r.text());
-        const tab = window.open("about:blank");
-        tab.document.write(html);
-      };
+          if (gameFrame) {
+            const srcAttr = gameFrame.getAttribute("src");
+            const finalUrl = BASE + srcAttr;
+            
+          
+            const actualHtml = await fetch(finalUrl).then(r => r.text());
+            viewerFrame.srcdoc = actualHtml;
+
+        
+            openNewTab.onclick = async () => {
+              const tabHtml = await fetch(finalUrl).then(r => r.text());
+              const tab = window.open("about:blank");
+              tab.document.open();
+              tab.document.write(tabHtml);
+              tab.document.close();
+            };
+          } else {
+          
+            viewerFrame.srcdoc = html;
+
+            openNewTab.onclick = async () => {
+              const tabHtml = await fetch(fullUrl).then(r => r.text());
+              const tab = window.open("about:blank");
+              tab.document.open();
+              tab.document.write(tabHtml);
+              tab.document.close();
+            };
+          }
+        });
 
     })
     .catch(show404);
