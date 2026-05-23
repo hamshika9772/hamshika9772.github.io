@@ -2,7 +2,7 @@ const repos = [
   "tharun9772/ugs-1",
   "tharun9772/ugs-2",
   "tharun9772/ugs-3"
-];
+]; 
 
 const params = new URLSearchParams(window.location.search);
 let view = params.get("view");
