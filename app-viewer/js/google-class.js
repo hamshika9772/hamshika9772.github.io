@@ -8,6 +8,7 @@ const BASE = "https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/"
 
 let gameData = null;
 let finalUrl = null;
+let gameHtml = null; 
 
 async function loadGame(){
 
@@ -31,9 +32,10 @@ async function loadGame(){
 
     viewerTitle.textContent = gameData.name;
 
-    const html = await fetch(finalUrl).then(r => r.text());
 
-    injectIntoFrame(html);
+    gameHtml = await fetch(finalUrl).then(r => r.text());
+
+    injectIntoFrame(gameHtml);
 
   } catch(err){
     console.error(err);
@@ -69,15 +71,24 @@ function injectIntoFrame(html){
 }
 
 
-document.getElementById("openNewTab").onclick = () => {
-  if(!finalUrl) return;
 
-  window.open(finalUrl, "_blank");
+document.getElementById("openNewTab").onclick = () => {
+  if(!gameHtml) return;
+
+  const newTab = window.open("about:blank", "_blank");
+  
+  if (newTab) {
+    newTab.document.open();
+    newTab.document.write(gameHtml);
+    newTab.document.close();
+  } else {
+    console.warn("The new tab was blocked by a popup blocker.");
+  }
 };
 
 
-document.getElementById("closeViewer").onclick = () => {
-  location.href = "https://google.com/";
+document.getElementById("closeViewer").onclick = ()=>{
+  window.top.location.href = "https://google.com/";
 };
 
 loadGame();
