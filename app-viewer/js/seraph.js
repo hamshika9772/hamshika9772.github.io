@@ -1,4 +1,4 @@
-    const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(window.location.search);
     const view = params.get("view");
 
     const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
@@ -42,13 +42,22 @@
 
           viewerTitle.textContent = entry.name || "Game";
 
+          const baseHref = fullUrl.substring(0, fullUrl.lastIndexOf("/")) + "/";
+
           fetch(fullUrl)
             .then(res => {
               if (!res.ok) throw new Error();
               return res.text();
             })
             .then(html => {
-              viewerFrame.srcdoc = html;
+              const headIndex = html.indexOf("<head>");
+              let modifiedHtml = html;
+              if (headIndex !== -1) {
+                modifiedHtml = html.slice(0, headIndex + 6) + `<base href="${baseHref}">` + html.slice(headIndex + 6);
+              } else {
+                modifiedHtml = `<base href="${baseHref}">` + html;
+              }
+              viewerFrame.srcdoc = modifiedHtml;
             })
             .catch(() => show404());
 
@@ -59,6 +68,15 @@
               if (!res.ok) throw new Error();
 
               const html = await res.text();
+              
+              const headIndex = html.indexOf("<head>");
+              let modifiedHtml = html;
+              if (headIndex !== -1) {
+                modifiedHtml = html.slice(0, headIndex + 6) + `<base href="${baseHref}">` + html.slice(headIndex + 6);
+              } else {
+                modifiedHtml = `<base href="${baseHref}">` + html;
+              }
+
               const newTab = window.open("about:blank", "_blank");
 
               if (!newTab) {
@@ -67,7 +85,7 @@
               }
 
               newTab.document.open();
-              newTab.document.write(html);
+              newTab.document.write(modifiedHtml);
               newTab.document.close();
             } catch {
               alert("Failed to open game");
