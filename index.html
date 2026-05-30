@@ -17,22 +17,23 @@
 <meta property="og:url" content="/">
 
 <style>
-  /* ==========================================================================
-   1. CORE VARIABLES & BASE SETUP
+/* ==========================================================================
+   1. CORE DESIGN TOKENS & RESET
    ========================================================================== */
 :root {
-  --accent: #7c5cff;         /* Electric Purple */
-  --accent2: #2fdcff;        /* Cyber Cyan */
-  --text: #cfd6ff;           /* Light Ice Blue */
+  --accent: #7c5cff;         /* Electric Neon Purple */
+  --accent2: #2fdcff;        /* Cyber Glow Cyan */
+  --text: #cfd6ff;           /* Muted Ice Blue */
   --text-muted: #5d6793;     /* Cold Slate Gray */
   --bg-dark: #05060d;        /* Deep Space Void */
-  --bg-panel: rgba(10, 12, 30, 0.7);
+  --bg-panel: rgba(10, 12, 30, 0.75);
+  --bg-card: rgba(13, 16, 37, 0.5);
   
-  /* Precision Neon Glow Fields */
-  --glow-purple: 0 0 15px rgba(124, 92, 255, 0.6);
-  --glow-cyan: 0 0 15px rgba(47, 220, 255, 0.6);
-  --text-glow-cyan: 0 0 10px rgba(47, 220, 255, 0.5);
-  --text-glow-purple: 0 0 10px rgba(124, 92, 255, 0.5);
+  /* Precision Glow Vectors */
+  --glow-purple: 0 0 15px rgba(124, 92, 255, 0.5);
+  --glow-cyan: 0 0 15px rgba(47, 220, 255, 0.5);
+  --text-glow-cyan: 0 0 10px rgba(47, 220, 255, 0.6);
+  --text-glow-purple: 0 0 10px rgba(124, 92, 255, 0.6);
 }
 
 * {
@@ -44,18 +45,45 @@
 body {
   height: 100vh;
   background: radial-gradient(circle at top, #0b0f2a, var(--bg-dark));
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   color: var(--text);
   overflow: hidden;
+  line-height: 1.5;
+}
+
+/* Global SVG Rule: Enforces all SVGs to be white */
+svg {
+  fill: #ffffff !important;
+  transition: filter 0.2s ease;
+}
+svg[stroke] {
+  stroke: #ffffff !important;
+}
+
+/* Custom Cyberpunk Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(5, 6, 13, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 92, 255, 0.2);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+  box-shadow: var(--glow-purple);
 }
 
 /* ==========================================================================
-   2. INITIALIZATION SCREENS & MODALS (startupContent)
+   2. INITIALIZATION LOADER & WELCOME FLOW (startupContent)
    ========================================================================== */
 #loader {
   position: fixed;
   inset: 0;
-  background: #05060d;
+  background: var(--bg-dark);
   z-index: 9999;
   display: flex;
   align-items: center;
@@ -64,125 +92,180 @@ body {
 
 .loader-content {
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.loader-content img {
+  max-width: 160px;
+  height: auto;
+  filter: drop-shadow(0 0 15px rgba(124, 92, 255, 0.4));
+  animation: pulseLogo 2s ease-in-out infinite;
 }
 
 .spinner {
-  width: 50px;
-  height: 50px;
+  width: 44px;
+  height: 44px;
   border: 3px solid rgba(124, 92, 255, 0.1);
   border-radius: 50%;
   border-top-color: var(--accent2);
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
+  animation: spin 0.8s linear infinite;
+  margin: 16px auto;
   box-shadow: var(--glow-cyan);
 }
 
 #hint {
-  font-size: 14px;
+  font-size: 13px;
   color: var(--accent2);
-  letter-spacing: 2px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
+  font-weight: 600;
 }
 
 /* Modal Core Overlays */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(4, 5, 10, 0.85);
-  backdrop-filter: blur(8px);
+  background: rgba(3, 4, 9, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
   z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 20px;
 }
 
+/* Premium Compact Modal Cards */
 .modal-card {
-  background: var(--bg-panel);
-  border: 1px solid rgba(124, 92, 255, 0.2);
+  background: linear-gradient(145deg, rgba(13, 16, 37, 0.9) 0%, rgba(7, 8, 18, 0.95) 100%);
+  border: 1px solid rgba(124, 92, 255, 0.25);
+  border-top: 2px solid var(--accent2);
   border-radius: 12px;
-  padding: 32px;
+  padding: 28px 24px;
   width: 100%;
-  max-width: 480px;
-  box-shadow: var(--glow-purple), inset 0 0 20px rgba(124, 92, 255, 0.1);
-  display: none; /* Controlled via operational JS engine */
+  max-width: 380px;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.6),
+    0 0 30px rgba(124, 92, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  display: none; 
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 16px;
 }
 
-/* Show states triggered via JS engine */
 .modal-card.active {
   display: flex;
+  animation: modalCascadeIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+/* Compact Welcome Flow Icons Constraint */
+.icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+  background: rgba(47, 220, 255, 0.05);
+  border: 1px solid rgba(47, 220, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent2);
+  box-shadow: inset 0 0 10px rgba(47, 220, 255, 0.1);
+  margin-bottom: 4px;
+}
+
+.icon-box svg,
+.icon-box img {
+  width: 24px !important;
+  height: 24px !important;
+  object-fit: contain;
+  filter: drop-shadow(0 0 6px var(--accent2));
 }
 
 .modal-title {
-  font-size: 24px;
-  color: #fff;
-  text-shadow: var(--text-glow-cyan);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .modal-text {
-  font-size: 14px;
-  color: var(--text);
-  line-height: 1.6;
+  font-size: 13.5px;
+  color: #a4b3e6;
+  line-height: 1.5;
+  margin-bottom: 4px;
 }
 
+/* Modern Pill Style Pagination Dots */
 .pagination {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin: 8px 0;
+  gap: 6px;
+  margin: 4px 0;
 }
 
 .pagination .dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  transition: 0.2s;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.25s ease;
 }
 
 .pagination .dot.active {
+  width: 14px;
+  border-radius: 3px;
   background: var(--accent2);
   box-shadow: var(--glow-cyan);
 }
 
+/* Setup Footer Interface Layout */
 .modal-footer {
   display: flex;
-  justify-content: flex-end;
+  width: 100%;
   gap: 12px;
-  margin-top: 12px;
+  margin-top: 8px;
 }
 
-/* Buttons Engine */
-.btn-primary, .btn-secondary {
-  padding: 10px 20px;
+.modal-footer button, .custom-action-btn {
+  flex: 1;
+  padding: 11px 16px;
   border-radius: 6px;
+  font-size: 12px;
   font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
   cursor: pointer;
-  transition: 0.2s;
+  transition: all 0.2s ease;
 }
 
 .btn-primary {
   background: var(--accent);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #fff;
-  box-shadow: 0 4px 12px rgba(124, 92, 255, 0.3);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(124, 92, 255, 0.2);
 }
 
 .btn-primary:hover {
   background: #8b6eff;
-  box-shadow: var(--glow-purple);
+  box-shadow: 0 0 15px rgba(124, 92, 255, 0.5);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: #7983b6;
 }
 
 .btn-secondary:hover {
-  color: #fff;
-  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.15);
+  color: #ffffff;
 }
 
 /* ==========================================================================
@@ -194,23 +277,24 @@ body {
   width: 100%;
 }
 
-/* Sidebar Navigation Drawer Frame */
+/* Sidebar Navigation Drawer */
 .sidebar {
   width: 64px;
-  background: rgba(6, 7, 16, 0.9);
+  background: rgba(6, 7, 16, 0.95);
   border-right: 1px solid rgba(255, 255, 255, 0.04);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 16px 0;
   z-index: 10;
+  flex-shrink: 0;
 }
 
 .nav-group, .extra-nav-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 14px;
 }
 
 .nav-btn {
@@ -218,82 +302,86 @@ body {
   height: 42px;
   border-radius: 10px;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.04);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-muted);
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-btn svg {
-  width: 20px;
-  height: 20px;
-  fill: currentColor;
+  width: 18px;
+  height: 18px;
+}
+
+.nav-btn:hover svg, .nav-btn.active svg {
+  filter: drop-shadow(0 0 6px var(--accent2));
 }
 
 .nav-btn:hover, .nav-btn.active {
   background: rgba(124, 92, 255, 0.12);
-  border-color: rgba(124, 92, 255, 0.3);
-  color: var(--accent2);
+  border-color: rgba(124, 92, 255, 0.25);
   box-shadow: var(--glow-purple);
   transform: translateY(-1px);
 }
 
-/* Core Main Window Screen */
+/* Core Main Canvas */
 .main {
   flex: 1;
   position: relative;
   height: 100%;
   overflow-y: auto;
+  background: transparent;
 }
 
-/* Landing Panel Stage Dashboard Container */
+/* Dashboard Panel Layout Home Component */
 .home {
-  padding: 40px 24px;
+  padding: 50px 24px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   text-align: center;
   min-height: 100%;
-  gap: 16px;
+  gap: 14px;
 }
 
 .logo {
-  width: 110px;
-  height: 110px;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
   border: 2px solid var(--accent);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: var(--glow-purple), inset 0 0 20px rgba(124, 92, 255, 0.3);
-  margin-bottom: 8px;
-  background: rgba(10, 12, 30, 0.5);
+  box-shadow: var(--glow-purple), inset 0 0 20px rgba(124, 92, 255, 0.2);
+  margin-bottom: 6px;
+  background: rgba(10, 12, 30, 0.4);
 }
 
 .logo img {
-  width: 85px;
-  height: 85px;
+  width: 76px;
+  height: 76px;
   object-fit: contain;
-  filter: drop-shadow(0 0 8px rgba(124, 92, 255, 0.6));
+  filter: drop-shadow(0 0 8px rgba(124, 92, 255, 0.5));
 }
 
 .title {
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 800;
-  letter-spacing: 3px;
+  letter-spacing: 4px;
   color: #fff;
   text-shadow: var(--text-glow-cyan);
+  text-transform: uppercase;
 }
 
 .subtitle {
   color: var(--text);
-  font-size: 15px;
-  max-width: 600px;
-  line-height: 1.5;
+  font-size: 14px;
+  max-width: 650px;
+  line-height: 1.6;
   opacity: 0.85;
 }
 
@@ -303,19 +391,30 @@ body {
   text-shadow: var(--text-glow-cyan);
 }
 
+.home button {
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+.home button:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
 /* ==========================================================================
-   4. CLOCK MODULE DESIGN COMPONENT
+   4. CLOCK SYSTEM MODULE STYLING
    ========================================================================== */
 #clock-container {
-  background: rgba(15, 18, 42, 0.6);
+  background: rgba(13, 16, 37, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 8px;
   display: inline-flex;
   flex-direction: column;
   align-items: flex-start;
-  min-width: 180px;
+  min-width: 170px;
   text-align: left;
+  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.01);
 }
 
 .time-wrapper {
@@ -325,28 +424,28 @@ body {
 }
 
 #time-display {
-  font-size: 32px;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.5px;
   text-shadow: var(--text-glow-cyan);
 }
 
 #seconds-display {
-  font-size: 16px;
+  font-size: 15px;
   color: var(--accent2);
   margin-left: 4px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .details-wrapper {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  font-size: 11px;
+  font-size: 10px;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .status-dot {
@@ -355,39 +454,42 @@ body {
   height: 6px;
   background: #10b981;
   border-radius: 50%;
-  margin-right: 6px;
+  margin-right: 5px;
   box-shadow: 0 0 8px #10b981;
 }
 
 /* ==========================================================================
-   5. ANALYTICS STATS & APP CONTAINERS
+   5. ANALYTICS & STATS GRID COMPONENT
    ========================================================================== */
 .stats {
-  margin-top: 32px;
-  background: rgba(10, 12, 32, 0.4);
-  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  margin-top: 28px;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.03);
   padding: 24px;
   width: 100%;
-  max-width: 700px;
+  max-width: 650px;
   border-radius: 8px;
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .stats h1 {
-  font-size: 14px;
+  font-size: 12px;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1.5px;
-  margin: 14px 0 8px 0;
+  margin: 16px 0 8px 0;
 }
 
 .stats img {
   border-radius: 4px;
-  opacity: 0.85;
-  transition: opacity 0.2s;
+  opacity: 0.8;
+  transition: all 0.2s ease;
+  max-width: 100%;
 }
 
 .stats img:hover {
   opacity: 1;
+  filter: drop-shadow(0 0 8px rgba(47, 220, 255, 0.3));
 }
 
 .stats h2 {
@@ -400,13 +502,15 @@ body {
 .stats h2 a {
   color: var(--accent2);
   text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
 }
 
 .stats h2 a:hover {
-  text-decoration: underline;
+  color: #fff;
+  text-shadow: var(--text-glow-cyan);
 }
 
-/* Frame Layout Display Outputs */
 iframe, #htmlContainer {
   width: 100%;
   height: 100%;
@@ -419,27 +523,28 @@ iframe, #htmlContainer {
 #htmlContainer { overflow: auto; }
 
 /* ==========================================================================
-   6. EXTRA OVERLAY DRAWER PANEL SYSTEM
+   6. EXTRA DRAWER PANEL SYSTEM (extraOverlay Settings)
    ========================================================================== */
 #extraOverlay {
   display: none;
   position: fixed;
   inset: 0;
-  background: rgba(5, 6, 13, 0.95);
-  backdrop-filter: blur(10px);
+  background: rgba(5, 6, 13, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 2000;
   color: var(--text);
   flex-direction: column;
-  padding: 40px;
-  max-width: 450px;
+  padding: 40px 32px;
+  max-width: 420px;
   border-right: 1px solid rgba(124, 92, 255, 0.2);
-  box-shadow: 20px 0 40px rgba(0, 0, 0, 0.5);
-  animation: slideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 20px 0 50px rgba(0, 0, 0, 0.6);
 }
 
 #extraOverlay h2 {
   color: #fff;
   font-size: 22px;
+  font-weight: 700;
   margin-bottom: 24px;
   text-shadow: var(--text-glow-purple);
 }
@@ -451,6 +556,34 @@ iframe, #htmlContainer {
   gap: 12px;
   overflow-y: auto;
   margin-bottom: 24px;
+  padding-right: 4px;
+}
+
+#extraOverlay .extraItem {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  padding: 12px 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: border-color 0.2s;
+}
+#extraOverlay .extraItem:hover {
+  border-color: rgba(124, 92, 255, 0.25);
+}
+
+/* Made SVG icon containers and SVGs noticeably smaller & sharper here */
+.extraIconPreview {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#extraOverlay svg {
+  width: 14px !important;
+  height: 14px !important;
 }
 
 #extraOverlay button {
@@ -460,8 +593,10 @@ iframe, #htmlContainer {
   background: var(--accent);
   color: #fff;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   cursor: pointer;
-  transition: 0.2s;
+  box-shadow: 0 4px 12px rgba(124, 92, 255, 0.2);
 }
 
 #extraOverlay button:hover {
@@ -470,15 +605,26 @@ iframe, #htmlContainer {
 }
 
 /* ==========================================================================
-   7. ANIMATION KEYFRAMES
+   7. CORE ANIMATIONS ENGINE
    ========================================================================== */
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
 
-@keyframes slideRight {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+@keyframes modalCascadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulseLogo {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(124, 92, 255, 0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 20px rgba(124, 92, 255, 0.6)); transform: scale(1.02); }
 }
   </style>
 <link rel="icon" type="image/png" id="favicon" href="/bloxcraft_transparent.png">
