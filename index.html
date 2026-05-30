@@ -507,13 +507,21 @@ svg[stroke] {
   border-right: 1px solid rgba(124, 92, 255, 0.1);
   box-shadow: 30px 0 60px rgba(0, 0, 0, 0.8);
   transform: translateX(-100%);
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
 }
+
 
 #extraOverlay[style*="display: flex"], 
 #extraOverlay[style*="display:flex"] {
   transform: translateX(0);
-  animation: slideInExtra 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  opacity: 1;
+  animation: slideInExtra 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+
+#extraOverlay.closing {
+  animation: slideOutExtra 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 #extraOverlay h2 {
@@ -628,8 +636,53 @@ svg[stroke] {
 }
 
 @keyframes slideInExtra {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(0); }
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideOutExtra {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-100%); opacity: 0; }
+}
+
+
+@media (max-width: 768px) {
+  #extraOverlay {
+    width: calc(100vw - 56px); 
+    padding: 24px 16px;
+    border-right: none;
+  }
+
+
+  #extraList div {
+    padding: 12px 14px;
+    font-size: 13px;
+  }
+  
+  #contentFrame {
+    width: 83.33% !important;
+    height: 83.33% !important;
+    transform: scale(1.2) !important; 
+    transform-origin: top left;
+    max-width: 83.33% !important;
+    max-height: 83.33% !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #clock-container {
+    bottom: 16px;
+    right: 16px;
+    padding: 8px 14px;
+    min-width: 120px;
+  }
+
+  #time-display {
+    font-size: 20px;
+  }
+
+  #seconds-display {
+    font-size: 11px;
+  }
 }
   </style>
 <link rel="icon" type="image/png" id="favicon" href="/bloxcraft_transparent.png">
