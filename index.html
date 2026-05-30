@@ -15,10 +15,472 @@
 <meta property="og:image:height" content="800" />
 <meta property="og:description" content="The Unblo¢k3d G@m3$ Site You Can Play Everyday! It Also has Some Custom G@m3$. Thousands of games and has a pr*xy!">
 <meta property="og:url" content="/">
-<link rel="stylesheet" href="/navbarsettings.css">
-<link rel="stylesheet" href="/assets/main-loader.css">
-<link rel="stylesheet" href="/clock.css">
-<link rel="stylesheet" href="/the-annc-welcome.css">
+
+<style>
+  /* ==========================================================================
+   1. CORE VARIABLES & BASE SETUP
+   ========================================================================== */
+:root {
+  --accent: #7c5cff;         /* Electric Purple */
+  --accent2: #2fdcff;        /* Cyber Cyan */
+  --text: #cfd6ff;           /* Light Ice Blue */
+  --text-muted: #5d6793;     /* Cold Slate Gray */
+  --bg-dark: #05060d;        /* Deep Space Void */
+  --bg-panel: rgba(10, 12, 30, 0.7);
+  
+  /* Precision Neon Glow Fields */
+  --glow-purple: 0 0 15px rgba(124, 92, 255, 0.6);
+  --glow-cyan: 0 0 15px rgba(47, 220, 255, 0.6);
+  --text-glow-cyan: 0 0 10px rgba(47, 220, 255, 0.5);
+  --text-glow-purple: 0 0 10px rgba(124, 92, 255, 0.5);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  height: 100vh;
+  background: radial-gradient(circle at top, #0b0f2a, var(--bg-dark));
+  font-family: system-ui, -apple-system, sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   2. INITIALIZATION SCREENS & MODALS (startupContent)
+   ========================================================================== */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: #05060d;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-content {
+  text-align: center;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(124, 92, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--accent2);
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+  box-shadow: var(--glow-cyan);
+}
+
+#hint {
+  font-size: 14px;
+  color: var(--accent2);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+/* Modal Core Overlays */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 5, 10, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-card {
+  background: var(--bg-panel);
+  border: 1px solid rgba(124, 92, 255, 0.2);
+  border-radius: 12px;
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--glow-purple), inset 0 0 20px rgba(124, 92, 255, 0.1);
+  display: none; /* Controlled via operational JS engine */
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Show states triggered via JS engine */
+.modal-card.active {
+  display: flex;
+}
+
+.modal-title {
+  font-size: 24px;
+  color: #fff;
+  text-shadow: var(--text-glow-cyan);
+}
+
+.modal-text {
+  font-size: 14px;
+  color: var(--text);
+  line-height: 1.6;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.pagination .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: 0.2s;
+}
+
+.pagination .dot.active {
+  background: var(--accent2);
+  box-shadow: var(--glow-cyan);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+/* Buttons Engine */
+.btn-primary, .btn-secondary {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary {
+  background: var(--accent);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(124, 92, 255, 0.3);
+}
+
+.btn-primary:hover {
+  background: #8b6eff;
+  box-shadow: var(--glow-purple);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-muted);
+}
+
+.btn-secondary:hover {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+/* ==========================================================================
+   3. APP VIEWPORT ENVIRONMENT LAYOUT (appContent)
+   ========================================================================== */
+.app {
+  display: flex;
+  height: 100%;
+  width: 100%;
+}
+
+/* Sidebar Navigation Drawer Frame */
+.sidebar {
+  width: 64px;
+  background: rgba(6, 7, 16, 0.9);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px 0;
+  z-index: 10;
+}
+
+.nav-group, .extra-nav-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-btn {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-btn svg {
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.nav-btn:hover, .nav-btn.active {
+  background: rgba(124, 92, 255, 0.12);
+  border-color: rgba(124, 92, 255, 0.3);
+  color: var(--accent2);
+  box-shadow: var(--glow-purple);
+  transform: translateY(-1px);
+}
+
+/* Core Main Window Screen */
+.main {
+  flex: 1;
+  position: relative;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Landing Panel Stage Dashboard Container */
+.home {
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+  min-height: 100%;
+  gap: 16px;
+}
+
+.logo {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--glow-purple), inset 0 0 20px rgba(124, 92, 255, 0.3);
+  margin-bottom: 8px;
+  background: rgba(10, 12, 30, 0.5);
+}
+
+.logo img {
+  width: 85px;
+  height: 85px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(124, 92, 255, 0.6));
+}
+
+.title {
+  font-size: 48px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: #fff;
+  text-shadow: var(--text-glow-cyan);
+}
+
+.subtitle {
+  color: var(--text);
+  font-size: 15px;
+  max-width: 600px;
+  line-height: 1.5;
+  opacity: 0.85;
+}
+
+.subtitle #checkversion {
+  color: var(--accent2);
+  font-weight: 600;
+  text-shadow: var(--text-glow-cyan);
+}
+
+/* ==========================================================================
+   4. CLOCK MODULE DESIGN COMPONENT
+   ========================================================================== */
+#clock-container {
+  background: rgba(15, 18, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 12px 24px;
+  border-radius: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 180px;
+  text-align: left;
+}
+
+.time-wrapper {
+  display: flex;
+  align-items: baseline;
+  color: #fff;
+}
+
+#time-display {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  text-shadow: var(--text-glow-cyan);
+}
+
+#seconds-display {
+  font-size: 16px;
+  color: var(--accent2);
+  margin-left: 4px;
+  font-weight: 500;
+}
+
+.details-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 4px;
+}
+
+.status-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+  margin-right: 6px;
+  box-shadow: 0 0 8px #10b981;
+}
+
+/* ==========================================================================
+   5. ANALYTICS STATS & APP CONTAINERS
+   ========================================================================== */
+.stats {
+  margin-top: 32px;
+  background: rgba(10, 12, 32, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.03);
+  padding: 24px;
+  width: 100%;
+  max-width: 700px;
+  border-radius: 8px;
+}
+
+.stats h1 {
+  font-size: 14px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin: 14px 0 8px 0;
+}
+
+.stats img {
+  border-radius: 4px;
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+
+.stats img:hover {
+  opacity: 1;
+}
+
+.stats h2 {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 24px;
+  font-weight: 400;
+}
+
+.stats h2 a {
+  color: var(--accent2);
+  text-decoration: none;
+}
+
+.stats h2 a:hover {
+  text-decoration: underline;
+}
+
+/* Frame Layout Display Outputs */
+iframe, #htmlContainer {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: none;
+  background: #000;
+  position: absolute;
+  inset: 0;
+}
+#htmlContainer { overflow: auto; }
+
+/* ==========================================================================
+   6. EXTRA OVERLAY DRAWER PANEL SYSTEM
+   ========================================================================== */
+#extraOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 6, 13, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 2000;
+  color: var(--text);
+  flex-direction: column;
+  padding: 40px;
+  max-width: 450px;
+  border-right: 1px solid rgba(124, 92, 255, 0.2);
+  box-shadow: 20px 0 40px rgba(0, 0, 0, 0.5);
+  animation: slideRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#extraOverlay h2 {
+  color: #fff;
+  font-size: 22px;
+  margin-bottom: 24px;
+  text-shadow: var(--text-glow-purple);
+}
+
+#extraList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  margin-bottom: 24px;
+}
+
+#extraOverlay button {
+  padding: 12px 20px;
+  border-radius: 6px;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#extraOverlay button:hover {
+  background: #8b6eff;
+  box-shadow: var(--glow-purple);
+}
+
+/* ==========================================================================
+   7. ANIMATION KEYFRAMES
+   ========================================================================== */
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes slideRight {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+  </style>
 <link rel="icon" type="image/png" id="favicon" href="/bloxcraft_transparent.png">
 <script type="application/ld+json" src="/assets/search-engine-tzt-data.js"></script>
 <script src="/assets/gtag/exe.js"></script>
