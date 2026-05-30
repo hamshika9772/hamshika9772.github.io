@@ -90,20 +90,20 @@ svg[stroke] {
 }
 
 .loader-content img {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   object-fit: contain;
-  border-radius: 0 !important;
+  border-radius: 24px !important;
   border: 2px solid var(--accent);
-  padding: 10px;
+  padding: 12px;
   background: rgba(13, 16, 37, 0.6);
   box-shadow: var(--glow-purple);
-  animation: pulseSquare 2s ease-in-out infinite;
+  animation: pulseLogo 2s ease-in-out infinite;
 }
 
 .spinner {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border: 3px solid rgba(124, 92, 255, 0.1);
   border-radius: 50%;
   border-top-color: var(--accent2);
@@ -134,14 +134,14 @@ svg[stroke] {
 }
 
 .sidebar {
-  width: 68px;
-  background: rgba(4, 5, 11, 0.95);
+  width: 56px;
+  background: rgba(4, 5, 11, 0.98);
   border-right: 1px solid rgba(124, 92, 255, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 20px 0;
-  z-index: 10;
+  padding: 16px 0;
+  z-index: 100;
   flex-shrink: 0;
 }
 
@@ -149,36 +149,38 @@ svg[stroke] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   width: 100%;
 }
 
 .nav-btn {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .nav-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
 }
 
 .nav-btn:hover, .nav-btn.active {
-  background: rgba(124, 92, 255, 0.15);
-  border-color: var(--accent);
+  background: rgba(124, 92, 255, 0.12);
+  border-color: rgba(124, 92, 255, 0.3);
   box-shadow: var(--glow-purple);
-  transform: scale(1.05);
+  transform: translateY(-1px);
 }
 
-.nav-btn:hover svg {
+.nav-btn:hover svg, .nav-btn.active svg {
+  opacity: 1;
   filter: drop-shadow(0 0 4px #fff);
 }
 
@@ -400,15 +402,15 @@ svg[stroke] {
 
 .action-buttons {
   display: flex;
-  gap: 14px;
+  gap: 12px;
 }
 
 .action-buttons button, .modal-footer button {
-  padding: 12px 24px;
+  padding: 10px 20px;
   border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
@@ -440,15 +442,21 @@ svg[stroke] {
 }
 
 #clock-container {
-  background: rgba(5, 6, 13, 0.6);
-  border: 1px solid rgba(124, 92, 255, 0.15);
-  padding: 12px 24px;
-  border-radius: 10px;
-  display: inline-flex;
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: rgba(10, 12, 30, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(124, 92, 255, 0.2);
+  padding: 14px 22px;
+  border-radius: 14px;
+  display: flex;
   flex-direction: column;
   align-items: flex-end;
-  min-width: 180px;
-  box-shadow: inset 0 0 15px rgba(124, 92, 255, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(124, 92, 255, 0.05);
+  z-index: 50;
+  min-width: 160px;
 }
 
 .time-wrapper {
@@ -458,14 +466,14 @@ svg[stroke] {
 }
 
 #time-display {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: 0.5px;
   text-shadow: var(--text-glow-cyan);
 }
 
 #seconds-display {
-  font-size: 16px;
+  font-size: 14px;
   color: var(--accent2);
   margin-left: 6px;
   font-weight: 700;
@@ -475,11 +483,11 @@ svg[stroke] {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  font-size: 10px;
+  font-size: 9px;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
-  margin-top: 4px;
+  margin-top: 6px;
   align-items: center;
 }
 
@@ -517,13 +525,14 @@ svg[stroke] {
   border-radius: 16px;
   padding: 32px;
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(124, 92, 255, 0.15);
   display: none;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 20px;
+  gap: 16px;
+  animation: modalScaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 .modal-card.leaving {
@@ -531,8 +540,8 @@ svg[stroke] {
 }
 
 #welcome-icon-container, #announcement-icon-container {
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   border-radius: 14px;
   background: rgba(47, 220, 255, 0.05);
   border: 1px solid rgba(47, 220, 255, 0.2);
@@ -543,8 +552,8 @@ svg[stroke] {
 }
 
 #welcome-icon-container svg, #announcement-icon-container svg {
-  width: 28px !important;
-  height: 28px !important;
+  width: 24px !important;
+  height: 24px !important;
   filter: drop-shadow(0 0 8px var(--accent2));
 }
 
@@ -556,7 +565,7 @@ svg[stroke] {
 }
 
 #welcome-description, #announcement-text {
-  font-size: 14px;
+  font-size: 13.5px;
   color: #a4b3e6;
   line-height: 1.6;
 }
@@ -582,13 +591,6 @@ svg[stroke] {
   box-shadow: var(--glow-cyan);
 }
 
-.modal-footer {
-  display: flex;
-  width: 100%;
-  gap: 14px;
-  margin-top: 10px;
-}
-
 .modal-footer button {
   flex: 1;
 }
@@ -597,36 +599,42 @@ svg[stroke] {
   display: none;
   position: fixed;
   top: 0;
-  left: 0;
+  left: 56px;
   bottom: 0;
   background: rgba(5, 6, 13, 0.96);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  z-index: 1500;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  z-index: 90;
   color: var(--text);
   flex-direction: column;
-  padding: 40px 30px;
+  padding: 32px 24px;
   width: 100%;
-  max-width: 400px;
-  border-right: 1px solid rgba(124, 92, 255, 0.2);
-  box-shadow: 25px 0 60px rgba(0, 0, 0, 0.7);
-  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  max-width: 360px;
+  border-right: 1px solid rgba(124, 92, 255, 0.15);
+  box-shadow: 30px 0 60px rgba(0, 0, 0, 0.8);
+  transform: translateX(-100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#extraOverlay[style*="display: flex"], 
+#extraOverlay[style*="display:flex"] {
+  transform: translateX(0);
 }
 
 #extraOverlay h2 {
   color: #fff;
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 800;
   margin-bottom: 24px;
   text-shadow: var(--text-glow-purple);
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
 }
 
 #extraList {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   overflow-y: auto;
   margin-bottom: 24px;
   padding-right: 4px;
@@ -635,7 +643,7 @@ svg[stroke] {
 #extraOverlay .extraItem {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.04);
-  padding: 14px 18px;
+  padding: 12px 16px;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -646,18 +654,12 @@ svg[stroke] {
 
 #extraOverlay .extraItem:hover {
   border-color: rgba(124, 92, 255, 0.3);
-  background: rgba(124, 92, 255, 0.03);
-}
-
-.extraItem-left {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  background: rgba(124, 92, 255, 0.04);
 }
 
 .extraIconPreview {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -670,13 +672,14 @@ svg[stroke] {
 }
 
 #extraOverlay span {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 600;
   color: #fff;
+  flex: 1;
 }
 
 #extraOverlay button {
-  padding: 8px 16px;
+  padding: 6px 14px;
   border-radius: 6px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.03);
@@ -695,17 +698,12 @@ svg[stroke] {
   transform: translateY(-1px);
 }
 
-.extra-close-btn {
-  width: 100%;
-  margin-top: auto;
-}
-
 #contentFrame, #htmlContainer {
   width: 100%;
   height: 100%;
   border: none;
   display: none;
-  background: #000;
+  background: transparent;
   position: absolute;
   inset: 0;
 }
@@ -717,30 +715,19 @@ svg[stroke] {
   100% { transform: rotate(360deg); }
 }
 
+@keyframes modalScaleIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 @keyframes modalScaleOut {
   from { opacity: 1; transform: scale(1); }
   to { opacity: 0; transform: scale(0.9); }
 }
 
-@keyframes pulseSquare {
-  0%, 100% { border-color: var(--accent); box-shadow: var(--glow-purple); }
-  50% { border-color: var(--accent2); box-shadow: var(--glow-cyan); }
-}
-
 @keyframes pulseLogo {
-  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(124, 92, 255, 0.6)); }
-  50% { transform: scale(1.03); filter: drop-shadow(0 0 22px rgba(124, 92, 255, 0.8)); }
-}
-
-@keyframes slideInLeft {
-  from {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
+  0%, 100% { filter: drop-shadow(0 0 15px rgba(124, 92, 255, 0.6)); }
+  50% { filter: drop-shadow(0 0 25px rgba(124, 92, 255, 0.9)); transform: scale(1.02); }
 }
   </style>
 <link rel="icon" type="image/png" id="favicon" href="/bloxcraft_transparent.png">
