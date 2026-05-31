@@ -1,83 +1,101 @@
-        const defaultWs = "wss://wisp.classroom.lat/";
-        let currentWs = localStorage.getItem("proxy-ws") || defaultWs;
+const defaultWs = "wss://wisp.classroom.lat/";
+let currentWs = localStorage.getItem("proxy-ws") || defaultWs;
 
-        const wsSelect = document.getElementById("ws-select");
-        const customWsGroup = document.getElementById("custom-ws-group");
-        const customWsInput = document.getElementById("custom-ws-input");
+const wsSelect = document.getElementById("ws-select");
+const customWsGroup = document.getElementById("custom-ws-group");
+const customWsInput = document.getElementById("custom-ws-input");
 
-        if (currentWs !== defaultWs) {
-            wsSelect.value = "custom";
-            customWsInput.value = currentWs;
-            customWsGroup.style.display = "block";
+if (currentWs !== defaultWs) {
+    wsSelect.value = "custom";
+    customWsInput.value = currentWs;
+    customWsGroup.style.display = "block";
+}
+
+navigator.serviceWorker.register("/sail/sw.js");
+const connection = new BareMux.BareMuxConnection("/sail/baremux/worker.js");
+
+async function applyTransport() {
+    await connection.setTransport("/sail/libcurl/index.mjs", [
+        { websocket: currentWs }
+    ]);
+}
+applyTransport();
+
+const { ScramjetController } = $scramjetLoadController();
+const scramjet = new ScramjetController({
+    files: {
+        all: "/sail/scram/scramjet.all.js",
+        wasm: "/sail/scram/scramjet.wasm.wasm",
+        sync: "/sail/scram/scramjet.sync.js"
+    },
+    prefix: "/sail/go/"
+});
+scramjet.init();
+
+function decodeProxiedUrl(u) {
+    if (!u) return "";
+    try {
+        if (u.includes("/sail/go/")) {
+            let part = u.split("/sail/go/")[1] || "";
+            part = decodeURIComponent(part);
+            return part;
         }
+        return u;
+    } catch { return u; }
+}
 
-        navigator.serviceWorker.register("/sail/sw.js");
-        const connection = new BareMux.BareMuxConnection("/sail/baremux/worker.js");
+wsSelect.addEventListener("change", () => {
+    customWsGroup.style.display = wsSelect.value === "custom" ? "block" : "none";
+});
 
-        async function applyTransport() {
-            await connection.setTransport("/sail/libcurl/index.mjs", [
-                { websocket: currentWs }
-            ]);
-        }
-        applyTransport();
+function toggleSettings() {
+    document.getElementById("settings-panel").classList.toggle("open");
+}
 
-        const { ScramjetController } = $scramjetLoadController();
-        const scramjet = new ScramjetController({
-            files: {
-                all: "/sail/scram/scramjet.all.js",
-                wasm: "/sail/scram/scramjet.wasm.wasm",
-                sync: "/sail/scram/scramjet.sync.js"
-            },
-            prefix: "/sail/go/"
-        });
-        scramjet.init();
+function saveSettings() {
+    if (wsSelect.value === "custom") {
+        const custom = customWsInput.value.trim();
+        if (!custom) return;
+        currentWs = custom;
+    } else {
+        currentWs = defaultWs;
+    }
+    localStorage.setItem("proxy-ws", currentWs);
+    location.reload();
+}
 
-        function decodeProxiedUrl(u) {
-            if (!u) return "";
-            try {
-                if (u.includes("/sail/go/")) {
-                    let part = u.split("/sail/go/")[1] || "";
-                    part = decodeURIComponent(part);
-                    return part;
-                }
-                return u;
-            } catch { return u; }
-        }
+async function loadFromHash() {
+    const hash = window.location.hash.substring(1);
+    let url = hash || 'https://google.com/';
+    if (!url.startsWith('http')) url = 'https://' + url;
 
-        wsSelect.addEventListener("change", () => {
-            customWsGroup.style.display = wsSelect.value === "custom" ? "block" : "none";
-        });
+    const container = document.getElementById('iframe-container');
+    container.innerHTML = ''; 
+    const frame = scramjet.createFrame();
+    container.appendChild(frame.frame);
+    frame.go(url);
 
-        function toggleSettings() {
-            document.getElementById("settings-panel").classList.toggle("open");
-        }
+ 
+    document.getElementById('viewerTitle').innerText = "BloxProxy - Loading";
 
-        function saveSettings() {
-            if (wsSelect.value === "custom") {
-                const custom = customWsInput.value.trim();
-                if (!custom) return;
-                currentWs = custom;
+ 
+    frame.frame.addEventListener('load', () => {
+        try {
+           
+            const iframeDoc = frame.frame.contentDocument || frame.frame.contentWindow.document;
+            
+        
+            if (iframeDoc && iframeDoc.title) {
+                document.getElementById('viewerTitle').innerText = "BloxProxy - " + iframeDoc.title;
             } else {
-                currentWs = defaultWs;
+                document.getElementById('viewerTitle').innerText = "BloxProxy - " + "Scarmjet";
             }
-            localStorage.setItem("proxy-ws", currentWs);
-            location.reload();
+        } catch (e) {
+          
+            document.getElementById('viewerTitle').innerText = "BloxProxy - " + "Scarmjet";
         }
+    });
+}
 
-        async function loadFromHash() {
-            const hash = window.location.hash.substring(1);
-            let url = hash || 'https://google.com/';
-            if (!url.startsWith('http')) url = 'https://' + url;
-
-            const container = document.getElementById('iframe-container');
-            container.innerHTML = ''; 
-            const frame = scramjet.createFrame();
-            container.appendChild(frame.frame);
-            frame.go(url);
-
-
-            document.getElementById('viewerTitle').innerText = "Bloxcraft UBG - " + decodeProxiedUrl(url);
-        }
-
-        window.addEventListener('hashchange', loadFromHash);
-        window.addEventListener('load', loadFromHash);
+window.addEventListener('hashchange', loadFromHash);
+window.addEventListener('load', loadFromHash);
