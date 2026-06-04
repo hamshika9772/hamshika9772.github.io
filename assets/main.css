@@ -266,8 +266,6 @@ svg[stroke] {
 }
 
 .nav-btn:hover, .nav-btn.active {
-  background: rgba(124, 92, 255, 0.12);
-  box-shadow: var(--glow-purple);
   transform: translateY(-2px);
 }
 
