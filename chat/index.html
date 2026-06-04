@@ -16,7 +16,7 @@
 
 body {
   margin: 0;
-  padding: 80px 20px 20px 20px; 
+  padding: 80px 20px 20px 20px;
   font-family: system-ui, -apple-system, Arial, sans-serif;
   color: var(--text-main);
   background: radial-gradient(circle at top, var(--bg-top), var(--bg-bottom));
@@ -30,7 +30,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.85); 
+  background-color: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   padding: 10px 20px;
@@ -57,8 +57,7 @@ body {
   background-color: rgba(255, 255, 255, 0.15);
 }
 
-#selector, 
-#proxySelector {
+#selector, #proxySelector {
   margin-bottom: 20px;
 }
 
@@ -93,6 +92,7 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-block;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  margin: 8px;
 }
 
 .a::before {
@@ -173,10 +173,12 @@ body {
 }
 
 .play-btn {
+  display: inline-block; 
+  margin: 8px; 
   background: #7668ff;
   color: #fff;
   border: none;
-  border-radius: 99px; 
+  border-radius: 99px;
   padding: 10px 28px;
   font-size: 1.1rem;
   font-family: 'Montserrat', system-ui, Arial, sans-serif;
@@ -188,7 +190,7 @@ body {
 
 .play-btn:hover {
   background: #2563eb;
-  transform: scale(1.05); 
+  transform: scale(1.05);
   box-shadow: 0 6px 20px 0 rgba(37, 99, 235, 0.4);
 }
   </style>
