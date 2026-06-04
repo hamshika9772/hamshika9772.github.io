@@ -433,7 +433,7 @@ const CONSTANT_MAX_INT = 2147483647;
         <button onclick="exportSiteSave()" style="padding:8px 14px;border-radius:6px;border:none;background:var(--accent);color:#fff;cursor:pointer">
           Export Site Save
         </button>
-        <button onclick="document.getElementById('importSaveInput').click()" style="padding:8px 14px;border-radius:6px;border:none;background:var(--accent2);color:#000;cursor:pointer">
+        <button onclick="document.getElementById('importSaveInput').click()" style="padding:8px 14px;border-radius:6px;border:none;background:var(--accent3);color:#000;cursor:pointer">
           Import Site Save
         </button>
         <input type="file" id="importSaveInput" accept=".json" style="display:none" onchange="importSiteSave(this)">
