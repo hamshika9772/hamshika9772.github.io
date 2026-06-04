@@ -74,16 +74,17 @@ svg[stroke] {
 }
 
 .loader-content img {
-  width: 140px;
-  height: 140px;
-  max-width: 140px;
-  max-height: 140px;
+  width: 180px;
+  height: 180px;
+  max-width: 180px;
+  max-height: 180px;
   aspect-ratio: 1 / 1;
-  object-fit: cover; 
+  object-fit: cover;
   border-radius: 0; 
   filter: drop-shadow(0 0 25px rgba(0, 102, 255, 0.45)); 
   animation: pulseLogo 2s ease-in-out infinite;
 }
+
 .spinner {
   width: 48px;
   height: 48px;
