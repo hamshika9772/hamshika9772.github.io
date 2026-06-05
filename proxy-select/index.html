@@ -2,115 +2,155 @@
 <html lang="en">
 <head>
     <style>
-:root {
-    --bg-inner: #111111;
-    --bg-outer: #020202;
-    --neon-cyan: #00fff2;
-    --neon-magenta: #ff00ff;
-    --text-glow: rgba(255, 255, 255, 0.8);
-}
+        :root {
+            --accent: #7c5cff;
+            --accent2: #441af0;
+            --accent3: #2fdcff;
+            --text: #cfd6ff;
+            --text-muted: #5d6793;
+            --bg-dark: #05060d;
+            --glow-purple: 0 0 15px rgba(124, 92, 255, 0.5);
+            --glow-cyan: 0 0 15px rgba(0, 102, 255, 0.5);
+            --text-glow-cyan: 0 0 10px rgba(47, 220, 255, 0.6);
+            --text-glow-purple: 0 0 10px rgba(124, 92, 255, 0.6);
+        }
 
-body {
-    background: radial-gradient(circle at center, var(--bg-inner), var(--bg-outer));
-    display: flex;
-    flex-direction: column; 
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-    padding: 20px;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-h1 {
-    color: #fff;
-    text-transform: uppercase;
-    font-size: clamp(2rem, 5vw, 3.5rem); 
-    margin-bottom: 50px;
-    letter-spacing: 0.15em;
-    text-align: center;
-    text-shadow: 0 0 5px #fff, 
-                 0 0 15px var(--text-glow), 
-                 0 0 30px var(--text-glow);
-}
+        body {
+            background: radial-gradient(circle at top, #0b0f2a, var(--bg-dark));
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            line-height: 1.5;
+            padding: 20px;
+        }
 
-.menu-container {
-    display: flex;
-    gap: 40px;
-    flex-wrap: wrap; 
-    justify-content: center;
-}
+   
+        h1:first-of-type {
+            font-size: clamp(2.5rem, 5vw, 3.5rem);
+            font-weight: 800;
+            color: #fff;
+            text-shadow: var(--text-glow-purple);
+            letter-spacing: 1px;
+            margin-bottom: 40px;
+            text-align: center;
+        }
 
-.neon-btn {
-    position: relative;
-    font-size: 1.2rem;
-    text-transform: uppercase;
-    text-decoration: none;
-    padding: 15px 35px;
-    border: 2px solid; 
-    border-radius: 8px;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    letter-spacing: 2px;
-    font-weight: 700;
-    text-align: center;
-    cursor: pointer;
-    background: transparent;
-    outline: none;
-}
+    
+        h1:not(:first-of-type) {
+            font-size: 14px;
+            color: var(--text-muted);
+            max-width: 650px;
+            opacity: 0.85;
+            line-height: 1.6;
+            font-weight: 500;
+            margin-top: 10px;
+            text-align: center;
+            letter-spacing: 0.5px;
+        }
 
-.neon-btn:active {
-    transform: scale(0.95); 
-}
+        .menu-container {
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 50px;
+            z-index: 10;
+        }
+
+        .neon-btn {
+            position: relative;
+            text-decoration: none;
+            padding: 24px 40px;
+            background: linear-gradient(150deg, rgba(13, 16, 37, 0.95) 0%, rgba(5, 6, 13, 0.98) 100%);
+            border: 1px solid rgba(124, 92, 255, 0.3);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(124, 92, 255, 0.05);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #fff;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+        }
+
+        .neon-btn small {
+            font-size: 13px;
+            color: var(--text-muted);
+            font-weight: 500;
+            letter-spacing: 0;
+            transition: color 0.2s ease, text-shadow 0.2s ease;
+        }
+
+        .neon-btn:active {
+            transform: scale(0.95);
+        }
 
 
-.option-a {
-    color: var(--neon-cyan);
-    border-color: var(--neon-cyan);
-    text-shadow: 0 0 8px var(--neon-cyan);
-    box-shadow: inset 0 0 12px rgba(0, 255, 242, 0.4), 
-                0 0 15px rgba(0, 255, 242, 0.4);
-}
+        .option-a {
+            border-top: 3px solid var(--accent3);
+            border-color: rgba(47, 220, 255, 0.3);
+            border-top-color: var(--accent3);
+        }
 
-.option-a:hover {
-    background: var(--neon-cyan);
-    color: var(--bg-outer);
-    text-shadow: none; 
-    box-shadow: 0 0 20px var(--neon-cyan), 
-                0 0 40px var(--neon-cyan), 
-                0 0 60px rgba(0, 255, 242, 0.6);
-    transform: translateY(-3px);
-}
+        .option-a:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent3);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), var(--glow-cyan);
+        }
 
+        .option-a:hover small {
+            color: #fff;
+            text-shadow: var(--text-glow-cyan);
+        }
 
-.option-b {
-    color: var(--neon-magenta);
-    border-color: var(--neon-magenta);
-    text-shadow: 0 0 8px var(--neon-magenta);
-    box-shadow: inset 0 0 12px rgba(255, 0, 255, 0.4), 
-                0 0 15px rgba(255, 0, 255, 0.4);
-}
+   
+        .option-b {
+            border-top: 3px solid var(--accent);
+            border-color: rgba(124, 92, 255, 0.3);
+            border-top-color: var(--accent);
+        }
 
-.option-b:hover {
-    background: var(--neon-magenta);
-    color: var(--bg-outer);
-    text-shadow: none;
-    box-shadow: 0 0 20px var(--neon-magenta), 
-                0 0 40px var(--neon-magenta), 
-                0 0 60px rgba(255, 0, 255, 0.6);
-    transform: translateY(-3px);
-}
+        .option-b:hover {
+            transform: translateY(-4px);
+            border-color: var(--accent);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.7), var(--glow-purple);
+        }
+
+        .option-b:hover small {
+            color: #fff;
+            text-shadow: var(--text-glow-purple);
+        }
     </style>
 </head>
 <body>
-
     <h1>Select Proxy</h1>
     <div class="menu-container">
-        <a href="/active/" class="neon-btn option-a">UV Static 2.0<br><small>(Likely blocked)</small></a>
-        <a href="/sail/" class="neon-btn option-b">Scarmjet<br><small>(Likely Unblocked)</small></a>
+        <a href="/active/" class="neon-btn option-a">
+            UV Static 2.0
+            <small>(Likely blocked)</small>
+        </a>
+        <a href="/sail/" class="neon-btn option-b">
+            Scarmjet
+            <small>(Likely Unblocked)</small>
+        </a>
     </div>
-<h1>Scarmjet is the best option</h1>
+    <h1>Scarmjet is the best option</h1>
     <h1>UV Static is broken right now</h1>
-<h1>BloxProxy 1.9.78</h1>
+    <h1>BloxProxy 1.9.78</h1>
 </body>
 </html>
