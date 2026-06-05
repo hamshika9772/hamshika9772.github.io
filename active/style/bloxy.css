@@ -1,0 +1,282 @@
+* {
+    box-sizing: border-box;
+}
+
+:root {
+    --bg: #000000;
+    --toolbar: #0d0d0d;
+    --toolbar2: #111111;
+    --tab: #0f0f0f;
+    --tab-hover: #1b1b1b;
+    --border: #1f1f1f;
+    --text: #ffffff;
+    --muted: #8a8a8a;
+    --active: #1c1c1c;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Arial, Helvetica, sans-serif;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.tab-bar {
+    height: 36px;
+    background: var(--toolbar);
+    display: flex;
+    align-items: flex-end;
+    padding: 0 8px;
+    gap: 6px;
+    border-bottom: 1px solid var(--border);
+}
+
+.tab {
+    height: 34px;
+    min-width: 190px;
+    max-width: 220px;
+    background: var(--tab);
+    border-radius: 10px 10px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 12px;
+    cursor: pointer;
+    color: #cfcfcf;
+    user-select: none;
+    transition: .15s;
+}
+
+.tab:hover {
+    background: var(--tab-hover);
+}
+
+.tab.active {
+    background: var(--toolbar2);
+}
+
+.tab-icon {
+    width: 14px;
+    height: 14px;
+    opacity: .9;
+}
+
+.tab-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: var(--text);
+}
+
+.tab-title {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 13px;
+}
+
+.tab-close {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: .15s;
+}
+
+.tab-close:hover {
+    background: rgba(255, 255, 255, .12);
+}
+
+.new-tab-btn {
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 22px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: .15s;
+}
+
+.new-tab-btn:hover {
+    background: #1a1a1a;
+}
+
+.navbar {
+    height: 52px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0 12px;
+}
+
+.nav-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: .15s;
+}
+
+.nav-btn:hover {
+    background: #1d1d1d;
+}
+
+.nav-btn svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--text);
+}
+
+.address-bar {
+    flex: 1;
+    height: 34px;
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 10px;
+}
+
+.lock-icon {
+    width: 14px;
+    height: 14px;
+    opacity: .9;
+}
+
+.lock-icon svg {
+    width: 100%;
+    height: 100%;
+    fill: #3ddc84;
+}
+
+#bar {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: 14px;
+}
+
+.bookmarks-bar {
+    height: 30px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 10px;
+    gap: 10px;
+}
+
+.bookmark {
+    color: #cfcfcf;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: .15s;
+}
+
+.bookmark:hover {
+    background: var(--tab-hover);
+}
+
+#viewport-container {
+    flex: 1;
+    position: relative;
+    background: var(--bg);
+}
+
+iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: none;
+    background: var(--bg);
+}
+
+iframe.active {
+    display: block;
+}
+
+.settings-panel {
+    position: fixed;
+    top: 50px;
+    right: 10px;
+    width: 320px;
+    background: var(--toolbar2);
+    border: 1px solid #242424;
+    border-radius: 14px;
+    padding: 16px;
+    display: none;
+    z-index: 9999;
+}
+
+.settings-panel.open {
+    display: block;
+}
+
+.settings-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.settings-label {
+    font-size: 13px;
+    color: #b5b5b5;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.settings-select,
+.settings-input {
+    width: 100%;
+    height: 42px;
+    background: #0b0b0b;
+    border: 1px solid #262626;
+    border-radius: 10px;
+    color: var(--text);
+    padding: 0 12px;
+    outline: none;
+    margin-bottom: 14px;
+}
+
+#custom-ws-group {
+    display: none;
+}
+
+.settings-save {
+    width: 100%;
+    height: 42px;
+    border: none;
+    background: var(--text);
+    color: var(--bg);
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.settings-save:hover {
+    opacity: .9;
+}
