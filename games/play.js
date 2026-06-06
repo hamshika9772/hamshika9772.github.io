@@ -240,7 +240,7 @@ async function loadAlexrworlds() {
 async function loadLupine() {
   if (DATA.lupine.length) return;
   try {
-    const r = await fetch("https://gitlab.com/api/v4/projects/rhenryw%2FLupineVault/repository/files/assets%2Fgames.json/raw?ref=main");
+    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/games.json");
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
 
@@ -249,8 +249,8 @@ async function loadLupine() {
       const encodedName = encodeURIComponent(g.name);
       return normalize({
         name: g.name,
-        img: `https://gitlab.com/rhenryw/LupineVault/-/raw/main/assets/images/games/tile/${encodedName}.png`,
-        altImg: `https://gitlab.com/rhenryw/LupineVault/-/raw/main/assets/images/games/large/${encodedName}.png`,
+        img: `https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/tile/${encodedName}.png`,
+        altImg: `https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/large/${encodedName}.png`,
         url: `/app-viewer/LupineVault/?view=${encodedName}`
       });
     }).filter(Boolean);
