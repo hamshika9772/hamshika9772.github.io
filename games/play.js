@@ -5,9 +5,9 @@ const count = document.getElementById("count");
 const PAGE_SIZE = 60;
 
 let DATA = {
-  blox: [],gn: [], elite: [], sea: [], ugs: [], seraph: [],
+  blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
-  nowgg: [], alexrworlds: [], lupine: [] 
+  nowgg: [], alexrworlds: [], lupine: []
 };
 
 let CURRENT = [];
@@ -26,11 +26,10 @@ function normalize(g) {
   return {
     name: g.name,
     img: g.img || "/1f3ae.png",
-    altImg: g.altImg || null, 
+    altImg: g.altImg || null,
     url: g.url
   };
 }
-
 
 async function loadBlox() {
   if (DATA.blox.length) return;
@@ -221,9 +220,7 @@ async function loadNowGG() {
         url: "/sail/embed/#" + cleanUrl
       };
     }).filter(Boolean);
-  } catch (e) {
-    console.error("NowGG load error:", e);
-  }
+  } catch (e) {}
 }
 
 async function loadAlexrworlds() {
@@ -237,9 +234,7 @@ async function loadAlexrworlds() {
       img: g.img || "/1f3ae.png",
       url: "/app-viewer/alexr-world-s/?view=" + encodeURIComponent(g.title)
     }));
-  } catch (e) {
-    console.error("Alexrsworld load error:", e);
-  }
+  } catch (e) {}
 }
 
 async function loadLupine() {
@@ -250,7 +245,6 @@ async function loadLupine() {
 
     DATA.lupine = safeArray(d).map(g => {
       if (!g.name) return null;
-      
       const encodedName = encodeURIComponent(g.name);
       return normalize({
         name: g.name,
@@ -259,24 +253,22 @@ async function loadLupine() {
         url: `/app-viewer/LupineVault/?view=${encodedName}`
       });
     }).filter(Boolean);
-  } catch (e) {
-    console.error("LupineVault load error:", e);
-  }
+  } catch (e) {}
 }
 
-document.querySelectorAll(".cat").forEach(btn => {
-  btn.onclick = async () => {
+document.querySelectorAll(".cat").forEach(el => {
+  el.onclick = async () => {
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
-    btn.classList.add("active");
+    el.classList.add("active");
 
-    const cat = btn.dataset.cat;
+    const cat = el.dataset.cat;
 
     if (cat === "all") {
       await Promise.all([
         loadBlox(), loadGN(), loadElite(), loadSea(), loadUGS(),
         loadSeraph(), loadCKV(), loadHydra(), loadCCPorted(),
         loadGoogleClass(), loadTruffled(), loadNowGG(), loadAlexrworlds(),
-        loadLupine() 
+        loadLupine()
       ]);
 
       CURRENT = Object.values(DATA).flat().map(normalize).filter(Boolean);
@@ -285,7 +277,7 @@ document.querySelectorAll(".cat").forEach(btn => {
         blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
         seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
         googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
-        alexrworlds: loadAlexrworlds, lupine: loadLupine 
+        alexrworlds: loadAlexrworlds, lupine: loadLupine
       };
 
       if (loaderMap[cat]) await loaderMap[cat]();
@@ -330,7 +322,7 @@ function render(reset = false) {
     
     img.onerror = () => {
       if (g.altImg && !img.dataset.retried) {
-        img.dataset.retried = "true"; 
+        img.dataset.retried = "true";
         img.src = g.altImg;
       } else {
         img.src = fallback;
