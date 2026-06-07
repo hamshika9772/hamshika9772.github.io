@@ -7,7 +7,7 @@ const PAGE_SIZE = 60;
 let DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
-  nowgg: [], alexrworlds: [], lupine: []
+  nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": []
 };
 
 let CURRENT = [];
@@ -259,6 +259,32 @@ async function loadLupine() {
   }
 }
 
+async function load3kh0() {
+  if (DATA["3kh0"].length) return;
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-assets.json");
+    const d = await r.json();
+    DATA["3kh0"] = safeArray(d).map(name => ({
+      name: name,
+      img: "https://raw.githack.com/tharun9772/3kh0-assets/main/" + name + "/splash.png",
+      url: "/app-viewer/3kh0/?view=" + encodeURIComponent(name)
+    }));
+  } catch (e) {}
+}
+
+async function load3kh0Lite() {
+  if (DATA["3kh0lite"].length) return;
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-lite.json");
+    const d = await r.json();
+    DATA["3kh0lite"] = safeArray(d).map(g => ({
+      name: g.title || "Unknown",
+      img: "https://raw.githack.com/3kh0/3kh0-lite/main/" + g.imgSrc,
+      url: "/app-viewer/3kh0/lite/?view=" + encodeURIComponent(g.link)
+    }));
+  } catch (e) {}
+}
+
 document.querySelectorAll(".cat").forEach(el => {
   el.onclick = async () => {
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
@@ -271,7 +297,7 @@ document.querySelectorAll(".cat").forEach(el => {
         loadBlox(), loadGN(), loadElite(), loadSea(), loadUGS(),
         loadSeraph(), loadCKV(), loadHydra(), loadCCPorted(),
         loadGoogleClass(), loadTruffled(), loadNowGG(), loadAlexrworlds(),
-        loadLupine()
+        loadLupine(), load3kh0(), load3kh0Lite()
       ]);
 
       CURRENT = Object.values(DATA).flat().map(normalize).filter(Boolean);
@@ -280,7 +306,8 @@ document.querySelectorAll(".cat").forEach(el => {
         blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
         seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
         googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
-        alexrworlds: loadAlexrworlds, lupine: loadLupine
+        alexrworlds: loadAlexrworlds, lupine: loadLupine,
+        "3kh0": load3kh0, "3kh0lite": load3kh0Lite
       };
 
       if (loaderMap[cat]) await loaderMap[cat]();
