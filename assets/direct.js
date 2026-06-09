@@ -366,7 +366,7 @@ const CONSTANT_MAX_INT = 2147483647;
     const startupContent = `
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NQM8XR48"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
-<script src="/games/play.js"></script>`;
+<script src="/games/gms.js"></script>`;
 
    
     const appContent = `
