@@ -1,0 +1,31 @@
+name: Actual Fork Sync
+
+on:
+  schedule:
+    # every 30 minutes
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Sync fork with upstream using tgymnich/fork-sync
+        uses: tgymnich/fork-sync@v2.0
+        with:
+          # Token to access the GitHub API. For basic sync, GITHUB_TOKEN works.
+          # To enable auto_approve set this to a PAT stored as a secret (see README).
+          token: ${{ secrets.GITHUB_TOKEN }}
+          owner: tharun9772
+          repo: Bloxcraft-UBG
+          head: main
+          base: main
+          merge_method: merge
+          pr_title: Fork Sync
+          pr_message: Sync from upstream tharun9772/Bloxcraft-UBG
+          auto_approve: false
+          ignore_fail: false
