@@ -6,6 +6,10 @@ on:
     - cron: '0 0 * * *'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  workflows: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
@@ -32,22 +36,23 @@ jobs:
       - name: Check for new commits
         id: check_updates
         run: |
-          LOCAL=$(git rev-parse origin/main)
+          LOCAL=$(git rev-parse HEAD)
           REMOTE=$(git rev-parse upstream/main)
+
+          echo "Local commit: $LOCAL"
+          echo "Upstream commit: $REMOTE"
 
           if [ "$LOCAL" != "$REMOTE" ]; then
             echo "updates_available=true" >> $GITHUB_OUTPUT
-            echo "Local: $LOCAL"
-            echo "Remote: $REMOTE"
           else
             echo "updates_available=false" >> $GITHUB_OUTPUT
-            echo "Fork is up to date"
           fi
 
-      - name: Pull upstream into runner
+      - name: Sync fork with upstream
         if: steps.check_updates.outputs.updates_available == 'true'
         run: |
           git reset --hard upstream/main
-          echo "✓ Runner checkout updated to upstream Bloxcraft-UBG"
+          git push origin main --force
+          echo "✓ Fork synced successfully with upstream Bloxcraft-UBG"
           git log -1 --oneline
 
