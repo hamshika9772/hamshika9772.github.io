@@ -101,7 +101,6 @@ svg[stroke] {
   gap: 12px;
 }
 
-
 #iframe-container, #viewerFrame { 
   flex-grow: 1;    
   width: 100%; 
@@ -120,7 +119,6 @@ svg[stroke] {
   display: block;
 }
 
-
 #settings-panel {
   display: none; 
   position: fixed;
@@ -138,7 +136,6 @@ svg[stroke] {
   color: white;
   width: 260px;
 }
-
 
 #settings-panel.open { 
   display: block; 
@@ -177,7 +174,6 @@ svg[stroke] {
   transform: scale(1.1);
 }
 
-
 select, input {
   width: 100%;
   background: rgba(18, 19, 24, 0.8);
@@ -199,27 +195,27 @@ select:focus, input:focus {
   background: rgba(18, 19, 24, 0.95);
 }
 
-
 button.save-btn {
   width: 100%;
-  background: var(--accent);
+  background: #694df9;
   color: #fff;
   border: none;
-  padding: 12px;
-  border-radius: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
+  padding: 14px;
+  border-radius: 20px;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: none;
   letter-spacing: 0.5px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(124, 92, 255, 0.2);
+  box-shadow: 0 4px 15px rgba(105, 77, 249, 0.2);
   transition: all 0.2s ease;
   margin-top: 8px;
 }
 
 button.save-btn:hover {
-  background: #8b6eff;
-  box-shadow: var(--glow-purple);
-  transform: translateY(-2px); 
+  background: #765cff;
+  box-shadow: 0 6px 20px rgba(105, 77, 249, 0.4);
+  transform: translateY(-1px); 
 }
 
 button.save-btn:active {
@@ -228,23 +224,21 @@ button.save-btn:active {
 
 .bloxy-btn {
   position: relative;
-  padding: 10px 20px;
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  color: #fff;
-  font-size: 12px; 
-  font-weight: 700;
-  text-transform: uppercase;
+  padding: 16px 40px;
+  background: #694df9;
+  border: none;
+  border-radius: 20px;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 500;
+  text-transform: none;
   text-decoration: none;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   overflow: hidden;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   display: inline-block;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 .bloxy-btn::before {
@@ -264,14 +258,14 @@ button.save-btn:active {
 }
 
 .bloxy-btn:hover {
-  background: var(--accent);
-  border-color: #8b6eff;
-  transform: translateY(-2px);
-  box-shadow: var(--glow-purple);
+  background: #765cff;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(105, 77, 249, 0.4);
 }
 
 .bloxy-btn:active {
   transform: translateY(0) scale(0.98);
+  background: #593ee3;
 }
 
 .bloxy-orange-btn {
@@ -324,7 +318,6 @@ button.save-btn:active {
   background: linear-gradient(135deg, rgba(255, 95, 109, 0.4), rgba(255, 195, 113, 0.4), rgba(71, 207, 115, 0.4), rgba(56, 249, 215, 0.4));
   box-shadow: 0 0 25px rgba(255, 95, 109, 0.6), 0 0 40px rgba(71, 207, 115, 0.3);
 }
-
 
 .clog-btn {
   width: 28px;
