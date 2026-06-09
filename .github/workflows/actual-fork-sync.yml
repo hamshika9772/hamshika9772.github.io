@@ -12,14 +12,16 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Sync fork with upstream using tgymnich/fork-sync
         uses: tgymnich/fork-sync@v2.0
         with:
-          # Token to access the GitHub API. For basic sync, GITHUB_TOKEN works.
-          # To enable auto_approve set this to a PAT stored as a secret (see README).
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # Token to access the GitHub API.
+          # Prefer a PAT stored as `GH_PERSONAL_ACCESS_TOKEN` for cross-repo PRs; fall back to the repo token.
+          token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN || github.token }}
           owner: tharun9772
           repo: Bloxcraft-UBG
           head: main
