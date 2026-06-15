@@ -1,29 +1,20 @@
+
 (function() {
     'use strict';
 
-    function detectDevTools() {
-        const devtoolsTest = /./;
-        devtoolsTest.toString = function() {
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U')) {
+            e.preventDefault();
             window.location.href = "https://www.google.com";
-            return '';
-        };
+        }
+    });
 
-        const element = new Image();
-        Object.defineProperty(element, 'id', {
-            get: function() {
-                window.location.href = "https://www.google.com";
-            }
-        });
-
-        setInterval(() => {
-            console.log(devtoolsTest);
-            console.log(element);
-            console.clear(); 
-        }, 500);
-    }
-
-
-    detectDevTools();
+    setInterval(() => {
+        const threshold = 160;
+        if ((window.outerWidth - window.innerWidth > threshold) || (window.outerHeight - window.innerHeight > threshold)) {
+            window.location.href = "https://www.google.com";
+        }
+    }, 500);
 
     const menu = document.createElement('div');
     menu.id = 'custom-macro-menu';
