@@ -1,18 +1,19 @@
-
 (function() {
     'use strict';
 
     window.addEventListener('keydown', (e) => {
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key.toUpperCase())) || (e.ctrlKey && e.key.toUpperCase() === 'U')) {
             e.preventDefault();
-            window.location.href = "https://www.google.com";
+            try { window.top.location.href = "https://www.google.com"; } catch (err) { window.location.href = "https://www.google.com"; }
         }
     });
 
     setInterval(() => {
-        const threshold = 160;
-        if ((window.outerWidth - window.innerWidth > threshold) || (window.outerHeight - window.innerHeight > threshold)) {
-            window.location.href = "https://www.google.com";
+        if (window.self === window.top) {
+            const threshold = 160;
+            if ((window.outerWidth - window.innerWidth > threshold) || (window.outerHeight - window.innerHeight > threshold)) {
+                window.location.href = "https://www.google.com";
+            }
         }
     }, 500);
 
