@@ -90,7 +90,10 @@
 
     const externalIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>`;
     const discordIcon = `<svg viewBox="0 0 127.14 96.36"><path d="M107.7,8.07A105.15,105.15,0,0,0,77.26,0a77.19,77.19,0,0,0-3.3,6.83A96.67,96.67,0,0,0,53.22,6.83,77.19,77.19,0,0,0,49.88,0,105.15,105.15,0,0,0,19.44,8.07C3.66,31.58-1.86,54.65,1,77.53a105.73,105.73,0,0,0,32,16.15,77.7,77.7,0,0,0,6.73-11A68.6,68.6,0,0,1,29.4,77.34c1-.71,2-1.46,3-2.23a74.12,74.12,0,0,0,62.43,0c1,.77,2,1.52,3,2.23a68.6,68.6,0,0,1-10.28,5.32,77,77,0,0,0,6.73,11,105.73,105.73,0,0,0,32-16.15C129.56,48.12,123.51,25.32,107.7,8.07ZM42.45,65.69C36.18,65.69,31,60,31,53S36.18,40.36,42.45,40.36,53.83,46,53.83,53,48.72,65.69,42.45,65.69Zm42.24,0C78.41,65.69,73.24,60,73.24,53S78.41,40.36,84.69,40.36,96.07,46,96.07,53,91,65.69,84.69,65.69Z"/></svg>`;
+    const docsIcon = ``
 
+
+    
     menu.innerHTML = `
         <div class="macro-item" id="opt-iframe">
             <span>Open about:blank</span>
@@ -121,7 +124,7 @@
         e.stopPropagation();
         menu.style.display = 'none';
 
-        const currentUrl = window.location.href;
+        const currentUrl = window.top.location.href;
         const newTab = window.open('about:blank', '_blank');
         
         if (newTab) {
