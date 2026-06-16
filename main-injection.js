@@ -110,7 +110,7 @@
 
     menu.innerHTML = `
         <div class="close-btn" id="close-menu">✕</div>
-        <div class="macro-item"><span>Close</span></div>
+        <div class="macro-item" id="opt-close-menu">><span>Close</span></div>
         <div class="macro-item" id="opt-iframe"><span>Open about:blank</span>${externalIcon}</div>
         <div class="macro-item" id="opt-discord"><span>Discord</span>${discordIcon}</div>
         <div class="macro-item" id="opt-game-list-ubg"><span>Games List</span>${docsIcon}</div>
@@ -204,6 +204,11 @@
     });
         
     document.getElementById('close-menu').addEventListener('click', (e) => {
+        e.stopPropagation();
+        menu.style.display = 'none';
+    });
+
+        document.getElementById('opt-close-menu').addEventListener('click', (e) => {
         e.stopPropagation();
         menu.style.display = 'none';
     });
