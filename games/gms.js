@@ -174,29 +174,22 @@ async function loadCKV() {
 
 async function loadHydra() {
   try {
-    const r = await fetch("https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/gmes.json");
+    const r = await fetch("https://jsdelivr.net");
     if (!r.ok) return;
+    
     const d = await r.json();
 
-    let rawArray = [];
-    if (Array.isArray(d)) {
-      rawArray = d;
-    } else if (d && typeof d === "object") {
-      rawArray = Array.isArray(d.games) ? d.games : 
-                 Array.isArray(d.data) ? d.data : 
-                 Array.isArray(d.list) ? d.list : 
-                 Object.values(d);
-    }
+    const rawArray = Array.isArray(d) ? d : (d?.games || d?.data || []);
 
     DATA.hydra = rawArray.map(g => {
-      if (!g || typeof g !== "object") return null;
+      if (!g) return null;
       
       const file = g.file_name || g.link || g.url;
       if (!file) return null;
 
       let thumb = g.thumb || g.image || g.img || "/1f3ae.png";
       if (thumb !== "/1f3ae.png" && !thumb.startsWith("http")) {
-        thumb = "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + thumb.replace(/^\/+/, "");
+        thumb = "https://jsdelivr.net" + thumb.replace(/^\/+/, "");
       }
 
       return {
