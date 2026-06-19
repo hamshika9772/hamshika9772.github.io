@@ -24,10 +24,22 @@ const OBSERVER = new IntersectionObserver(entries => {
 }, { rootMargin: "300px" });
 
 function safeArray(v) {
+  if (!v) return [];
   if (Array.isArray(v)) return v;
-  if (v && typeof v === 'object') {
+  if (typeof v === 'object') {
     if (Array.isArray(v.games)) return v.games;
     if (Array.isArray(v.data)) return v.data;
+    if (Array.isArray(v.list)) return v.list;
+    if (Array.isArray(v.assets)) return v.assets;
+
+    const vals = Object.values(v);
+    const objectsOnly = vals.filter(x => x && typeof x === 'object' && !Array.isArray(x));
+    
+    if (objectsOnly.length > 0) {
+       return Object.entries(v)
+         .filter(([, val]) => val && typeof val === 'object' && !Array.isArray(val))
+         .map(([k, val]) => ({ ...val, _idFallback: k }));
+    }
   }
   return [];
 }
@@ -42,10 +54,16 @@ function normalize(g) {
   };
 }
 
+const withTimeout = (fn, ms = 4000) => Promise.race([
+  fn(),
+  new Promise(resolve => setTimeout(resolve, ms))
+]);
+
 async function loadBlox() {
   if (DATA.blox.length) return;
   try {
     const r = await fetch("/games/gms.json");
+    if (!r.ok) return;
     DATA.blox = safeArray(await r.json()).map(normalize).filter(Boolean);
   } catch (e) {}
 }
@@ -54,6 +72,7 @@ async function loadGN() {
   if (DATA.gn.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/freebuisness/assets/zones.json");
+    if (!r.ok) return;
     const d = await r.json();
     DATA.gn = safeArray(d)
       .filter(g => g.id !== -1 && g.name && !g.name.startsWith("[!]"))
@@ -69,6 +88,7 @@ async function loadElite() {
   if (DATA.elite.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/games.json");
+    if (!r.ok) return;
     const d = await r.json();
     DATA.elite = safeArray(d).map(g => ({
       name: g.title || "Unknown",
@@ -82,6 +102,7 @@ async function loadSea() {
   if (DATA.sea.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/sea-bean-unblocked/sde@main/zzz.json");
+    if (!r.ok) return;
     const d = await r.json();
     DATA.sea = safeArray(d).map(g => {
       const cover = (g.cover || "").replace("{COVER_URL}/", "");
@@ -103,6 +124,7 @@ async function loadUGS() {
   const results = await Promise.all(repos.map(async repo => {
     try {
       const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/" + repo + "/file.json");
+      if (!r.ok) return [];
       const d = await r.json();
       return safeArray(d)
         .filter(f => f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html"))
@@ -123,6 +145,7 @@ async function loadSeraph() {
   if (DATA.seraph.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/DominumNetwork/dominum@main/src/assets/libraries/seraph/games.json");
+    if (!r.ok) return;
     const d = await r.json();
     const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
 
@@ -138,19 +161,18 @@ async function loadCKV() {
   if (DATA.ckv.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.ckv = safeArray(d)
       .map(g => {
-        const id = g?.Id || g?.id;
-        const base = g?.base || g?.directory || g?.path || "";
-        
-        if (!id) return null;
-        
+        const gameUrl = g?.html || g?.url;
+        if (!gameUrl) return null;
+
         return {
           name: g.name || g.title || "Unknown",
-          img: base ? (base + "/thumb.jpg") : (g.image || g.thumb || "/1f3ae.png"),
-          url: "/app-viewer/chicken-kings-vault/?view=" + id
+          img: g.img || g.image || g.thumb || "/1f3ae.png",
+          url: "/app-viewer/chicken-kings-vault/?view=" + encodeURIComponent(gameUrl)
         };
       })
       .filter(Boolean);
@@ -161,6 +183,7 @@ async function loadHydra() {
   if (DATA.hydra.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/gmes.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.hydra = safeArray(d).map(g => ({
@@ -177,14 +200,23 @@ async function loadCCPorted() {
   if (DATA.ccported.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/ccported-stupid-game-lib.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.ccported = safeArray(d)
-      .map(g => g?.base && g?.Id ? {
-        name: g.name || "Game " + g.Id,
-        img: g.base + "/thumb.jpg",
-        url: "/app-viewer/ccported/?view=" + g.Id
-      } : null)
+      .map(g => {
+        const id = g?.Id || g?.id || g?._idFallback;
+        if (!id) return null;
+        
+        let img = g?.img || g?.image || g?.thumb || g?.thumbnail || "/1f3ae.png";
+        if (g?.base) img = g.base + "/thumb.jpg";
+
+        return {
+          name: g.name || g.title || "Game " + id,
+          img: img,
+          url: "/app-viewer/ccported/?view=" + encodeURIComponent(id)
+        };
+      })
       .filter(Boolean);
   } catch (e) {}
 }
@@ -193,6 +225,7 @@ async function loadGoogleClass() {
   if (DATA.googleclass.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/assets/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.googleclass = safeArray(d).map(g => ({
@@ -207,6 +240,7 @@ async function loadTruffled() {
   if (DATA.truffled.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.truffled = safeArray(d).map(g => {
@@ -231,6 +265,7 @@ async function loadNowGG() {
   if (DATA.nowgg.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.nowgg = safeArray(d).map(g => {
@@ -252,6 +287,7 @@ async function loadAlexrworlds() {
   if (DATA.alexrworlds.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/dskjfoisjfsjio/alexrsworld@latest/singlefilegames.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.alexrworlds = safeArray(d).map(g => ({
@@ -266,6 +302,7 @@ async function loadLupine() {
   if (DATA.lupine.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.lupine = safeArray(d).map(g => {
@@ -287,6 +324,7 @@ async function load3kh0() {
   if (DATA["3kh0"].length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-assets.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA["3kh0"] = safeArray(d).map(name => ({
@@ -301,6 +339,7 @@ async function load3kh0Lite() {
   if (DATA["3kh0lite"].length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-lite.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA["3kh0lite"] = safeArray(d).map(g => ({
@@ -315,6 +354,7 @@ async function loadTGLSC() {
   if (DATA.tglsc.length) return;
   try {
     const r = await fetch("https://math-question-generator.dk-ubg.workers.dev/bloxy/ubg/games.json");
+    if (!r.ok) return;
     const d = await r.json();
     const base = "https://math-question-generator.dk-ubg.workers.dev";
 
@@ -336,6 +376,7 @@ async function loadSelenite() {
   if (DATA.selenite.length) return;
   try {
     const r = await fetch("https://math-quests-cc.dk-ubg.workers.dev/resources/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.selenite = safeArray(d).map(g => {
@@ -356,6 +397,7 @@ async function loadVelera() {
   if (DATA.velera.length) return;
   try {
     const r = await fetch("https://math-of-cc.dk-ubg.workers.dev/data/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.velera = safeArray(d).map(g => {
@@ -386,8 +428,12 @@ document.querySelectorAll(".cat").forEach(el => {
 
     const cat = el.dataset.cat;
 
+    CURRENT = [];
+    FILTERED = [];
+    RESET_RENDER();
+
     if (cat === "all") {
-      await Promise.allSettled(Object.values(LOADER_MAP).map(fn => fn()));
+      await Promise.allSettled(Object.values(LOADER_MAP).map(fn => withTimeout(fn, 4000)));
       CURRENT = Object.values(DATA).flat();
     } else {
       if (LOADER_MAP[cat]) await LOADER_MAP[cat]();
@@ -495,7 +541,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cat = activeTab ? activeTab.dataset.cat : "blox";
 
   if (cat === "all") {
-    await Promise.allSettled(Object.values(LOADER_MAP).map(fn => fn()));
+    await Promise.allSettled(Object.values(LOADER_MAP).map(fn => withTimeout(fn, 4000)));
     CURRENT = Object.values(DATA).flat();
   } else {
     if (LOADER_MAP[cat]) await LOADER_MAP[cat]();
