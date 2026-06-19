@@ -4,7 +4,7 @@ const count = document.getElementById("count");
 
 const PAGE_SIZE = 60;
 
-let DATA = {
+const DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
@@ -13,10 +13,15 @@ let DATA = {
 
 let CURRENT = [];
 let FILTERED = [];
-
 let RENDERED = 0;
 let OBSERVER_SENTINEL = null;
-let OBSERVER = null;
+
+const OBSERVER = new IntersectionObserver(entries => {
+  if (entries[0].isIntersecting) {
+    RESET_OBSERVER_ONLY();
+    render(false);
+  }
+}, { rootMargin: "300px" });
 
 function safeArray(v) {
   return Array.isArray(v) ? v : [];
@@ -107,7 +112,6 @@ async function loadUGS() {
       });
     } catch (e) {}
   }
-
   DATA.ugs = games;
 }
 
@@ -194,8 +198,9 @@ async function loadTruffled() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
     const d = await r.json();
 
-    const games = safeArray(d.games);
-    DATA.truffled = games.map(g => {
+    DATA.truffled = safeArray(d.games).map(g => {
+      if (!g.url) return null;
+
       const thumb = (g.thumbnail || "")
         .replace(/^\/+/, "")
         .replace(/^png\/games\//, "");
@@ -205,9 +210,7 @@ async function loadTruffled() {
         img: thumb
           ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
           : "/1f3ae.png",
-        url: g.url
-          ? "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
-          : null
+        url: "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
       };
     }).filter(Boolean);
   } catch (e) {}
@@ -298,11 +301,10 @@ async function load3kh0Lite() {
 }
 
 async function loadTGLSC() {
-  if (DATA.tglsc?.length) return;
+  if (DATA.tglsc.length) return;
   try {
     const r = await fetch("https://math-question-generator.dk-ubg.workers.dev/bloxy/ubg/games.json");
     const d = await r.json();
-
     const base = "https://math-question-generator.dk-ubg.workers.dev";
 
     DATA.tglsc = safeArray(d.data).map(g => {
@@ -387,8 +389,8 @@ document.querySelectorAll(".cat").forEach(el => {
       CURRENT = DATA[cat] || [];
     }
 
-    FILTERED = CURRENT;
-    search.value = "";
+    const v = search.value.toLowerCase().trim();
+    FILTERED = CURRENT.filter(g => g?.name?.toLowerCase().includes(v));
     RESET_RENDER();
     updateCount();
     render(true);
@@ -458,20 +460,11 @@ function setupObserver() {
   OBSERVER_SENTINEL = document.createElement("div");
   grid.appendChild(OBSERVER_SENTINEL);
 
-  if (OBSERVER) OBSERVER.disconnect();
-
-  OBSERVER = new IntersectionObserver(entries => {
-    if (entries[0].isIntersecting) {
-      RESET_OBSERVER_ONLY();
-      render(false);
-    }
-  }, { rootMargin: "300px" });
-
   OBSERVER.observe(OBSERVER_SENTINEL);
 }
 
 function RESET_OBSERVER_ONLY() {
-  if (OBSERVER) OBSERVER.disconnect();
+  OBSERVER.disconnect();
   if (OBSERVER_SENTINEL) {
     OBSERVER_SENTINEL.remove();
     OBSERVER_SENTINEL = null;
@@ -491,9 +484,16 @@ function updateCount() {
   await loadBlox();
   await loadSelenite();
 
-  CURRENT = [...DATA.blox, ...DATA.selenite];
-  FILTERED = CURRENT;
+  const activeTab = document.querySelector(".cat.active");
+  const isDefaultState = !activeTab || activeTab.dataset.cat === "all" || activeTab.dataset.cat === "blox";
 
-  updateCount();
-  render(true);
+  if (isDefaultState) {
+    CURRENT = [...DATA.blox, ...DATA.selenite];
+    
+    const query = search.value.toLowerCase().trim();
+    FILTERED = CURRENT.filter(g => g?.name?.toLowerCase().includes(query));
+
+    updateCount();
+    render(true);
+  }
 })();
