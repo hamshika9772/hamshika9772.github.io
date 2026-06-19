@@ -186,13 +186,21 @@ async function loadHydra() {
     if (!r.ok) return;
     const d = await r.json();
 
-    DATA.hydra = safeArray(d).map(g => ({
-      name: g.title || "Unknown",
-      img: g.thumb
-        ? "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + g.thumb
-        : "",
-      url: "/app-viewer/hydra-network/?view=" + g.file_name
-    }));
+    DATA.hydra = safeArray(d).map(g => {
+      const file = g.file_name || g.link || g.url;
+      if (!file) return null;
+
+      let thumb = g.thumb || g.image || g.img || "/1f3ae.png";
+      if (thumb !== "/1f3ae.png" && !thumb.startsWith("http")) {
+        thumb = "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + thumb.replace(/^\/+/, "");
+      }
+
+      return {
+        name: g.title || g.name || "Unknown",
+        img: thumb,
+        url: "/app-viewer/hydra-network/?view=" + encodeURIComponent(file)
+      };
+    }).filter(Boolean);
   } catch (e) {}
 }
 
