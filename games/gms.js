@@ -186,7 +186,9 @@ async function loadHydra() {
     if (!r.ok) return;
     const d = await r.json();
 
-    DATA.hydra = safeArray(d).map(g => {
+    const rawArray = Array.isArray(d) ? d : (d.games || d.data || d.list || Object.values(d));
+
+    DATA.hydra = rawArray.map(g => {
       const file = g.file_name || g.link || g.url;
       if (!file) return null;
 
