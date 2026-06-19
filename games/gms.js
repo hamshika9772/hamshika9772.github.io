@@ -359,6 +359,15 @@ async function loadVelera() {
   } catch (e) {}
 }
 
+const LOADER_MAP = {
+  blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
+  seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
+  googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
+  alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
+  "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
+  velera: loadVelera
+};
+
 document.querySelectorAll(".cat").forEach(el => {
   el.onclick = async () => {
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
@@ -367,25 +376,10 @@ document.querySelectorAll(".cat").forEach(el => {
     const cat = el.dataset.cat;
 
     if (cat === "all") {
-      await Promise.all([
-        loadBlox(), loadGN(), loadElite(), loadSea(), loadUGS(), loadSeraph(),
-        loadCKV(), loadHydra(), loadCCPorted(), loadGoogleClass(), loadTruffled(),
-        loadNowGG(), loadAlexrworlds(), loadLupine(), load3kh0(), load3kh0Lite(),
-        loadTGLSC(), loadSelenite(), loadVelera()
-      ]);
-
+      await Promise.all(Object.values(LOADER_MAP).map(fn => fn()));
       CURRENT = Object.values(DATA).flat();
     } else {
-      const loaderMap = {
-        blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
-        seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
-        googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
-        alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
-        "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
-        velera: loadVelera
-      };
-
-      if (loaderMap[cat]) await loaderMap[cat]();
+      if (LOADER_MAP[cat]) await LOADER_MAP[cat]();
       CURRENT = DATA[cat] || [];
     }
 
@@ -404,96 +398,3 @@ search.oninput = () => {
   updateCount();
   render(true);
 };
-
-function render(reset = false) {
-  const fallback = "/1f3ae.png";
-
-  if (reset) {
-    grid.innerHTML = "";
-    RENDERED = 0;
-  }
-
-  const valid = FILTERED.filter(g => g && g.name && g.url);
-  const slice = valid.slice(RENDERED, RENDERED + PAGE_SIZE);
-  const frag = document.createDocumentFragment();
-
-  for (const g of slice) {
-    const card = document.createElement("div");
-    card.className = "game-card";
-
-    const img = document.createElement("img");
-    img.loading = "lazy";
-    img.src = g.img || fallback;
-
-    img.onerror = () => {
-      if (g.altImg && !img.dataset.retried) {
-        img.dataset.retried = "true";
-        img.src = g.altImg;
-      } else {
-        img.src = fallback;
-      }
-    };
-
-    const title = document.createElement("h3");
-    title.textContent = g.name;
-
-    const link = document.createElement("a");
-    link.className = "play-btn";
-    link.href = g.url;
-    link.textContent = "Play";
-
-    card.append(img, title, link);
-    frag.appendChild(card);
-  }
-
-  grid.appendChild(frag);
-  RENDERED += slice.length;
-
-  if (RENDERED < valid.length) {
-    setupObserver();
-  }
-}
-
-function setupObserver() {
-  if (OBSERVER_SENTINEL) OBSERVER_SENTINEL.remove();
-
-  OBSERVER_SENTINEL = document.createElement("div");
-  grid.appendChild(OBSERVER_SENTINEL);
-
-  OBSERVER.observe(OBSERVER_SENTINEL);
-}
-
-function RESET_OBSERVER_ONLY() {
-  OBSERVER.disconnect();
-  if (OBSERVER_SENTINEL) {
-    OBSERVER_SENTINEL.remove();
-    OBSERVER_SENTINEL = null;
-  }
-}
-
-function RESET_RENDER() {
-  RENDERED = 0;
-  RESET_OBSERVER_ONLY();
-}
-
-function updateCount() {
-  count.textContent = FILTERED.length + " games";
-}
-
-(async () => {
-  await loadBlox();
-  await loadSelenite();
-
-  const activeTab = document.querySelector(".cat.active");
-  const isDefaultState = !activeTab || activeTab.dataset.cat === "all" || activeTab.dataset.cat === "blox";
-
-  if (isDefaultState) {
-    CURRENT = [...DATA.blox, ...DATA.selenite];
-    
-    const query = search.value.toLowerCase().trim();
-    FILTERED = CURRENT.filter(g => g?.name?.toLowerCase().includes(query));
-
-    updateCount();
-    render(true);
-  }
-})();
