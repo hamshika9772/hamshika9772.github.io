@@ -24,7 +24,12 @@ const OBSERVER = new IntersectionObserver(entries => {
 }, { rootMargin: "300px" });
 
 function safeArray(v) {
-  return Array.isArray(v) ? v : [];
+  if (Array.isArray(v)) return v;
+  if (v && typeof v === 'object') {
+    if (Array.isArray(v.games)) return v.games;
+    if (Array.isArray(v.data)) return v.data;
+  }
+  return [];
 }
 
 function normalize(g) {
@@ -94,25 +99,24 @@ async function loadSea() {
 async function loadUGS() {
   if (DATA.ugs.length) return;
   const repos = ["tharun9772/ugs-1", "tharun9772/ugs-2", "tharun9772/ugs-3"];
-  let games = [];
-
-  for (const repo of repos) {
+  
+  const results = await Promise.all(repos.map(async repo => {
     try {
       const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/" + repo + "/file.json");
       const d = await r.json();
-
-      safeArray(d).forEach(f => {
-        if (f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html")) {
-          games.push({
-            name: f.name.replace(/^cl/, "").replace(".html", ""),
-            img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
-            url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
-          });
-        }
-      });
-    } catch (e) {}
-  }
-  DATA.ugs = games;
+      return safeArray(d)
+        .filter(f => f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html"))
+        .map(f => ({
+          name: f.name.replace(/^cl/, "").replace(".html", ""),
+          img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
+          url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
+        }));
+    } catch (e) {
+      return [];
+    }
+  }));
+  
+  DATA.ugs = results.flat();
 }
 
 async function loadSeraph() {
@@ -137,11 +141,18 @@ async function loadCKV() {
     const d = await r.json();
 
     DATA.ckv = safeArray(d)
-      .map(g => g?.base && g?.Id ? {
-        name: g.name || "Unknown",
-        img: g.base + "/thumb.jpg",
-        url: "/app-viewer/chicken-kings-vault/?view=" + g.Id
-      } : null)
+      .map(g => {
+        const id = g?.Id || g?.id;
+        const base = g?.base || g?.directory || g?.path || "";
+        
+        if (!id) return null;
+        
+        return {
+          name: g.name || g.title || "Unknown",
+          img: base ? (base + "/thumb.jpg") : (g.image || g.thumb || "/1f3ae.png"),
+          url: "/app-viewer/chicken-kings-vault/?view=" + id
+        };
+      })
       .filter(Boolean);
   } catch (e) {}
 }
@@ -198,7 +209,7 @@ async function loadTruffled() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
     const d = await r.json();
 
-    DATA.truffled = safeArray(d.games).map(g => {
+    DATA.truffled = safeArray(d).map(g => {
       if (!g.url) return null;
 
       const thumb = (g.thumbnail || "")
@@ -307,7 +318,7 @@ async function loadTGLSC() {
     const d = await r.json();
     const base = "https://math-question-generator.dk-ubg.workers.dev";
 
-    DATA.tglsc = safeArray(d.data).map(g => {
+    DATA.tglsc = safeArray(d).map(g => {
       if (!g?.title || !g?.embed_url) return null;
 
       return {
@@ -376,7 +387,7 @@ document.querySelectorAll(".cat").forEach(el => {
     const cat = el.dataset.cat;
 
     if (cat === "all") {
-      await Promise.all(Object.values(LOADER_MAP).map(fn => fn()));
+      await Promise.allSettled(Object.values(LOADER_MAP).map(fn => fn()));
       CURRENT = Object.values(DATA).flat();
     } else {
       if (LOADER_MAP[cat]) await LOADER_MAP[cat]();
@@ -484,7 +495,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const cat = activeTab ? activeTab.dataset.cat : "blox";
 
   if (cat === "all") {
-    await Promise.all(Object.values(LOADER_MAP).map(fn => fn()));
+    await Promise.allSettled(Object.values(LOADER_MAP).map(fn => fn()));
     CURRENT = Object.values(DATA).flat();
   } else {
     if (LOADER_MAP[cat]) await LOADER_MAP[cat]();
