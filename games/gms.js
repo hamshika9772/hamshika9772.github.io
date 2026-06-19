@@ -7,7 +7,8 @@ const PAGE_SIZE = 60;
 let DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
-  nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": []
+  nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
+  tglsc: []
 };
 
 let CURRENT = [];
@@ -285,6 +286,40 @@ async function load3kh0Lite() {
   } catch (e) {}
 }
 
+async function loadTGLSC() {
+  if (DATA.tglsc?.length) return;
+
+  try {
+    const r = await fetch("https://math-question-generator.dk-ubg.workers.dev/bloxy/ubg/games.json");
+    const d = await r.json();
+
+    const baseImg = "https://math-question-generator.dk-ubg.workers.dev";
+
+    DATA.tglsc = safeArray(d.data).map(g => {
+      if (!g?.title || !g?.embed_url) return null;
+
+      const img =
+        baseImg.replace(/\/+$/, "") +
+        "/" +
+        (g.thumbnail || "").replace(/^\/+/, "");
+
+      const embed =
+        "/sail/embed/#" +
+        (g.embed_url || "").replace(/^https?:\/\//, "");
+
+      return {
+        name: g.title,
+        img,
+        url: embed,
+        category: g.category,
+        status: g.status
+      };
+    }).filter(Boolean);
+  } catch (e) {
+    console.error("TGLSC load failed:", e);
+  }
+}
+
 document.querySelectorAll(".cat").forEach(el => {
   el.onclick = async () => {
     document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
@@ -297,7 +332,7 @@ document.querySelectorAll(".cat").forEach(el => {
         loadBlox(), loadGN(), loadElite(), loadSea(), loadUGS(),
         loadSeraph(), loadCKV(), loadHydra(), loadCCPorted(),
         loadGoogleClass(), loadTruffled(), loadNowGG(), loadAlexrworlds(),
-        loadLupine(), load3kh0(), load3kh0Lite()
+        loadLupine(), load3kh0(), load3kh0Lite(), loadTGLSC()
       ]);
 
       CURRENT = Object.values(DATA).flat().map(normalize).filter(Boolean);
@@ -307,7 +342,7 @@ document.querySelectorAll(".cat").forEach(el => {
         seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
         googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
         alexrworlds: loadAlexrworlds, lupine: loadLupine,
-        "3kh0": load3kh0, "3kh0lite": load3kh0Lite
+        "3kh0": load3kh0, "3kh0lite": load3kh0Lite, tglsc: loadTGLSC
       };
 
       if (loaderMap[cat]) await loaderMap[cat]();
