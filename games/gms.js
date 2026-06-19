@@ -186,9 +186,19 @@ async function loadHydra() {
     if (!r.ok) return;
     const d = await r.json();
 
-    const rawArray = Array.isArray(d) ? d : (d.games || d.data || d.list || Object.values(d));
+    let rawArray = [];
+    if (Array.isArray(d)) {
+      rawArray = d;
+    } else if (d && typeof d === "object") {
+      rawArray = Array.isArray(d.games) ? d.games : 
+                 Array.isArray(d.data) ? d.data : 
+                 Array.isArray(d.list) ? d.list : 
+                 Object.values(d);
+    }
 
     DATA.hydra = rawArray.map(g => {
+      if (!g || typeof g !== "object") return null;
+      
       const file = g.file_name || g.link || g.url;
       if (!file) return null;
 
