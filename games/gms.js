@@ -60,7 +60,6 @@ const withTimeout = (fn, ms = 4000) => Promise.race([
 ]);
 
 async function loadBlox() {
-  if (DATA.blox.length) return;
   try {
     const r = await fetch("/games/gms.json");
     if (!r.ok) return;
@@ -68,11 +67,10 @@ async function loadBlox() {
   } catch (e) {}
 }
 
-
 async function loadGN() {
-  if (DATA.gn.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/freebuisness/assets/zones.json");
+    if (!r.ok) return;
     const d = await r.json();
     DATA.gn = safeArray(d)
       .filter(g => g.id !== -1 && g.name && !g.name.startsWith("[!]"))
@@ -85,9 +83,9 @@ async function loadGN() {
 }
 
 async function loadElite() {
-  if (DATA.elite.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/games.json");
+    if (!r.ok) return;
     const d = await r.json();
     DATA.elite = safeArray(d).map(g => ({
       name: g.title || "Unknown",
@@ -98,15 +96,17 @@ async function loadElite() {
 }
 
 async function loadSea() {
-  if (DATA.sea.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/sea-bean-unblocked/sde@main/zzz.json");
+    if (!r.ok) return;
     const d = await r.json();
     DATA.sea = safeArray(d).map(g => {
       const cover = (g.cover || "").replace("{COVER_URL}/", "");
       return {
         name: g.name || "Unknown",
-        img: cover.startsWith("http") ? cover : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
+        img: cover.startsWith("http")
+          ? cover
+          : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
         url: "/app-viewer/sea-bean?view=" + encodeURIComponent(g.id)
       };
     });
@@ -114,33 +114,32 @@ async function loadSea() {
 }
 
 async function loadUGS() {
-  if (DATA.ugs.length) return;
   const repos = ["tharun9772/ugs-1", "tharun9772/ugs-2", "tharun9772/ugs-3"];
-  let games = [];
-
-  for (const repo of repos) {
+  
+  const results = await Promise.all(repos.map(async repo => {
     try {
-      const r = await fetch(`https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/${repo}/file.json`);
+      const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/" + repo + "/file.json");
+      if (!r.ok) return [];
       const d = await r.json();
-
-      safeArray(d).forEach(f => {
-        if (f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html")) {
-          games.push({
-            name: f.name.replace(/^cl/, "").replace(".html", ""),
-            img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
-            url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
-          });
-        }
-      });
-    } catch (e) {}
-  }
-  DATA.ugs = games;
+      return safeArray(d)
+        .filter(f => f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html"))
+        .map(f => ({
+          name: f.name.replace(/^cl/, "").replace(".html", ""),
+          img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
+          url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
+        }));
+    } catch (e) {
+      return [];
+    }
+  }));
+  
+  DATA.ugs = results.flat();
 }
 
 async function loadSeraph() {
-  if (DATA.seraph.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/DominumNetwork/dominum@main/src/assets/libraries/seraph/games.json");
+    if (!r.ok) return;
     const d = await r.json();
     const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
 
@@ -153,51 +152,90 @@ async function loadSeraph() {
 }
 
 async function loadCKV() {
-  if (DATA.ckv.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
-    DATA.ckv = safeArray(d).map(g => ({
-      name: g.name || "Unknown",
-      img: g.img ? "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.img : "",
-      url: "/app-viewer/chicken-kings-vault/?view=" + g.html
-    }));
+    DATA.ckv = safeArray(d)
+      .map(g => {
+        const gameUrl = g?.html || g?.url;
+        if (!gameUrl) return null;
+
+        return {
+          name: g.name || g.title || "Unknown",
+          img: g.img || g.image || g.thumb || "/1f3ae.png",
+          url: "/app-viewer/chicken-kings-vault/?view=" + encodeURIComponent(gameUrl)
+        };
+      })
+      .filter(Boolean);
   } catch (e) {}
 }
 
 async function loadHydra() {
-  if (DATA.hydra.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/gmes.json");
+    if (!r.ok) return;
     const d = await r.json();
 
-    DATA.hydra = safeArray(d).map(g => ({
-      name: g.title || "Unknown",
-      img: g.thumb ? "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + g.thumb : "",
-      url: "/app-viewer/hydra-network/?view=" + g.file_name
-    }));
+    let rawArray = [];
+    if (Array.isArray(d)) {
+      rawArray = d;
+    } else if (d && typeof d === "object") {
+      rawArray = Array.isArray(d.games) ? d.games : 
+                 Array.isArray(d.data) ? d.data : 
+                 Array.isArray(d.list) ? d.list : 
+                 Object.values(d);
+    }
+
+    DATA.hydra = rawArray.map(g => {
+      if (!g || typeof g !== "object") return null;
+      
+      const file = g.file_name || g.link || g.url;
+      if (!file) return null;
+
+      let thumb = g.thumb || g.image || g.img || "/1f3ae.png";
+      if (thumb !== "/1f3ae.png" && !thumb.startsWith("http")) {
+        thumb = "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + thumb.replace(/^\/+/, "");
+      }
+
+      return {
+        name: g.title || g.name || "Unknown",
+        img: thumb,
+        url: "/app-viewer/hydra-network/?view=" + encodeURIComponent(file)
+      };
+    }).filter(Boolean);
   } catch (e) {}
 }
 
 async function loadCCPorted() {
-  if (DATA.ccported.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/ccported-stupid-game-lib.json");
+    if (!r.ok) return;
     const d = await r.json();
 
-    DATA.ccported = safeArray(d).map(g => g?.base && g?.Id ? ({
-      name: g.name || ("Game " + g.Id),
-      img: g.base + "/thumb.jpg",
-      url: "/app-viewer/ccported/?view=" + g.Id
-    }) : null).filter(Boolean);
+    DATA.ccported = safeArray(d)
+      .map(g => {
+        const id = g?.Id || g?.id || g?._idFallback;
+        if (!id) return null;
+        
+        let img = g?.img || g?.image || g?.thumb || g?.thumbnail || "/1f3ae.png";
+        if (g?.base) img = g.base + "/thumb.jpg";
+
+        return {
+          name: g.name || g.title || "Game " + id,
+          img: img,
+          url: "/app-viewer/ccported/?view=" + encodeURIComponent(id)
+        };
+      })
+      .filter(Boolean);
   } catch (e) {}
 }
 
 async function loadGoogleClass() {
-  if (DATA.googleclass.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/assets/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.googleclass = safeArray(d).map(g => ({
@@ -209,40 +247,40 @@ async function loadGoogleClass() {
 }
 
 async function loadTruffled() {
-  if (DATA.truffled.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
+    if (!r.ok) return;
     const d = await r.json();
-    const games = safeArray(d.games);
 
-    DATA.truffled = games.map(g => {
+    DATA.truffled = safeArray(d).map(g => {
+      if (!g.url) return null;
+
       const thumb = (g.thumbnail || "")
         .replace(/^\/+/, "")
         .replace(/^png\/games\//, "");
 
-      return normalize({
+      return {
         name: g.name,
         img: thumb
           ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
           : "/1f3ae.png",
-        url: g.url
-          ? "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
-          : null
-      });
+        url: "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
+      };
     }).filter(Boolean);
   } catch (e) {}
 }
 
 async function loadNowGG() {
-  if (DATA.nowgg.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.nowgg = safeArray(d).map(g => {
       if (!g.name || !g.url) return null;
-      let rawUrl = g.url.trim();
-      let cleanUrl = rawUrl.startsWith("http") ? rawUrl : "https://" + rawUrl;
+
+      let cleanUrl = g.url.trim();
+      if (!cleanUrl.startsWith("http")) cleanUrl = "https://" + cleanUrl;
 
       return {
         name: g.name,
@@ -254,9 +292,9 @@ async function loadNowGG() {
 }
 
 async function loadAlexrworlds() {
-  if (DATA.alexrworlds.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/dskjfoisjfsjio/alexrsworld@latest/singlefilegames.json");
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.alexrworlds = safeArray(d).map(g => ({
@@ -268,34 +306,34 @@ async function loadAlexrworlds() {
 }
 
 async function loadLupine() {
-  if (DATA.lupine.length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/games.json");
-    if (!r.ok) throw new Error(r.status);
+    if (!r.ok) return;
     const d = await r.json();
 
     DATA.lupine = safeArray(d).map(g => {
       if (!g.name) return null;
-      const encodedName = encodeURIComponent(g.name);
-      return normalize({
+
+      const encoded = encodeURIComponent(g.name);
+
+      return {
         name: g.name,
-        img: `https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/tile/${encodedName}.png`,
-        altImg: `https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/large/${encodedName}.png`,
-        url: `/app-viewer/LupineVault/?view=${encodedName}`
-      });
+        img: "https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/tile/" + encoded + ".png",
+        altImg: "https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/large/" + encoded + ".png",
+        url: "/app-viewer/LupineVault/?view=" + encoded
+      };
     }).filter(Boolean);
-  } catch (e) { 
-    console.error(e); 
-  }
+  } catch (e) {}
 }
 
 async function load3kh0() {
-  if (DATA["3kh0"].length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-assets.json");
+    if (!r.ok) return;
     const d = await r.json();
+
     DATA["3kh0"] = safeArray(d).map(name => ({
-      name: name,
+      name,
       img: "https://raw.githack.com/tharun9772/3kh0-assets/main/" + name + "/splash.png",
       url: "/app-viewer/3kh0/?view=" + encodeURIComponent(name)
     }));
@@ -303,19 +341,20 @@ async function load3kh0() {
 }
 
 async function load3kh0Lite() {
-  if (DATA["3kh0lite"].length) return;
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-lite.json");
+    if (!r.ok) return;
     const d = await r.json();
+
     DATA["3kh0lite"] = safeArray(d).map(g => ({
       name: g.title || "Unknown",
       img: "https://raw.githack.com/3kh0/3kh0-lite/main/" + g.imgSrc,
       url: "/app-viewer/3kh0/lite/?view=" + encodeURIComponent(g.link)
     }));
-  }
+  } catch (e) {}
+}
 
 async function loadTGLSC() {
-  if (DATA.tglsc.length) return;
   try {
     const r = await fetch("https://math-question-generator.dk-ubg.workers.dev/bloxy/ubg/games.json");
     if (!r.ok) return;
@@ -337,7 +376,6 @@ async function loadTGLSC() {
 }
 
 async function loadSelenite() {
-  if (DATA.selenite.length) return;
   try {
     const r = await fetch("https://math-quests-cc.dk-ubg.workers.dev/resources/games.json");
     if (!r.ok) return;
@@ -358,7 +396,6 @@ async function loadSelenite() {
 }
 
 async function loadVelera() {
-  if (DATA.velera.length) return;
   try {
     const r = await fetch("https://math-of-cc.dk-ubg.workers.dev/data/games.json");
     if (!r.ok) return;
