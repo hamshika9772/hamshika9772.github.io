@@ -8,7 +8,7 @@ let DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: []
+  tglsc: [], selenite: []
 };
 
 let CURRENT = [];
@@ -49,7 +49,9 @@ async function loadGN() {
       .filter(g => g.id !== -1 && g.name && !g.name.startsWith("[!]"))
       .map(g => ({
         name: g.name,
-        img: "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/" + (g.cover || "").replace("{COVER_URL}", ""),
+        img:
+          "https://cdn.jsdelivr.net/gh/freebuisness/covers@main/" +
+          (g.cover || "").replace("{COVER_URL}", ""),
         url: "/app-viewer/gn-math/?gn-id=" + g.id
       }));
   } catch (e) {}
@@ -62,7 +64,9 @@ async function loadElite() {
     const d = await r.json();
     DATA.elite = safeArray(d).map(g => ({
       name: g.title || "Unknown",
-      img: "https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/" + g.image,
+      img:
+        "https://cdn.jsdelivr.net/gh/elite-gamez/elite-gamez.github.io@main/" +
+        g.image,
       url: "/app-viewer/elite-gamez?url=" + encodeURIComponent(g.url)
     }));
   } catch (e) {}
@@ -77,7 +81,9 @@ async function loadSea() {
       const cover = (g.cover || "").replace("{COVER_URL}/", "");
       return {
         name: g.name || "Unknown",
-        img: cover.startsWith("http") ? cover : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
+        img: cover.startsWith("http")
+          ? cover
+          : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
         url: "/app-viewer/sea-bean?view=" + encodeURIComponent(g.id)
       };
     });
@@ -86,25 +92,41 @@ async function loadSea() {
 
 async function loadUGS() {
   if (DATA.ugs.length) return;
-  const repos = ["tharun9772/ugs-1", "tharun9772/ugs-2", "tharun9772/ugs-3"];
+
+  const repos = [
+    "tharun9772/ugs-1",
+    "tharun9772/ugs-2",
+    "tharun9772/ugs-3"
+  ];
+
   let games = [];
 
   for (const repo of repos) {
     try {
-      const r = await fetch(`https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/${repo}/file.json`);
+      const r = await fetch(
+        "https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/" +
+          repo +
+          "/file.json"
+      );
       const d = await r.json();
 
       safeArray(d).forEach(f => {
-        if (f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html")) {
+        if (
+          f.type === "file" &&
+          f.name?.startsWith("cl") &&
+          f.name?.endsWith(".html")
+        ) {
           games.push({
             name: f.name.replace(/^cl/, "").replace(".html", ""),
-            img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
+            img:
+              "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
             url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
           });
         }
       });
     } catch (e) {}
   }
+
   DATA.ugs = games;
 }
 
@@ -113,12 +135,15 @@ async function loadSeraph() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/DominumNetwork/dominum@main/src/assets/libraries/seraph/games.json");
     const d = await r.json();
-    const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
+    const BASE =
+      "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
 
     DATA.seraph = safeArray(d).map(g => ({
       name: g.name || "Unknown",
       img: g.img || "",
-      url: "/app-viewer/seraph/?view=" + (g.url ? g.url.replace(BASE, "") : "")
+      url:
+        "/app-viewer/seraph/?view=" +
+        (g.url ? g.url.replace(BASE, "") : "")
     }));
   } catch (e) {}
 }
@@ -129,11 +154,15 @@ async function loadCKV() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/games.json");
     const d = await r.json();
 
-    DATA.ckv = safeArray(d).map(g => ({
-      name: g.name || "Unknown",
-      img: g.img ? "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.img : "",
-      url: "/app-viewer/chicken-kings-vault/?view=" + g.html
-    }));
+    DATA.ckv = safeArray(d).map(g =>
+      g?.base && g?.Id
+        ? {
+            name: g.name || "Unknown",
+            img: g.base + "/thumb.jpg",
+            url: "/app-viewer/chicken-kings-vault/?view=" + g.Id
+          }
+        : null
+    ).filter(Boolean);
   } catch (e) {}
 }
 
@@ -145,7 +174,9 @@ async function loadHydra() {
 
     DATA.hydra = safeArray(d).map(g => ({
       name: g.title || "Unknown",
-      img: g.thumb ? "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + g.thumb : "",
+      img: g.thumb
+        ? "https://cdn.jsdelivr.net/gh/Hydra-Network/hydra-assets@main/" + g.thumb
+        : "",
       url: "/app-viewer/hydra-network/?view=" + g.file_name
     }));
   } catch (e) {}
@@ -157,11 +188,17 @@ async function loadCCPorted() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/ccported-stupid-game-lib.json");
     const d = await r.json();
 
-    DATA.ccported = safeArray(d).map(g => g?.base && g?.Id ? ({
-      name: g.name || ("Game " + g.Id),
-      img: g.base + "/thumb.jpg",
-      url: "/app-viewer/ccported/?view=" + g.Id
-    }) : null).filter(Boolean);
+    DATA.ccported = safeArray(d)
+      .map(g =>
+        g?.base && g?.Id
+          ? {
+              name: g.name || "Game " + g.Id,
+              img: g.base + "/thumb.jpg",
+              url: "/app-viewer/ccported/?view=" + g.Id
+            }
+          : null
+      )
+      .filter(Boolean);
   } catch (e) {}
 }
 
@@ -186,21 +223,25 @@ async function loadTruffled() {
     const d = await r.json();
     const games = safeArray(d.games);
 
-    DATA.truffled = games.map(g => {
-      const thumb = (g.thumbnail || "")
-        .replace(/^\/+/, "")
-        .replace(/^png\/games\//, "");
+    DATA.truffled = games
+      .map(g => {
+        const thumb = (g.thumbnail || "")
+          .replace(/^\/+/, "")
+          .replace(/^png\/games\//, "");
 
-      return normalize({
-        name: g.name,
-        img: thumb
-          ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
-          : "/1f3ae.png",
-        url: g.url
-          ? "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
-          : null
-      });
-    }).filter(Boolean);
+        return normalize({
+          name: g.name,
+          img: thumb
+            ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" +
+              thumb
+            : "/1f3ae.png",
+          url: g.url
+            ? "/sail/embed/#https://truffled.lol/" +
+              g.url.replace(/^\/+/, "")
+            : null
+        });
+      })
+      .filter(Boolean);
   } catch (e) {}
 }
 
@@ -210,17 +251,22 @@ async function loadNowGG() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
     const d = await r.json();
 
-    DATA.nowgg = safeArray(d).map(g => {
-      if (!g.name || !g.url) return null;
-      let rawUrl = g.url.trim();
-      let cleanUrl = rawUrl.startsWith("http") ? rawUrl : "https://" + rawUrl;
+    DATA.nowgg = safeArray(d)
+      .map(g => {
+        if (!g.name || !g.url) return null;
 
-      return {
-        name: g.name,
-        img: g.img || "/1f3ae.png",
-        url: "/sail/embed/#" + cleanUrl
-      };
-    }).filter(Boolean);
+        let rawUrl = g.url.trim();
+        let cleanUrl = rawUrl.startsWith("http")
+          ? rawUrl
+          : "https://" + rawUrl;
+
+        return {
+          name: g.name,
+          img: g.img || "/1f3ae.png",
+          url: "/sail/embed/#" + cleanUrl
+        };
+      })
+      .filter(Boolean);
   } catch (e) {}
 }
 
@@ -245,19 +291,29 @@ async function loadLupine() {
     if (!r.ok) throw new Error(r.status);
     const d = await r.json();
 
-    DATA.lupine = safeArray(d).map(g => {
-      if (!g.name) return null;
-      const encodedName = encodeURIComponent(g.name);
-      return normalize({
-        name: g.name,
-        img: `https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/tile/${encodedName}.png`,
-        altImg: `https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/large/${encodedName}.png`,
-        url: `/app-viewer/LupineVault/?view=${encodedName}`
-      });
-    }).filter(Boolean);
-  } catch (e) { 
-    console.error(e); 
-  }
+    DATA.lupine = safeArray(d)
+      .map(g => {
+        if (!g.name) return null;
+
+        const encodedName = encodeURIComponent(g.name);
+
+        return normalize({
+          name: g.name,
+          img:
+            "https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/tile/" +
+            encodedName +
+            ".png",
+          altImg:
+            "https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/large/" +
+            encodedName +
+            ".png",
+          url:
+            "/app-viewer/LupineVault/?view=" +
+            encodedName
+        });
+      })
+      .filter(Boolean);
+  } catch (e) {}
 }
 
 async function load3kh0() {
@@ -265,9 +321,13 @@ async function load3kh0() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-assets.json");
     const d = await r.json();
+
     DATA["3kh0"] = safeArray(d).map(name => ({
-      name: name,
-      img: "https://raw.githack.com/tharun9772/3kh0-assets/main/" + name + "/splash.png",
+      name,
+      img:
+        "https://raw.githack.com/tharun9772/3kh0-assets/main/" +
+        name +
+        "/splash.png",
       url: "/app-viewer/3kh0/?view=" + encodeURIComponent(name)
     }));
   } catch (e) {}
@@ -278,11 +338,49 @@ async function load3kh0Lite() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-lite.json");
     const d = await r.json();
+
     DATA["3kh0lite"] = safeArray(d).map(g => ({
       name: g.title || "Unknown",
-      img: "https://raw.githack.com/3kh0/3kh0-lite/main/" + g.imgSrc,
-      url: "/app-viewer/3kh0/lite/?view=" + encodeURIComponent(g.link)
+      img:
+        "https://raw.githack.com/3kh0/3kh0-lite/main/" +
+        g.imgSrc,
+      url:
+        "/app-viewer/3kh0/lite/?view=" +
+        encodeURIComponent(g.link)
     }));
+  } catch (e) {}
+}
+
+async function loadSelenite() {
+  if (DATA.selenite.length) return;
+  try {
+    const r = await fetch("https://math-quests-cc.dk-ubg.workers.dev/resources/games.json");
+    const d = await r.json();
+
+    DATA.selenite = safeArray(d).map(g => {
+      if (!g?.name || !g?.image || !g?.directory) return null;
+
+      const dir = String(g.directory)
+        .replace(/^\/+/, "")
+        .replace(/\/+$/, "");
+
+      const img =
+        "https://math-quests-cc.dk-ubg.workers.dev/resources/semag/" +
+        dir +
+        "/" +
+        g.image;
+
+      const url =
+        "/sail/embed/#https://selenite.cc/resources/semag/" +
+        dir +
+        "/index.html";
+
+      return {
+        name: g.name,
+        img,
+        url
+      };
+    }).filter(Boolean);
   } catch (e) {}
 }
 
@@ -315,9 +413,7 @@ async function loadTGLSC() {
         status: g.status
       };
     }).filter(Boolean);
-  } catch (e) {
-    console.error("TGLSC load failed:", e);
-  }
+  } catch (e) {}
 }
 
 document.querySelectorAll(".cat").forEach(el => {
@@ -329,20 +425,47 @@ document.querySelectorAll(".cat").forEach(el => {
 
     if (cat === "all") {
       await Promise.all([
-        loadBlox(), loadGN(), loadElite(), loadSea(), loadUGS(),
-        loadSeraph(), loadCKV(), loadHydra(), loadCCPorted(),
-        loadGoogleClass(), loadTruffled(), loadNowGG(), loadAlexrworlds(),
-        loadLupine(), load3kh0(), load3kh0Lite(), loadTGLSC()
+        loadBlox(),
+        loadGN(),
+        loadElite(),
+        loadSea(),
+        loadUGS(),
+        loadSeraph(),
+        loadCKV(),
+        loadHydra(),
+        loadCCPorted(),
+        loadGoogleClass(),
+        loadTruffled(),
+        loadNowGG(),
+        loadAlexrworlds(),
+        loadLupine(),
+        load3kh0(),
+        load3kh0Lite(),
+        loadTGLSC(),
+        loadSelenite()
       ]);
 
       CURRENT = Object.values(DATA).flat().map(normalize).filter(Boolean);
     } else {
       const loaderMap = {
-        blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
-        seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
-        googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
-        alexrworlds: loadAlexrworlds, lupine: loadLupine,
-        "3kh0": load3kh0, "3kh0lite": load3kh0Lite, tglsc: loadTGLSC
+        blox: loadBlox,
+        gn: loadGN,
+        elite: loadElite,
+        sea: loadSea,
+        ugs: loadUGS,
+        seraph: loadSeraph,
+        ckv: loadCKV,
+        hydra: loadHydra,
+        ccported: loadCCPorted,
+        googleclass: loadGoogleClass,
+        truffled: loadTruffled,
+        nowgg: loadNowGG,
+        alexrworlds: loadAlexrworlds,
+        lupine: loadLupine,
+        "3kh0": load3kh0,
+        "3kh0lite": load3kh0Lite,
+        tglsc: loadTGLSC,
+        selenite: loadSelenite
       };
 
       if (loaderMap[cat]) await loaderMap[cat]();
@@ -384,7 +507,7 @@ function render(reset = false) {
     const img = document.createElement("img");
     img.loading = "lazy";
     img.src = g.img || fallback;
-    
+
     img.onerror = () => {
       if (g.altImg && !img.dataset.retried) {
         img.dataset.retried = "true";
@@ -449,7 +572,8 @@ function updateCount() {
 
 (async () => {
   await loadBlox();
-  CURRENT = DATA.blox;
+  await loadSelenite();
+  CURRENT = [...DATA.blox, ...DATA.selenite];
   FILTERED = CURRENT;
   updateCount();
   render(true);
