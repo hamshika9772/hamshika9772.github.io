@@ -1,52 +1,57 @@
-<!-- Dear Mojang, Minecraft, and Github, This is not hosted on This Repo it is hosted on https://github.com/tharuniscool/elite-gamez.github.io DMCA thata nd not this -->
-const username = 'tharun-official-web';
-const repo = 'games';
-const branch = 'main';
+<!DOCTYPE html>
+<html style="width:100%;height:100%;background-color:black;">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+  <meta name="description" content="EaglercraftX 1.8 test directory HTML page" />
+  <meta name="keywords" content="eaglercraft, eaglercraftx, minecraft, 1.8, 1.8.8" />
+  <title>EaglyMC 1.20</title>
 
-async function purgeEntireRepo() {
-  console.log(`Fetching all files from ${username}/${repo}...`);
-  
-  try {
-    // 1. Fetch the repository file tree directly from GitHub's API
-    const githubApiUrl = `https://github.com{username}/${repo}/git/trees/${branch}?recursive=1`;
-    const response = await fetch(githubApiUrl);
-    const repoData = await response.json();
-    
-    if (!repoData.tree) {
-      throw new Error("Could not fetch repository files. Make sure it is a public repo.");
-    }
+  <meta property="og:locale" content="en-US" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="EaglyMC 1.20" />
+  <meta property="og:description" content="test directory HTML page" />
 
-    // 2. Filter out directories, keeping only actual files
-    const files = repoData.tree
-      .filter(item => item.type === 'blob')
-      .map(item => item.path);
+  <link type="image/png" rel="shortcut icon" href="https://cdn.jsdelivr.net/gh/tharuniscool/elite-gamez.github.io@main/favicon.png" />
 
-    console.log(`Found ${files.length} files. Starting bulk cache purge...`);
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/tharuniscool/elite-gamez.github.io@main/classess.js"></script>
 
-    // 3. Loop through and hit the jsDelivr purge API for every file
-    const purgePromises = files.map(async (filePath) => {
-      // Encode file paths to handle spaces (like "Minecraft 1.20.1.html")
-      const encodedPath = encodeURIComponent(filePath).replace(/%2F/g, '/');
-      const purgeUrl = `https://purge.jsdelivr.net/gh/${username}/${repo}@${branch}/${encodedPath}`;
-      
-      try {
-        const res = await fetch(purgeUrl);
-        const data = await res.json();
-        return { File: filePath, Status: data.status || 'Done' };
-      } catch (err) {
-        return { File: filePath, Status: 'Failed', Error: err.message };
+  <script type="text/javascript">
+    "use strict";
+    window.addEventListener("load", function () {
+      var relayId = Math.floor(Math.random() * 3);
+      window.eaglercraftXOpts = {
+        demoMode: false,
+        container: "game_frame",
+        assetsURI: "https://cdn.jsdelivr.net/gh/tharuniscool/elite-gamez.github.io@main/assets.epk",
+        localesURI: "https://cdn.jsdelivr.net/gh/tharuniscool/elite-gamez.github.io@main/lang/",
+        worldsDB: "worlds",
+        logInvalidCerts: true,
+        crashOnUncaughtExceptions: true,
+        servers: [
+          { addr: "ws://localhost:8081/", name: "Local test server" }
+        ],
+        relays: [
+          { addr: "wss://relay.deev.is/", comment: "lax1dude relay #1", primary: relayId === 0 },
+          { addr: "wss://relay.lax1dude.net/", comment: "lax1dude relay #2", primary: relayId === 1 },
+          { addr: "wss://relay.shhnowisnottheti.me/", comment: "ayunami relay #1", primary: relayId === 2 },
+          { addr: "wss://wisp.classroom.lat/", comment: "(CUSTOM) kryption replay #1", primary: relayId === 4 },
+          { addr: "wss://wisp.mercurywork.shop/", comment: "(CUSTOM) sandstone relay #1", primary: relayId === 4 }
+        ]
+      };
+
+
+      var q = window.location.search;
+      if ((typeof q === "string") && q[0] === "?" && (typeof window.URLSearchParams !== "undefined")) {
+        q = new window.URLSearchParams(q);
+        var s = q.get("server");
+        if (s) window.eaglercraftXOpts.joinServer = s;
       }
+
+      main();
     });
-
-    // 4. Run all purges concurrently and output a clean table
-    const summary = await Promise.all(purgePromises);
-    console.table(summary);
-    console.log("🚀 All files have been successfully sent to jsDelivr for clearing!");
-
-  } catch (error) {
-    console.error("Error executing bulk purge:", error);
-  }
-}
-
-// Execute the script
-purgeEntireRepo();
+  </script>
+</head>
+<body style="margin:0px;width:100%;height:100%;overflow:hidden;background-color:black;" id="game_frame">
+</body>
+</html>
