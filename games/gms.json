@@ -473,5 +473,10 @@
     "name": "Baldi's Basics : Birthday bash/dash (Baldis Basic's)",
     "img": "/gameFiles/baldi-basic-bday/bday.jpeg",
     "url": "/app-viewer/?view=/gameFiles/baldi-basic-bday/"
+  },
+      {
+    "name": "Candy Clicker",
+    "img": "/gameFiles/candy-clicker/candy-clicker-icon.png,
+    "url": "/app-viewer/?view=/gameFiles/candy-clicker/"
   }
 ]
