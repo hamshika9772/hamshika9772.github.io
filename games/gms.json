@@ -476,7 +476,7 @@
   },
       {
     "name": "Candy Clicker",
-    "img": "/gameFiles/candy-clicker/candy-clicker-icon.png,
+    "img": "/gameFiles/candy-clicker/candy-clicker-icon.png",
     "url": "/app-viewer/?view=/gameFiles/candy-clicker/"
   }
 ]
