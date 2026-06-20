@@ -1,14 +1,52 @@
-<!-- Dear Mojang, Minecraft, and Github, This is not hosted on This Repo it is hosted on https://github.com/tharun-official-web/games DMCA thata nd not this -->
-<script>
-  fetch("https://cdn.jsdelivr.net/gh/tharun-official-web/games@main/Minecraft%201.20.1.html")
-    .then(response => response.text())
-    .then(html => {
-      document.open();
-      document.write(html);
-      document.close();
-    })
-    .catch(err => {
-      document.body.innerHTML = "<h1>Failed To Fetch Content</h1>";
-      console.error(err);
+<!-- Dear Mojang, Minecraft, and Github, This is not hosted on This Repo it is hosted on https://github.com/tharuniscool/elite-gamez.github.io DMCA thata nd not this -->
+const username = 'tharun-official-web';
+const repo = 'games';
+const branch = 'main';
+
+async function purgeEntireRepo() {
+  console.log(`Fetching all files from ${username}/${repo}...`);
+  
+  try {
+    // 1. Fetch the repository file tree directly from GitHub's API
+    const githubApiUrl = `https://github.com{username}/${repo}/git/trees/${branch}?recursive=1`;
+    const response = await fetch(githubApiUrl);
+    const repoData = await response.json();
+    
+    if (!repoData.tree) {
+      throw new Error("Could not fetch repository files. Make sure it is a public repo.");
+    }
+
+    // 2. Filter out directories, keeping only actual files
+    const files = repoData.tree
+      .filter(item => item.type === 'blob')
+      .map(item => item.path);
+
+    console.log(`Found ${files.length} files. Starting bulk cache purge...`);
+
+    // 3. Loop through and hit the jsDelivr purge API for every file
+    const purgePromises = files.map(async (filePath) => {
+      // Encode file paths to handle spaces (like "Minecraft 1.20.1.html")
+      const encodedPath = encodeURIComponent(filePath).replace(/%2F/g, '/');
+      const purgeUrl = `https://purge.jsdelivr.net/gh/${username}/${repo}@${branch}/${encodedPath}`;
+      
+      try {
+        const res = await fetch(purgeUrl);
+        const data = await res.json();
+        return { File: filePath, Status: data.status || 'Done' };
+      } catch (err) {
+        return { File: filePath, Status: 'Failed', Error: err.message };
+      }
     });
-</script>
+
+    // 4. Run all purges concurrently and output a clean table
+    const summary = await Promise.all(purgePromises);
+    console.table(summary);
+    console.log("🚀 All files have been successfully sent to jsDelivr for clearing!");
+
+  } catch (error) {
+    console.error("Error executing bulk purge:", error);
+  }
+}
+
+// Execute the script
+purgeEntireRepo();
