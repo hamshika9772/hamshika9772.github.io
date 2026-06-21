@@ -402,7 +402,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="sections">
     <section class="section" id="featuredSection">
       <button class="section-header" type="button" data-target="featuredGridWrap" aria-expanded="true">
-        <span class="section-title-text">Featured Games</span>
+        <span class="section-title-text">Popular Games</span>
         <span class="section-arrow">›</span>
       </button>
       <div class="section-body" id="featuredGridWrap">
