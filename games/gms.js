@@ -157,14 +157,18 @@ async function loadCKV() {
     if (!r.ok) return;
     const d = await r.json();
 
+    const imgBaseUrl = "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/";
+
     DATA.ckv = safeArray(d)
       .map(g => {
         const gameUrl = g?.html || g?.url;
         if (!gameUrl) return null;
 
+        const imgFile = g.img || g.image || g.thumb;
+
         return {
           name: g.name || g.title || "Unknown",
-          img: g.img || g.image || g.thumb || "/1f3ae.png",
+          img: imgFile ? imgBaseUrl + imgFile : "/1f3ae.png",
           url: "/app-viewer/chicken-kings-vault/?view=" + encodeURIComponent(gameUrl)
         };
       })
