@@ -17,7 +17,6 @@ const UI_FONT_SIZE_BASE = '16px';
 const UI_LINE_HEIGHT_NORMAL = 1.5;
 const API_PROTOCOL_HTTP = 'http';
 const API_PROTOCOL_HTTPS = 'https';
-const API_PROTOCOL_WSS = 'wss';
 const API_HEADER_CONTENT_TYPE = 'Content-Type';
 const API_HEADER_AUTHORIZATION = 'Authorization';
 const API_CONTENT_TYPE_JSON = 'application/json';
