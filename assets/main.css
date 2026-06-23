@@ -1017,4 +1017,9 @@ svg[stroke] {
     width: calc(100vw - 56px);
     padding: 22px 16px;
   }
+
+  #settingsOverlay.open {
+  display: block;
+}
+  
 }
