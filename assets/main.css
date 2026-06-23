@@ -691,46 +691,85 @@ svg[stroke] {
     }
 
 #extraOverlay {
-  display: none;
   position: fixed;
-  top: 0;
-  left: 56px;
-  bottom: 0;
-  background: rgba(6, 7, 10, 0.98);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  z-index: 90;
-  color: var(--text);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: fit-content; 
+  min-width: 460px;   
+  max-width: 90vw;   
+  background-color: #0b0f19;
+  border: 2px solid #1e3a8a; 
+  border-radius: 12px;
+  padding: 24px;
+  color: #ffffff;
+  z-index: 1000;
+  display: flex;
   flex-direction: column;
-  padding: 32px 24px;
-  width: 320px;
-  border-right: 1px solid rgba(124, 92, 255, 0.1);
-  box-shadow: 30px 0 60px rgba(0, 0, 0, 0.8);
-  transform: translateX(-100%);
-  opacity: 0;
-  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  gap: 20px;
+  box-sizing: border-box;
 }
 
-
-#extraOverlay[style*="display: flex"], 
-#extraOverlay[style*="display:flex"] {
-  transform: translateX(0);
-  opacity: 1;
-  animation: slideInExtra 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-
-#extraOverlay.closing {
-  animation: slideOutExtra 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
 
 #extraOverlay h2 {
-  color: #fff;
-  font-size: 20px;
-  font-weight: 800;
-  margin-bottom: 24px;
-  text-shadow: 0 0 15px rgba(150, 120, 255, 0.8), 0 0 25px rgba(150, 120, 255, 0.4);
-  letter-spacing: 0.5px;
+  font-size: 1.5rem;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #1e293b;
+  padding-bottom: 8px;
+}
+
+
+#extraList {
+  display: flex;
+  flex-direction: column;
+  gap: 20px; 
+  width: 100%;
+}
+
+
+#extraList .input-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+}
+
+#extraList input[type="text"], 
+#extraList .form-input {
+  min-width: 320px; 
+  flex: 1;
+  padding: 12px;
+  background-color: #111827;
+  border: 1px solid #1e3a8a;
+  border-radius: 6px;
+  color: #ffffff;
+}
+
+#extraList button, 
+#extraList .btn {
+  white-space: nowrap; 
+  padding: 12px 20px;
+  cursor: pointer;
+  background-color: #12223f;
+  border: 1px solid #2563eb;
+  border-radius: 6px;
+  color: #ffffff;
+  font-weight: 600;
+}
+
+#extraOverlay > button {
+  align-self: flex-end; 
+  background-color: #1e293b;
+  border: 1px solid #475569;
+  padding: 10px 20px;
+  border-radius: 6px;
+  color: #ffffff;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+#extraOverlay > button:hover {
+  background-color: #334155;
 }
 
 #extraList {
