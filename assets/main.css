@@ -691,51 +691,95 @@ svg[stroke] {
     }
 
 #extraOverlay {
+  display: none; 
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: fit-content; 
-  min-width: 460px;   
-  max-width: 90vw;    
+  
+  width: fit-content;
+  min-width: 600px;   
+  max-width: 95vw;    
+  max-height: 70vh;   
+  overflow-y: auto;  
+  
   background-color: #0b0f19;
-  border: 2px solid #1e3a8a; 
+  border: 2px solid #1e3a8a;
   border-radius: 12px;
-  padding: 24px;
+  padding: 16px 48px; 
   color: #ffffff;
   z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
   box-sizing: border-box;
 }
 
+#extraOverlay.active {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
 #extraOverlay h2 {
-  font-size: 1.5rem;
-  margin-bottom: 4px;
+  font-size: 1.4rem;
+  margin-bottom: 2px;
   border-bottom: 1px solid #1e293b;
-  padding-bottom: 8px;
+  padding: 4px 0;
 }
 
 #extraList {
   display: flex;
   flex-direction: column;
-  gap: 20px; 
+  gap: 12px;
   width: 100%;
+}
+
+.default-settings-item { order: 1; }
+.navbar-settings-item { order: 2; }
+.addon-settings-item { order: 3; }
+
+#extraList > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #111827;
+  border: 1px solid #1e3a8a;
+  border-radius: 8px;
+  padding: 8px 24px; 
+  gap: 24px;
+  width: 100%;
+}
+
+#extraList img, 
+#extraList svg {
+  width: 40px !important;   
+  height: 40px !important;  
+  object-fit: contain;      
+}
+
+.setting-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+}
+
+.setting-title {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #ffffff;
 }
 
 #extraList .input-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   width: 100%;
 }
 
 #extraList input[type="text"], 
 #extraList .form-input {
-  min-width: 320px; 
+  min-width: 400px; 
   flex: 1;
-  padding: 12px;
+  padding: 8px 16px;
   background-color: #111827;
   border: 1px solid #1e3a8a;
   border-radius: 6px;
@@ -744,31 +788,35 @@ svg[stroke] {
 
 #extraList button, 
 #extraList .btn {
-  white-space: nowrap; 
-  padding: 12px 20px;
-  cursor: pointer;
+  white-space: nowrap;
+  padding: 8px 24px;
   background-color: #12223f;
   border: 1px solid #2563eb;
   border-radius: 6px;
   color: #ffffff;
   font-weight: 600;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+#extraList button:hover {
+  background-color: #1e3a8a;
 }
 
 #extraOverlay > button {
   align-self: flex-end; 
   background-color: #1e293b;
   border: 1px solid #475569;
-  padding: 10px 20px;
+  padding: 6px 20px;
   border-radius: 6px;
   color: #ffffff;
   cursor: pointer;
-  margin-top: 10px;
+  margin-top: 4px;
 }
 
 #extraOverlay > button:hover {
   background-color: #334155;
 }
-
 @keyframes spin {
   100% { transform: rotate(360deg); }
 }
