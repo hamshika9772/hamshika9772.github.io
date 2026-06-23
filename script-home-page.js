@@ -54,49 +54,13 @@ function renderExtraOverlay(){
   const container = document.getElementById("extraList");
   container.innerHTML = "";
 
-  const sectionIconsTitle = document.createElement("div");
-  sectionIconsTitle.style = "font-weight: bold; font-size: 16px; margin: 15px 0 10px 0; border-bottom: 1px solid #3f3f46; padding-bottom: 5px; color: #a1a1aa;";
-  sectionIconsTitle.textContent = "Extra Navbar Icons";
-  container.appendChild(sectionIconsTitle);
-
-  predefinedExtras.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "extraItem";
-    div.innerHTML = `<div class="extraIconPreview">${item.svg}</div><span>${item.name}</span>`;
-
-    const exists = extraNavs.find(x => x.name === item.name);
-
-    if(!exists){
-      const addBtn = document.createElement("button");
-      addBtn.textContent = "Add";
-      addBtn.onclick = () => {
-        extraNavs.push(item);
-        localStorage.setItem("extraNavs", JSON.stringify(extraNavs));
-        renderExtraNavGroup();
-        renderExtraOverlay();
-      };
-      div.appendChild(addBtn);
-    } else {
-      const removeBtn = document.createElement("button");
-      removeBtn.textContent = "Remove";
-      removeBtn.onclick = () => {
-        extraNavs = extraNavs.filter(x => x.name !== item.name);
-        localStorage.setItem("extraNavs", JSON.stringify(extraNavs));
-        renderExtraNavGroup();
-        renderExtraOverlay();
-      };
-      div.appendChild(removeBtn);
-    }
-    container.appendChild(div);
-  });
-
   const sectionSettingsTitle = document.createElement("div");
-  sectionSettingsTitle.style = "font-weight: bold; font-size: 16px; margin: 25px 0 15px 0; border-bottom: 1px solid #3f3f46; padding-bottom: 5px; color: #a1a1aa;";
+  sectionSettingsTitle.style = "font-weight: bold; font-size: 16px; color: #a1a1aa;";
   sectionSettingsTitle.textContent = "Default Settings";
   container.appendChild(sectionSettingsTitle);
 
   const wispWrapper = document.createElement("div");
-  wispWrapper.style = "margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px;";
+  wispWrapper.style = "margin-top: 15px; margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px;";
   wispWrapper.innerHTML = `<label style="font-size:13px; color:#e4e4e7;">Wisp Server URL:</label>`;
   
   const wispRow = document.createElement("div");
@@ -124,7 +88,7 @@ function renderExtraOverlay(){
   container.appendChild(wispWrapper);
 
   const cloakWrapper = document.createElement("div");
-  cloakWrapper.style = "margin-bottom: 15px; display: flex; flex-direction: column; gap: 5px;";
+  cloakWrapper.style = "margin-bottom: 25px; display: flex; flex-direction: column; gap: 5px;";
   cloakWrapper.innerHTML = `<label style="font-size:13px; color:#e4e4e7;">Idle Tab Cloaking Preset:</label>`;
 
   const cloakSelect = document.createElement("select");
@@ -181,6 +145,42 @@ function renderExtraOverlay(){
     customInputsDiv.style.display = cloakSelect.value === 'custom' ? 'flex' : 'none';
     saveCloakConfig();
   };
+
+  const sectionIconsTitle = document.createElement("div");
+  sectionIconsTitle.style = "font-weight: bold; font-size: 16px; color: #a1a1aa; margin-bottom: 15px;";
+  sectionIconsTitle.textContent = "Extra Navbar Icons";
+  container.appendChild(sectionIconsTitle);
+
+  predefinedExtras.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "extraItem";
+    div.innerHTML = `<div class="extraIconPreview">${item.svg}</div><span>${item.name}</span>`;
+
+    const exists = extraNavs.find(x => x.name === item.name);
+
+    if(!exists){
+      const addBtn = document.createElement("button");
+      addBtn.textContent = "Add";
+      addBtn.onclick = () => {
+        extraNavs.push(item);
+        localStorage.setItem("extraNavs", JSON.stringify(extraNavs));
+        renderExtraNavGroup();
+        renderExtraOverlay();
+      };
+      div.appendChild(addBtn);
+    } else {
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "Remove";
+      removeBtn.onclick = () => {
+        extraNavs = extraNavs.filter(x => x.name !== item.name);
+        localStorage.setItem("extraNavs", JSON.stringify(extraNavs));
+        renderExtraNavGroup();
+        renderExtraOverlay();
+      };
+      div.appendChild(removeBtn);
+    }
+    container.appendChild(div);
+  });
 
   setTimeout(() => {
     const tIn = document.getElementById("cloak-custom-title");
