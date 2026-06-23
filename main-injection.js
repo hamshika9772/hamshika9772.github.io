@@ -2,8 +2,9 @@
     'use strict';
 
     const originalTitle = document.title;
-    const originalFavicon = document.querySelector("link[rel*='icon']")?.href || "/favicon.ico";
-
+    const originalFavicon = document.querySelector("link[rel*='icon']")?.href || "/favicon.ico"; 
+    const blank = " "
+    const png = "image/png"
     const awayTitle = "Home - Classroom";
     const awayFavicon = "/idle-favicons/clasroom.ico"; 
 
@@ -17,9 +18,11 @@
         if (document.hidden) {
             document.title = awayTitle;
             icon.setAttribute("href", awayFavicon);
+            icon.setAttribute("type", blank);
         } else {
             document.title = originalTitle;
             icon.setAttribute("href", originalFavicon);
+            icon.setAttribute("type", png);
         }
     });
 
