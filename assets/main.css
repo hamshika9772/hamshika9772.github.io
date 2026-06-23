@@ -694,7 +694,7 @@ svg[stroke] {
   display: none;
   position: fixed;
   top: 0;
-  left: 75px;
+  left: 65px;
   bottom: 0;
   background: rgba(6, 7, 10, 0.98);
   backdrop-filter: blur(20px);
