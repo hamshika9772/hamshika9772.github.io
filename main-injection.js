@@ -5,7 +5,7 @@
     const originalFavicon = document.querySelector("link[rel*='icon']")?.href || "/favicon.ico";
 
     const awayTitle = "Home - Classroom";
-    const awayFavicon = "https://cdn.jsdelivr.net/gh/tharun9772/Bloxcraft-UBG@main/ic_product_classroom_32.png"; 
+    const awayFavicon = "/idle-favicons/clasroom.ico"; 
 
     document.addEventListener("visibilitychange", () => {
         let icon = document.querySelector("link[rel*='icon']");
