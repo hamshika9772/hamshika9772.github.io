@@ -93,8 +93,11 @@ function applyIdleTab() {
 }
 
 document.addEventListener("visibilitychange", () => {
-  if (document.hidden) applyIdleTab();
-  else applyOriginalTab();
+  if (document.hidden) {
+    applyIdleTab();
+  } else {
+    applyOriginalTab();
+  }
 });
 
 function clearContent() {
@@ -198,9 +201,18 @@ function validateFaviconUrl(url) {
 function toggleSettingsOverlay() {
   const el = document.getElementById("settingsOverlay");
   if (!el) return;
-  const open = el.style.display === "flex";
-  el.style.display = open ? "none" : "flex";
-  if (!open) renderSettingsPanel();
+
+  const isOpen = el.classList.contains("open");
+
+  if (isOpen) {
+    el.classList.remove("open");
+    el.style.display = "none";
+    return;
+  }
+
+  el.classList.add("open");
+  el.style.display = "flex";
+  renderSettingsPanel();
 }
 
 function renderSettingsPanel() {
