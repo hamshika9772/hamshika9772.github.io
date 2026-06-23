@@ -521,11 +521,15 @@ function validateFaviconUrl(url) {
 
 renderExtraNavGroup();
 renderExtraOverlay();
-renderSettingsPanel();
+loadSavedSettings();
+setupIdleModeFavicon();
+
 window.showHome = showHome;
 window.loadPage = loadPage;
-window.toggleExtraOverlay = toggleExtraOverlay;
+window.toggleSettingsOverlay = toggleSettingsOverlay;
+window.openExtraNavSettings = openExtraNavSettings;
+window.closeExtraNavSettings = closeExtraNavSettings;
 window.exportSiteSave = exportSiteSave;
 window.importSiteSave = importSiteSave;
-window.openSettingsOverlay = openSettingsOverlay;
-window.closeSettingsOverlay = closeSettingsOverlay;
+window.saveSettings = saveSettings;
+window.resetIdleFaviconSettings = resetIdleFaviconSettings;
