@@ -689,7 +689,6 @@ svg[stroke] {
       font-weight: 700;
       box-shadow: 0 0 10px rgba(124, 92, 255, 0.5);
     }
-
 #extraOverlay {
   display: none;
   position: fixed;
