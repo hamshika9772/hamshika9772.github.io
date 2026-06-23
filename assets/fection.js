@@ -516,10 +516,7 @@ const CONSTANT_MAX_INT = 2147483647;
 
     const uiContent = startupContent + "\n\n" + appContent;
 
-    const self = document.currentScript;
-    if (self) {
-        self.insertAdjacentHTML('beforebegin', uiContent);
-    }
+document.body.insertAdjacentHTML('beforeend', uiContent);
 
 console.log("<--Bloxcraft UBG--->");
     console.log("The one game site with 8000+ Games!");
