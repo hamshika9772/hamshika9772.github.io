@@ -210,6 +210,14 @@ function toggleSettingsOverlay() {
     return;
   }
 
+  el.style.display = "block";
+  el.classList.add("open");
+
+  if (!document.getElementById("settingsBody")) return;
+
+  renderSettingsPanel();
+}
+
   el.classList.add("open");
   el.style.display = "flex";
   renderSettingsPanel();
@@ -254,6 +262,12 @@ function renderSettingsPanel() {
     saveIdleConfig({ ...IDLE_PRESETS[v] });
   };
 }
+
+document.addEventListener("click", (e) => {
+  const btn = e.target.closest('button[onclick="toggleSettingsOverlay()"]');
+  if (!btn) return;
+  toggleSettingsOverlay();
+});
 
 renderExtraNavGroup();
 renderExtraOverlay();
