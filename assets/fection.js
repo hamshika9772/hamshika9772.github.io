@@ -507,7 +507,59 @@ const CONSTANT_MAX_INT = 2147483647;
   <h2>Extra Navbar Settings</h2>
   <div id="extraList"></div>
   <button onclick="toggleExtraOverlay()">Close</button>
-</div>`;
+</div>
+
+<div id="settingsOverlay">
+  <div class="settings-header">
+    <h2>Settings</h2>
+    <button class="settings-close-btn" onclick="toggleSettingsOverlay()">Close</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Tab Cloak</div>
+
+    <label class="settings-label" for="tabPresetSelect">Preset</label>
+    <select id="tabPresetSelect" class="settings-select">
+      <option value="classroom">Classroom</option>
+      <option value="docs">Google Docs</option>
+      <option value="drive">Google Drive</option>
+      <option value="custom">Custom</option>
+    </select>
+
+    <div id="customTabFields" class="settings-stack" style="display:none;">
+      <label class="settings-label" for="customTabTitle">Custom Title</label>
+      <input id="customTabTitle" class="settings-input" type="text" placeholder="Tab title">
+
+      <label class="settings-label" for="customTabIcon">Custom Icon URL / path</label>
+      <input id="customTabIcon" class="settings-input" type="text" placeholder="/idle-favicons/custom.ico">
+    </div>
+
+    <button class="settings-action-btn" onclick="saveTabCloakSettings()">Save Tab Cloak</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Wisp Server</div>
+
+    <label class="settings-label" for="wispModeSelect">Mode</label>
+    <select id="wispModeSelect" class="settings-select">
+      <option value="default">Default</option>
+      <option value="custom">Custom</option>
+    </select>
+
+    <div id="customWispWrap" class="settings-stack" style="display:none;">
+      <label class="settings-label" for="customWispInput">Custom Wisp URL</label>
+      <input id="customWispInput" class="settings-input" type="text" placeholder="wss://example.com/">
+    </div>
+
+    <button class="settings-action-btn" onclick="saveWispSettings()">Save Wisp Server</button>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Extra Navbars</div>
+    <button class="settings-action-btn alt" onclick="openExtraNavbarManager()">Manage Extra Navbars</button>
+  </div>
+</div>
+`;
 
     const uiContent = startupContent + "\n\n" + appContent;
 
