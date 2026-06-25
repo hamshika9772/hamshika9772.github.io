@@ -396,6 +396,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="cat" data-cat="tglsc">TGLSC</div>
     <div class="cat" data-cat="selenite">Selenite</div>
     <div class="cat" data-cat="velera">Velera</div>
+    <div class="cat" data-cat="frogies">Frogie's Arcade</div>
     <div class="cat" data-cat="all">All</div>
   </div>
 
