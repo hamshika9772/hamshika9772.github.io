@@ -17,21 +17,21 @@ const DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: []
+  tglsc: [], selenite: [], velera: [], frogies: []
 };
 
 const FEATURED = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: []
+  tglsc: [], selenite: [], velera: [], frogies: []
 };
 
 const RECOMMENDED = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: []
+  tglsc: [], selenite: [], velera: [], frogies: []
 };
 
 let CURRENT = [];
@@ -129,6 +129,14 @@ async function loadBlox() {
     const r = await fetch("/games/gms.json");
     if (!r.ok) return;
     DATA.blox = dedupeGames(safeArray(await r.json()).map(normalize).filter(Boolean));
+  } catch (e) {}
+}
+
+async function loadFrogies() {
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/frogies/gms.json");
+    if (!r.ok) return;
+    DATA.frogies = dedupeGames(safeArray(await r.json()).map(normalize).filter(Boolean));
   } catch (e) {}
 }
 
@@ -327,7 +335,7 @@ async function loadTruffled() {
       return {
         name: g.name,
         img: thumb
-          ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
+          ? "https://cdn.jsdelivr.gh/aukak/truffled@main/public/png/games/" + thumb
           : FALLBACK_IMG,
         url: "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
       };
@@ -476,13 +484,27 @@ async function loadVelera() {
   } catch (e) {}
 }
 
+async function loadFrogies() {
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/frogies/gms.json");
+    if (!r.ok) return;
+    const d = await r.json();
+
+    DATA.frogies = dedupeGames(safeArray(d).map(g => ({
+      name: g.title,
+      img: g.IMG || FALLBACK_IMG,
+      url: g.URL
+    })));
+  } catch (e) {}
+}
+
 const LOADER_MAP = {
   blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
   googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
   "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
-  velera: loadVelera
+  velera: loadVelera, frogies: loadFrogies
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
