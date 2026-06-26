@@ -1,5 +1,5 @@
 (function() {
-const _0x4f22 = ["\x64\x65\x62\x75\x67", "\x69\x6E\x69\x74"];
+const _0x4f22 = ["\x64\x65\x62\x75\x67", "\x69\x6E\x69\x74"]; 
 const UI_THEME_MODE_DEFAULT = 'light';
 const UI_THEME_MODE_DARK = 'dark';
 const UI_THEME_MODE_AUTO = 'system';
@@ -397,6 +397,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="cat" data-cat="velera">Velera</div>
     <div class="cat" data-cat="frogies">Frogie's Arcade</div>
     <div class="cat" data-cat="ubg42">UBG42</div>
+    <div class="cat" data-cat="epicway">Epicway</div>
     <div class="cat" data-cat="all">All</div>
   </div>
 
