@@ -17,21 +17,21 @@ const DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: []
+  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: []
 };
 
 const FEATURED = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: []
+  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: []
 };
 
 const RECOMMENDED = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: []
+  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: []
 };
 
 let CURRENT = [];
@@ -512,13 +512,52 @@ async function loadUbg42() {
   } catch (e) {}
 }
 
+async function loadEpicway() {
+  try {
+    const [resJson, resJs] = await Promise.all([
+      fetch("https://aisian-calc.dk-ubg.workers.dev/games/loader.json"),
+      fetch("https://aisian-calc.dk-ubg.workers.dev/games/load.js")
+    ]);
+    if (!resJson.ok || !resJs.ok) return;
+
+    const gamesData = await resJson.json();
+    const jsText = await resJs.text();
+
+    const sourcesMap = {};
+    const regex = /['"]?(\w+)['"]?\s*:\s*\{\s*url\s*:\s*['"]([^'"]+)['"]/g;
+    let match;
+    while ((match = regex.exec(jsText)) !== null) {
+      sourcesMap[match[1]] = match[2];
+    }
+
+    DATA.epicway = dedupeGames(safeArray(gamesData).map(g => {
+      if (!g || !g.url) return null;
+      const idMatch = g.url.match(/[?&]id=(\d+)/);
+      if (!idMatch) return null;
+      const id = idMatch[1];
+      const embedUrl = sourcesMap[id];
+      if (!embedUrl) return null;
+
+      const cleanEmbedUrl = embedUrl.trim().replace(/^\/+/, "");
+      const finalUrl = "/sail/embed/#https://wilway.today/" + cleanEmbedUrl;
+      const imgUrl = "https://aisian-calc.dk-ubg.workers.dev/" + (g.img || "").replace(/^\/+/, "");
+
+      return {
+        name: g.title || g.display || "Unknown",
+        img: imgUrl,
+        url: finalUrl
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
 const LOADER_MAP = {
   blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
   googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
   "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
-  velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42
+  velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42, epicway: loadEpicway
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
