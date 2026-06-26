@@ -1,4 +1,5 @@
-(function() {
+(function() 
+ {
 const _0x4f22 = ["\x64\x65\x62\x75\x67", "\x69\x6E\x69\x74"];
 const UI_THEME_MODE_DEFAULT = 'light';
 const UI_THEME_MODE_DARK = 'dark';
