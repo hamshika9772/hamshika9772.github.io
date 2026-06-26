@@ -524,7 +524,7 @@ async function loadEpicway() {
     const jsText = await resJs.text();
 
     const sourcesMap = {};
-    const regex = /['"]?(\w+)['"]?\s*:\s*\{\s*url\s*:\s*['"]([^'"]+)['"]/g;
+    const regex = /['"]?(\w+)['"]?\s*:\s*\{[^}]*?url\s*:\s*['"]([^'"]+)['"]/g;
     let match;
     while ((match = regex.exec(jsText)) !== null) {
       sourcesMap[match[1]] = match[2];
@@ -539,8 +539,11 @@ async function loadEpicway() {
       if (!embedUrl) return null;
 
       const cleanEmbedUrl = embedUrl.trim().replace(/^\/+/, "");
-      const finalUrl = "/sail/embed/#https://wilway.today/" + cleanEmbedUrl;
-      const imgUrl = "https://aisian-calc.dk-ubg.workers.dev/" + (g.img || "").replace(/^\/+/, "");
+      let finalUrl = "/sail/embed/#https://wilway.today/" + cleanEmbedUrl;
+      finalUrl = finalUrl.replace(/([^:]\/)\/+/g, "$1");
+
+      let imgUrl = "https://aisian-calc.dk-ubg.workers.dev/" + (g.img || "").replace(/^\/+/, "");
+      imgUrl = imgUrl.replace(/([^:]\/)\/+/g, "$1");
 
       return {
         name: g.title || g.display || "Unknown",
