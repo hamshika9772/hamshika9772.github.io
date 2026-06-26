@@ -17,21 +17,21 @@ const DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: []
+  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: []
 };
 
 const FEATURED = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: []
+  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: []
 };
 
 const RECOMMENDED = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: []
+  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: []
 };
 
 let CURRENT = [];
@@ -129,14 +129,6 @@ async function loadBlox() {
     const r = await fetch("/games/gms.json");
     if (!r.ok) return;
     DATA.blox = dedupeGames(safeArray(await r.json()).map(normalize).filter(Boolean));
-  } catch (e) {}
-}
-
-async function loadFrogies() {
-  try {
-    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/frogies/gms.json");
-    if (!r.ok) return;
-    DATA.frogies = dedupeGames(safeArray(await r.json()).map(normalize).filter(Boolean));
   } catch (e) {}
 }
 
@@ -498,13 +490,35 @@ async function loadFrogies() {
   } catch (e) {}
 }
 
+async function loadUbg42() {
+  try {
+    const r = await fetch("https://multible-questions.dk-ubg.workers.dev/gms/bloxy/gaming.json");
+    if (!r.ok) return;
+    const d = await r.json();
+    const base = "https://multible-questions.dk-ubg.workers.dev";
+
+    DATA.ubg42 = dedupeGames(safeArray(d).map(g => {
+      if (!g?.NAME || !g?.URL) return null;
+
+      let imgUrl = g.IMG ? `${base}/${g.IMG}` : FALLBACK_IMG;
+      imgUrl = imgUrl.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
+
+      return {
+        name: g.NAME,
+        url: g.URL,
+        img: imgUrl
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
 const LOADER_MAP = {
   blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
   googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
   "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
-  velera: loadVelera, frogies: loadFrogies
+  velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
