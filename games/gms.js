@@ -561,14 +561,19 @@ async function loadNoahh() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/noahh/gms_replaced.json");
     if (!r.ok) return;
-    const d = await r.json();
+    
+    const rawText = await r.text();
+    
+    const fixedJsonText = rawText
+      .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
+      .replace(/,\s*([\]}])/g, '$1');
+
+    const d = JSON.parse(fixedJsonText);
 
     DATA.noahh = dedupeGames(safeArray(d).map(g => {
       if (!g) return null;
-      
       const title = g.title || g.name;
-      const url = g.url || g.link || g.href;
-      
+      const url = g.url || g.link;
       if (!title || !url) return null;
       
       return {
@@ -577,9 +582,11 @@ async function loadNoahh() {
         url: url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/?view=")
       };
     }).filter(Boolean));
-  } catch (e) {}
-}
 
+  } catch (e) {
+    console.error("Failed to parse game data. Error details:", e);
+  }
+}
 const LOADER_MAP = {
   blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
