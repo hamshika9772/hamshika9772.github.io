@@ -514,27 +514,46 @@ async function loadUbg42() {
 
 async function loadEpicway() {
   try {
-    const res = await fetch("https://aisian-calc.dk-ubg.workers.dev/games/loader.json");
-    if (!res.ok) return;
+    const [resJson, resJs] = await Promise.all([
+      fetch("https://aisian-calc.dk-ubg.workers.dev/games/loader.json"),
+      fetch("https://aisian-calc.dk-ubg.workers.dev/games/load.js")
+    ]);
+    if (!resJson.ok || !resJs.ok) return;
 
-    const gamesData = await res.json();
+    const gamesData = await resJson.json();
+    const jsText = await resJs.text();
+
+    const sourcesMap = {};
+    const regex = /['"]?(\w+)['"]?\s*:\s*\{[^}]*?url\s*:\s*['"]([^'"]+)['"]/g;
+    let match;
+    while ((match = regex.exec(jsText)) !== null) {
+      sourcesMap[match[1]] = match[2];
+    }
 
     DATA.epicway = dedupeGames(safeArray(gamesData).map(g => {
-      if (!g || !g.title || !g.url) return null;
+      if (!g || !g.url) return null;
+      const idMatch = g.url.match(/[?&]id=(\d+)/);
+      if (!idMatch) return null;
+      const id = idMatch[1];
+      const embedUrl = sourcesMap[id];
+      if (!embedUrl) return null;
 
-      let imgUrl = "https://aisian-calc.dk-ubg.workers.dev/" + g.img;
-      imgUrl = imgUrl.replace(/([^:]\/)\/+/g, "$1");
-      let finalUrl = "/sail/embed/#https://wilway.today/" + g.url;
+      const cleanEmbedUrl = embedUrl.trim().replace(/^\/+/, "");
+      let finalUrl = "/sail/embed/#https://wilway.today/" + cleanEmbedUrl;
       finalUrl = finalUrl.replace(/([^:]\/)\/+/g, "$1");
 
+      let imgUrl = "https://aisian-calc.dk-ubg.workers.dev/" + (g.img || "").replace(/^\/+/, "");
+      imgUrl = imgUrl.replace(/([^:]\/)\/+/g, "$1");
+
       return {
-        name: g.title,
+        name: g.title || g.display || "Unknown",
         img: imgUrl,
         url: finalUrl
       };
     }).filter(Boolean));
-  } catch (e) {
-  }
+  } catch (e) {}
+}
+
 }
 
 
