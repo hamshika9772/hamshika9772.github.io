@@ -554,9 +554,6 @@ async function loadEpicway() {
   } catch (e) {}
 }
 
-}
-
-
 const LOADER_MAP = {
   blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
