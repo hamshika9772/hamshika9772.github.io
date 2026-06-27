@@ -557,19 +557,24 @@ async function loadEpicway() {
   } catch (e) {}
 }
 
-async function loadNoah() {
+async function loadNoahh() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/noahh/gms_replaced.json");
     if (!r.ok) return;
     const d = await r.json();
 
     DATA.noahh = dedupeGames(safeArray(d).map(g => {
-      if (!g || !g.title || !g.url) return null;
+      if (!g) return null;
+      
+      const title = g.title || g.name;
+      const url = g.url || g.link || g.href;
+      
+      if (!title || !url) return null;
       
       return {
-        name: g.title,
-        img: g.image || FALLBACK_IMG,
-        url: g.url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/?view=")
+        name: title,
+        img: g.image || g.img || FALLBACK_IMG,
+        url: url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/?view=")
       };
     }).filter(Boolean));
   } catch (e) {}
@@ -582,7 +587,7 @@ const LOADER_MAP = {
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
   "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
   velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42, epicway: loadEpicway,
-  noahh: loadNoah
+  noahh: loadNoahh
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
