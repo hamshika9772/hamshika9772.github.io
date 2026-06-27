@@ -557,7 +557,7 @@ async function loadEpicway() {
   } catch (e) {}
 }
 
-async function loadNoahh() {
+async function loadNoah() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/noahh/gms_replaced.json");
     if (!r.ok) return;
@@ -569,7 +569,7 @@ async function loadNoahh() {
       return {
         name: g.title,
         img: g.image || FALLBACK_IMG,
-        url: g.url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/noahh?view=")
+        url: g.url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/?view=")
       };
     }).filter(Boolean));
   } catch (e) {}
@@ -582,7 +582,7 @@ const LOADER_MAP = {
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
   "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
   velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42, epicway: loadEpicway,
-  noahh: loadNoahh
+  noahh: loadNoah
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
