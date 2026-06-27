@@ -579,7 +579,7 @@ async function loadNoahh() {
       return {
         name: title,
         img: g.image || g.img || FALLBACK_IMG,
-        url: url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/?view=")
+        url: url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/noah/?view=")
       };
     }).filter(Boolean));
 
