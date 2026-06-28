@@ -381,10 +381,20 @@ const appContent = `
     </div>
     
     <div class="category-row">
-      <div class="row-label">Topics</div>
+      <div class="row-label">Topics)</div>
       <div class="categories" id="topicsContainer"></div>
     </div>
   </div>
+
+    <section class="section" id="topicsSection" style="display: none;">
+      <button class="section-header" type="button" data-target="topicsGridWrap" aria-expanded="true">
+        <span class="section-title-text">Selected Topic</span>
+        <span class="section-arrow">›</span>
+      </button>
+      <div class="section-body" id="topicsGridWrap">
+        <div id="topicsGrid" class="grid"></div>
+      </div>
+    </section>
 
   <div class="sections">
     <section class="section" id="featuredSection">
@@ -404,16 +414,6 @@ const appContent = `
       </button>
       <div class="section-body" id="recommendedGridWrap">
         <div id="recommendedGrid" class="grid"></div>
-      </div>
-    </section>
-
-    <section class="section" id="topicsSection" style="display: none;">
-      <button class="section-header" type="button" data-target="topicsGridWrap" aria-expanded="true">
-        <span class="section-title-text">Selected Topic</span>
-        <span class="section-arrow">›</span>
-      </button>
-      <div class="section-body" id="topicsGridWrap">
-        <div id="topicsGrid" class="grid"></div>
       </div>
     </section>
 
