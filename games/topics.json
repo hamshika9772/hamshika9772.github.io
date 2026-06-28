@@ -27,10 +27,6 @@
     "id": "run",
     "name": "Run Series",
   },
-      {
-    "id": "yt",
-    "name": "Youtube Playables",
-  },
         {
     "id": "cloudgames",
     "name": "Cloud Gaming",

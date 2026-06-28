@@ -232,7 +232,7 @@ async function loadCKV() {
 
         return {
           name: g.name || g.title || "Unknown",
-          img: g.img || g.image || g.thumb || FALLBACK_IMG,
+          img: "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.img || "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.image || "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.thumb || FALLBACK_IMG,
           url: "/app-viewer/chicken-kings-vault/?view=" + encodeURIComponent(gameUrl)
         };
       })
