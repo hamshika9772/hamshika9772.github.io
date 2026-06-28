@@ -399,6 +399,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="cat" data-cat="ubg42">UBG42</div>
     <div class="cat" data-cat="epicway">Epicway</div>
     <div class="cat" data-cat="noahh">Noah's Tutoring Hub</div>
+    <div class="cat" data-cat="youtube">YouTube Playables</div>
     <div class="cat" data-cat="all">All</div>
   </div>
 
