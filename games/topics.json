@@ -68,5 +68,9 @@
      {
     "id": "edu",
     "name": "Education Games",
+  },
+  {
+    "id": "pokemon",
+    "name": "Pokemon Games",
   }
 ]
