@@ -18,7 +18,7 @@ const DATA = {
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
   tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
-  noahh: []
+  noahh: [], youtube: []
 };
 
 const FEATURED = {
@@ -26,7 +26,7 @@ const FEATURED = {
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
   tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
-  noahh: []
+  noahh: [], youtube: []
 };
 
 const RECOMMENDED = {
@@ -34,7 +34,7 @@ const RECOMMENDED = {
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
   tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
-  noahh: []
+  noahh: [], youtube: []
 };
 
 let CURRENT = [];
@@ -587,6 +587,24 @@ async function loadNoahh() {
     console.error("Failed to parse game data. Error details:", e);
   }
 }
+
+async function loadYoutube() {
+  try {
+    const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/youtube/gms.json");
+    if (!r.ok) return;
+    const d = await r.json();
+
+    DATA.youtube = dedupeGames(safeArray(d).map(g => {
+      if (!g || !g.name) return null;
+      return {
+        name: g.name,
+        img: "/youtube.png",
+        url: "/app-viewer/youtube-playables/?view=" + encodeURIComponent(g.name)
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
 const LOADER_MAP = {
   blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
@@ -594,7 +612,7 @@ const LOADER_MAP = {
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
   "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
   velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42, epicway: loadEpicway,
-  noahh: loadNoahh
+  noahh: loadNoahh, youtube: loadYoutube
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
