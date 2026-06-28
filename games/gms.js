@@ -2,17 +2,14 @@ const grid = document.getElementById("grid");
 const featuredGrid = document.getElementById("featuredGrid");
 const recommendedGrid = document.getElementById("recommendedGrid");
 const topicsGrid = document.getElementById("topicsGrid");
-
 const featuredSection = document.getElementById("featuredSection");
 const recommendedSection = document.getElementById("recommendedSection");
 const topicsSection = document.getElementById("topicsSection");
 const allSection = document.getElementById("allSection");
-
 const search = document.getElementById("search");
 const count = document.getElementById("count");
 const librariesContainer = document.getElementById("librariesContainer");
 const topicsContainer = document.getElementById("topicsContainer");
-
 const PAGE_SIZE = 60;
 const FEATURED_LIMIT = 100000;
 const RECOMMENDED_LIMIT = 100000;
@@ -34,7 +31,7 @@ const RECOMMENDED = JSON.parse(JSON.stringify(DATA));
 const CACHED_TOPICS_RAW = {}; 
 let TOPIC_METADATA = [];
 
-let ACTIVE_LIBS = new Set(["blox"]);
+let ACTIVE_LIBS = new Set(["all"]);
 let ACTIVE_TOPICS = new Set(["none"]);
 
 let CURRENT = [];
@@ -770,7 +767,7 @@ function buildDynamicCategoryLayouts() {
       
       if (ACTIVE_LIBS.has(lib.id)) {
         ACTIVE_LIBS.delete(lib.id);
-        if (ACTIVE_LIBS.size === 0) ACTIVE_LIBS.add("blox"); 
+        if (ACTIVE_LIBS.size === 0) ACTIVE_LIBS.add("all"); 
       } else {
         ACTIVE_LIBS.add(lib.id);
       }
