@@ -35,6 +35,7 @@
         {
     "id": "multiplayer",
     "name": "Multiplayer Games",
+    "include": "minecraft, cloudgames"
   },
           {
     "id": "baldmods",
