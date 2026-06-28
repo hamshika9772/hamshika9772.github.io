@@ -18,7 +18,7 @@ const LIB_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/librar
 const TOPIC_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/topics/";
 
 const DATA = {
-  blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
+  blox: [], gn: [], elite: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
   tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
@@ -160,22 +160,6 @@ async function loadElite() {
       img: "https://cdn.jsdelivr.net/gh/tharuniscool/elite-gamez.github.io@main/" + g.image,
       url: "/app-viewer/elite-gamez?url=" + encodeURIComponent(g.url)
     })));
-  } catch (e) {}
-}
-
-async function loadSea() {
-  try {
-    const r = await fetch("https://cdn.jsdelivr.net/gh/sea-bean-unblocked/sde@main/zzz.json");
-    if (!r.ok) return;
-    const d = await r.json();
-    DATA.sea = dedupeGames(safeArray(d).map(g => {
-      const cover = (g.cover || "").replace("{COVER_URL}/", "");
-      return {
-        name: g.name || "Unknown",
-        img: cover.startsWith("http") ? cover : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
-        url: "/app-viewer/sea-bean?view=" + encodeURIComponent(g.id)
-      };
-    }));
   } catch (e) {}
 }
 
@@ -506,7 +490,7 @@ async function loadYoutube() {
 }
 
 const LOADER_MAP = {
-  blox: loadBlox, gn: loadGN, elite: loadElite, sea: loadSea, ugs: loadUGS,
+  blox: loadBlox, gn: loadGN, elite: loadElite, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
   googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
@@ -747,7 +731,7 @@ function buildDynamicCategoryLayouts() {
 
   const libraryKeys = [
     { id: "blox", name: "Bloxcraft UBG" }, { id: "gn", name: "GN-Math" }, { id: "elite", name: "Elite Gamez" },
-    { id: "sea", name: "Sea Bean" }, { id: "ugs", name: "Ultimate Game Stash" }, { id: "seraph", name: "Seraph" },
+    { id: "ugs", name: "Ultimate Game Stash" }, { id: "seraph", name: "Seraph" },
     { id: "ckv", name: "Chicken Kings Vault" }, { id: "hydra", name: "Hydra" }, { id: "ccported", name: "CCPorted" },
     { id: "googleclass", name: "Google Class" }, { id: "truffled", name: "Truffled" }, { id: "nowgg", name: "Now.GG" },
     { id: "alexrworlds", name: "Alexr's World" }, { id: "lupine", name: "LupineVault" }, { id: "3kh0", name: "3kh0" },
