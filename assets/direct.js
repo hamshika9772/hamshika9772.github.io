@@ -387,6 +387,7 @@ const appContent = `
     </div>
   </div>
 
+  <div class="sections">
     <section class="section" id="topicsSection" style="display: none;">
       <button class="section-header" type="button" data-target="topicsGridWrap" aria-expanded="true">
         <span class="section-title-text">Selected Topic</span>
@@ -397,7 +398,6 @@ const appContent = `
       </div>
     </section>
 
-  <div class="sections">
     <section class="section" id="featuredSection">
       <button class="section-header" type="button" data-target="featuredGridWrap" aria-expanded="true">
         <span class="section-title-text">Popular Games</span>
