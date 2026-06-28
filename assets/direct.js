@@ -381,7 +381,7 @@ const appContent = `
     </div>
     
     <div class="category-row">
-      <div class="row-label">Topics)</div>
+      <div class="row-label">Topics</div>
       <div class="categories" id="topicsContainer"></div>
     </div>
   </div>
