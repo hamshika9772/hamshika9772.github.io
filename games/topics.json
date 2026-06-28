@@ -1,80 +1,83 @@
 [
   {
     "id": "minecraft",
-    "name": "Minecraft",
+    "name": "Minecraft"
   },
   {
     "id": "driving",
-    "name": "Driving & Racing",
+    "name": "Driving & Racing"
   },
   {
     "id": "puzzle",
-    "name": "Strategy & Puzzles",
+    "name": "Strategy & Puzzles"
   },
   {
     "id": "retro",
-    "name": "Retro & Classic",
+    "name": "Retro & Classic"
   },
   {
     "id": "simulation",
-    "name": "Tycoon & Simulation",
+    "name": "Tycoon & Simulation"
   },
-    {
+  {
     "id": "io",
-    "name": ".io Games",
+    "name": ".io Games"
   },
-      {
+  {
     "id": "run",
-    "name": "Run Series",
+    "name": "Run Series"
   },
-        {
+  {
     "id": "cloudgames",
-    "name": "Cloud Gaming",
+    "name": "Cloud Gaming"
   },
-
-        {
+  {
     "id": "multiplayer",
     "name": "Multiplayer Games",
     "include": "minecraft, cloudgames"
   },
-          {
+  {
     "id": "baldmods",
-    "name": "Baldi Basic's (Includeds Mods)",
+    "name": "Baldi Basic's (Includeds Mods)"
   },
-   {
+  {
     "id": "clicker",
-    "name": "Clicker Games",
+    "name": "Clicker Games"
   },
-     {
+  {
     "id": "card",
-    "name": "Card Games",
+    "name": "Card Games"
   },
   {
     "id": "google",
-    "name": "Google Games",
+    "name": "Google Games"
   },
-    {
+  {
     "id": "papa",
-    "name": "Papa's Games",
+    "name": "Papa's Games"
   },
-      {
+  {
     "id": "cutropes",
-    "name": "Cut The Rope Series",
+    "name": "Cut The Rope Series"
   },
-   {
+  {
     "id": "towers",
-    "name": "Tower Defense Games",
+    "name": "Tower Defense Games"
   },
-     {
+  {
     "id": "edu",
-    "name": "Education Games",
+    "name": "Education Games"
   },
   {
     "id": "pokemon",
-    "name": "Pokemon Games",
+    "name": "Pokemon Games"
   },
-    {
+  {
     "id": "moto3",
-    "name": "Moto X3M Series",
+    "name": "Moto X3M Series"
+  },
+  {
+    "id": "granny1234",
+    "name": "Granny Series"
   }
 ]
