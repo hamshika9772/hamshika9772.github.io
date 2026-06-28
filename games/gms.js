@@ -1,17 +1,24 @@
 const grid = document.getElementById("grid");
 const featuredGrid = document.getElementById("featuredGrid");
 const recommendedGrid = document.getElementById("recommendedGrid");
+const topicsGrid = document.getElementById("topicsGrid");
+
 const featuredSection = document.getElementById("featuredSection");
 const recommendedSection = document.getElementById("recommendedSection");
+const topicsSection = document.getElementById("topicsSection");
 const allSection = document.getElementById("allSection");
+
 const search = document.getElementById("search");
 const count = document.getElementById("count");
+const librariesContainer = document.getElementById("librariesContainer");
+const topicsContainer = document.getElementById("topicsContainer");
 
 const PAGE_SIZE = 60;
 const FEATURED_LIMIT = 100000;
 const RECOMMENDED_LIMIT = 100000;
 const FALLBACK_IMG = "/1f3ae.png";
 const LIB_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/";
+const TOPIC_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/topics/";
 
 const DATA = {
   blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
@@ -21,28 +28,25 @@ const DATA = {
   noahh: [], youtube: []
 };
 
-const FEATURED = {
-  blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
-  ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
-  nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
-  noahh: [], youtube: []
-};
+const FEATURED = JSON.parse(JSON.stringify(DATA));
+const RECOMMENDED = JSON.parse(JSON.stringify(DATA));
 
-const RECOMMENDED = {
-  blox: [], gn: [], elite: [], sea: [], ugs: [], seraph: [],
-  ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
-  nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
-  noahh: [], youtube: []
-};
+const CACHED_TOPICS_RAW = {}; 
+let TOPIC_METADATA = [];
+
+let ACTIVE_LIBS = new Set(["blox"]);
+let ACTIVE_TOPICS = new Set(["none"]);
 
 let CURRENT = [];
 let CURRENT_FEATURED = [];
 let CURRENT_RECOMMENDED = [];
+let CURRENT_TOPICS = [];
+
 let FILTERED = [];
 let FILTERED_FEATURED = [];
 let FILTERED_RECOMMENDED = [];
+let FILTERED_TOPICS = [];
+
 let RENDERED = 0;
 let OBSERVER_SENTINEL = null;
 
@@ -78,9 +82,10 @@ function normalize(g) {
   if (!g || !g.name || !g.url) return null;
   return {
     name: g.name,
-    img: g.img || FALLBACK_IMG,
+    img: g.img || g.IMG || g.image || FALLBACK_IMG,
     altImg: g.altImg || null,
-    url: g.url
+    url: g.url || g.URL,
+    engine: g.engine || null
   };
 }
 
@@ -96,9 +101,13 @@ function dedupeGames(list) {
     seen.add(key);
     out.push(g);
   }
-
   return out;
 }
+
+const withTimeout = (fn, ms = 4000) => Promise.race([
+  fn(),
+  new Promise(resolve => setTimeout(resolve, ms))
+]);
 
 async function fetchLibraryList(lib, jsonName) {
   try {
@@ -117,15 +126,9 @@ async function loadLibraryExtras(cat) {
     fetchLibraryList(lib, "popular.json"),
     fetchLibraryList(lib, "recommended.json")
   ]);
-
   FEATURED[cat] = popular;
   RECOMMENDED[cat] = recommended;
 }
-
-const withTimeout = (fn, ms = 4000) => Promise.race([
-  fn(),
-  new Promise(resolve => setTimeout(resolve, ms))
-]);
 
 async function loadBlox() {
   try {
@@ -172,9 +175,7 @@ async function loadSea() {
       const cover = (g.cover || "").replace("{COVER_URL}/", "");
       return {
         name: g.name || "Unknown",
-        img: cover.startsWith("http")
-          ? cover
-          : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
+        img: cover.startsWith("http") ? cover : "https://cdn.jsdelivr.net/gh/sea-bean-unblocked/Singlemile@main/Icon/" + cover,
         url: "/app-viewer/sea-bean?view=" + encodeURIComponent(g.id)
       };
     }));
@@ -183,7 +184,6 @@ async function loadSea() {
 
 async function loadUGS() {
   const repos = ["tharun9772/ugs-1", "tharun9772/ugs-2", "tharun9772/ugs-3"];
-
   const results = await Promise.all(repos.map(async repo => {
     try {
       const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/" + repo + "/file.json");
@@ -196,11 +196,8 @@ async function loadUGS() {
           img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
           url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
         }));
-    } catch (e) {
-      return [];
-    }
+    } catch (e) { return []; }
   }));
-
   DATA.ugs = dedupeGames(results.flat());
 }
 
@@ -210,7 +207,6 @@ async function loadSeraph() {
     if (!r.ok) return;
     const d = await r.json();
     const BASE = "https://cdn.jsdelivr.net/gh/a456pur/seraph@main/games/";
-
     DATA.seraph = dedupeGames(safeArray(d).map(g => ({
       name: g.name || "Unknown",
       img: g.img || "",
@@ -224,19 +220,15 @@ async function loadCKV() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/games.json");
     if (!r.ok) return;
     const d = await r.json();
-
-    DATA.ckv = dedupeGames(safeArray(d)
-      .map(g => {
-        const gameUrl = g?.html || g?.url;
-        if (!gameUrl) return null;
-
-        return {
-          name: g.name || g.title || "Unknown",
-          img: "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.img || "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.image || "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + g.thumb || FALLBACK_IMG,
-          url: "/app-viewer/chicken-kings-vault/?view=" + encodeURIComponent(gameUrl)
-        };
-      })
-      .filter(Boolean));
+    DATA.ckv = dedupeGames(safeArray(d).map(g => {
+      const gameUrl = g?.html || g?.url;
+      if (!gameUrl) return null;
+      return {
+        name: g.name || g.title || "Unknown",
+        img: "https://cdn.jsdelivr.net/gh/carbonicality/ChickenKingsVault@main/gameimages/" + (g.img || g.image || g.thumb || FALLBACK_IMG),
+        url: "/app-viewer/chicken-kings-vault/?view=" + encodeURIComponent(gameUrl)
+      };
+    }).filter(Boolean));
   } catch (e) {}
 }
 
@@ -245,33 +237,16 @@ async function loadHydra() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharuniscool/hydra-assets@main/gmes.json");
     if (!r.ok) return;
     const d = await r.json();
-
-    let rawArray = [];
-    if (Array.isArray(d)) {
-      rawArray = d;
-    } else if (d && typeof d === "object") {
-      rawArray = Array.isArray(d.games) ? d.games :
-                 Array.isArray(d.data) ? d.data :
-                 Array.isArray(d.list) ? d.list :
-                 Object.values(d);
-    }
-
+    let rawArray = Array.isArray(d) ? d : safeArray(d);
     DATA.hydra = dedupeGames(rawArray.map(g => {
       if (!g || typeof g !== "object") return null;
-
       const file = g.file_name || g.link || g.url;
       if (!file) return null;
-
       let thumb = g.thumb || g.image || g.img || FALLBACK_IMG;
       if (thumb !== FALLBACK_IMG && !thumb.startsWith("http")) {
         thumb = "https://cdn.jsdelivr.net/gh/tharuniscool/hydra-assets@main/" + thumb.replace(/^\/+/, "");
       }
-
-      return {
-        name: g.title || g.name || "Unknown",
-        img: thumb,
-        url: "/app-viewer/hydra-network/?view=" + encodeURIComponent(file)
-      };
+      return { name: g.title || g.name || "Unknown", img: thumb, url: "/app-viewer/hydra-network/?view=" + encodeURIComponent(file) };
     }).filter(Boolean));
   } catch (e) {}
 }
@@ -281,22 +256,13 @@ async function loadCCPorted() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/ccported-stupid-game-lib.json");
     if (!r.ok) return;
     const d = await r.json();
-
-    DATA.ccported = dedupeGames(safeArray(d)
-      .map(g => {
-        const id = g?.Id || g?.id || g?._idFallback;
-        if (!id) return null;
-
-        let img = g?.img || g?.image || g?.thumb || g?.thumbnail || FALLBACK_IMG;
-        if (g?.base) img = g.base + "/thumb.jpg";
-
-        return {
-          name: g.name || g.title || "Game " + id,
-          img: img,
-          url: "/app-viewer/ccported/?view=" + encodeURIComponent(id)
-        };
-      })
-      .filter(Boolean));
+    DATA.ccported = dedupeGames(safeArray(d).map(g => {
+      const id = g?.Id || g?.id || g?._idFallback;
+      if (!id) return null;
+      let img = g?.img || g?.image || g?.thumb || g?.thumbnail || FALLBACK_IMG;
+      if (g?.base) img = g.base + "/thumb.jpg";
+      return { name: g.name || g.title || "Game " + id, img: img, url: "/app-viewer/ccported/?view=" + encodeURIComponent(id) };
+    }).filter(Boolean));
   } catch (e) {}
 }
 
@@ -305,7 +271,6 @@ async function loadGoogleClass() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/bloxcraft-st/google-class-files@main/assets/games.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.googleclass = dedupeGames(safeArray(d).map(g => ({
       name: g.name || "Unknown",
       img: g.img || "",
@@ -319,19 +284,12 @@ async function loadTruffled() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/js/json/g.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.truffled = dedupeGames(safeArray(d).map(g => {
       if (!g.url) return null;
-
-      const thumb = (g.thumbnail || "")
-        .replace(/^\/+/, "")
-        .replace(/^png\/games\//, "");
-
+      const thumb = (g.thumbnail || "").replace(/^\/+/, "").replace(/^png\/games\//, "");
       return {
         name: g.name,
-        img: thumb
-          ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb
-          : FALLBACK_IMG,
+        img: thumb ? "https://cdn.jsdelivr.net/gh/aukak/truffled@main/public/png/games/" + thumb : FALLBACK_IMG,
         url: "/sail/embed/#https://truffled.lol/" + g.url.replace(/^\/+/, "")
       };
     }).filter(Boolean));
@@ -343,18 +301,11 @@ async function loadNowGG() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/nowgg.fun/games.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.nowgg = dedupeGames(safeArray(d).map(g => {
       if (!g.name || !g.url) return null;
-
       let cleanUrl = g.url.trim();
       if (!cleanUrl.startsWith("http")) cleanUrl = "https://" + cleanUrl;
-
-      return {
-        name: g.name,
-        img: g.img || FALLBACK_IMG,
-        url: "/sail/embed/#" + cleanUrl
-      };
+      return { name: g.name, img: g.img || FALLBACK_IMG, url: "/sail/embed/#" + cleanUrl };
     }).filter(Boolean));
   } catch (e) {}
 }
@@ -364,7 +315,6 @@ async function loadAlexrworlds() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/dskjfoisjfsjio/alexrsworld@latest/singlefilegames.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.alexrworlds = dedupeGames(safeArray(d).map(g => ({
       name: g.title || "Unknown",
       img: g.img || FALLBACK_IMG,
@@ -378,12 +328,9 @@ async function loadLupine() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/games.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.lupine = dedupeGames(safeArray(d).map(g => {
       if (!g.name) return null;
-
       const encoded = encodeURIComponent(g.name);
-
       return {
         name: g.name,
         img: "https://cdn.jsdelivr.net/gh/tharun9772/LupineVault@main/assets/images/games/tile/" + encoded + ".png",
@@ -399,7 +346,6 @@ async function load3kh0() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-assets.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA["3kh0"] = dedupeGames(safeArray(d).map(name => ({
       name,
       img: "https://raw.githack.com/tharun9772/3kh0-assets/main/" + name + "/splash.png",
@@ -413,7 +359,6 @@ async function load3kh0Lite() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/3kh0/3kh0-lite.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA["3kh0lite"] = dedupeGames(safeArray(d).map(g => ({
       name: g.title || "Unknown",
       img: "https://raw.githack.com/3kh0/3kh0-lite/main/" + g.imgSrc,
@@ -428,10 +373,8 @@ async function loadTGLSC() {
     if (!r.ok) return;
     const d = await r.json();
     const base = "https://math-question-generator.dk-ubg.workers.dev";
-
     DATA.tglsc = dedupeGames(safeArray(d).map(g => {
       if (!g?.title || !g?.embed_url) return null;
-
       return {
         name: g.title,
         img: base + "/" + (g.thumbnail || "").replace(/^\/+/, ""),
@@ -446,12 +389,9 @@ async function loadSelenite() {
     const r = await fetch("https://math-quests-cc.dk-ubg.workers.dev/resources/games.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.selenite = dedupeGames(safeArray(d).map(g => {
       if (!g?.name || !g?.image || !g?.directory) return null;
-
       const dir = String(g.directory).replace(/^\/+/, "").replace(/\/+$/, "");
-
       return {
         name: g.name,
         img: "https://math-quests-cc.dk-ubg.workers.dev/resources/semag/" + dir + "/" + g.image,
@@ -466,10 +406,8 @@ async function loadVelera() {
     const r = await fetch("https://math-of-cc.dk-ubg.workers.dev/data/games.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.velera = dedupeGames(safeArray(d).map(g => {
       if (!g?.title || !g?.location) return null;
-
       return {
         name: g.title,
         img: "https://math-of-cc.dk-ubg.workers.dev/" + String(g.image || "").replace(/^\/+/, ""),
@@ -484,12 +422,7 @@ async function loadFrogies() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/frogies/gms.json");
     if (!r.ok) return;
     const d = await r.json();
-
-    DATA.frogies = dedupeGames(safeArray(d).map(g => ({
-      name: g.title,
-      img: g.IMG || FALLBACK_IMG,
-      url: g.URL
-    })));
+    DATA.frogies = dedupeGames(safeArray(d).map(g => ({ name: g.title, img: g.IMG || FALLBACK_IMG, url: g.URL })));
   } catch (e) {}
 }
 
@@ -499,18 +432,11 @@ async function loadUbg42() {
     if (!r.ok) return;
     const d = await r.json();
     const base = "https://multible-questions.dk-ubg.workers.dev";
-
     DATA.ubg42 = dedupeGames(safeArray(d).map(g => {
       if (!g?.NAME || !g?.URL) return null;
-
       let imgUrl = g.IMG ? `${base}/${g.IMG}` : FALLBACK_IMG;
       imgUrl = imgUrl.replace(/(https?:\/\/)|(\/)+/g, "$1$2");
-
-      return {
-        name: g.NAME,
-        url: g.URL,
-        img: imgUrl
-      };
+      return { name: g.NAME, url: g.URL, img: imgUrl };
     }).filter(Boolean));
   } catch (e) {}
 }
@@ -522,17 +448,14 @@ async function loadEpicway() {
       fetch("https://aisian-calc.dk-ubg.workers.dev/games/load.js")
     ]);
     if (!resJson.ok || !resJs.ok) return;
-
     const gamesData = await resJson.json();
     const jsText = await resJs.text();
-
     const sourcesMap = {};
     const regex = /['"]?(\w+)['"]?\s*:\s*\{[^}]*?url\s*:\s*['"]([^'"]+)['"]/g;
     let match;
     while ((match = regex.exec(jsText)) !== null) {
       sourcesMap[match[1]] = match[2];
     }
-
     DATA.epicway = dedupeGames(safeArray(gamesData).map(g => {
       if (!g || !g.url) return null;
       const idMatch = g.url.match(/[?&]id=(\d+)/);
@@ -540,19 +463,12 @@ async function loadEpicway() {
       const id = idMatch[1];
       const embedUrl = sourcesMap[id];
       if (!embedUrl) return null;
-
       const cleanEmbedUrl = embedUrl.trim().replace(/^\/+/, "");
       let finalUrl = "/sail/embed/#https://wilway.today/" + cleanEmbedUrl;
       finalUrl = finalUrl.replace(/([^:]\/)\/+/g, "$1");
-
       let imgUrl = "https://aisian-calc.dk-ubg.workers.dev/" + (g.img || "").replace(/^\/+/, "");
       imgUrl = imgUrl.replace(/([^:]\/)\/+/g, "$1");
-
-      return {
-        name: g.title || g.display || "Unknown",
-        img: imgUrl,
-        url: finalUrl
-      };
+      return { name: g.title || g.display || "Unknown", img: imgUrl, url: finalUrl };
     }).filter(Boolean));
   } catch (e) {}
 }
@@ -561,31 +477,23 @@ async function loadNoahh() {
   try {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/noahh/gms_replaced.json");
     if (!r.ok) return;
-    
     const rawText = await r.text();
-    
     const fixedJsonText = rawText
       .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
       .replace(/,\s*([\]}])/g, '$1');
-
     const d = JSON.parse(fixedJsonText);
-
     DATA.noahh = dedupeGames(safeArray(d).map(g => {
       if (!g) return null;
       const title = g.title || g.name;
       const url = g.url || g.link;
       if (!title || !url) return null;
-      
       return {
         name: title,
         img: g.image || g.img || FALLBACK_IMG,
         url: url.replace("https://cdn.jsdelivr.net/gh/NoahsAmazingTutoringHelp/Noahs-Calculus-Tutor/", "/app-viewer/noah/?view=")
       };
     }).filter(Boolean));
-
-  } catch (e) {
-    console.error("Failed to parse game data. Error details:", e);
-  }
+  } catch (e) {}
 }
 
 async function loadYoutube() {
@@ -593,14 +501,9 @@ async function loadYoutube() {
     const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/youtube/gms.json");
     if (!r.ok) return;
     const d = await r.json();
-
     DATA.youtube = dedupeGames(safeArray(d).map(g => {
       if (!g || !g.name) return null;
-      return {
-        name: g.name,
-        img: "/youtube.png",
-        url: "/app-viewer/youtube-playables/?view=" + encodeURIComponent(g.name)
-      };
+      return { name: g.name, img: "/youtube.png", url: "/app-viewer/youtube-playables/?view=" + encodeURIComponent(g.name) };
     }).filter(Boolean));
   } catch (e) {}
 }
@@ -629,9 +532,48 @@ async function loadAllCategories() {
   await Promise.allSettled(CATEGORY_KEYS.map(cat => loadCategory(cat)));
 }
 
+async function fetchTopicData(topicId) {
+  if (CACHED_TOPICS_RAW[topicId]) return CACHED_TOPICS_RAW[topicId];
+  try {
+    const res = await fetch(`${TOPIC_BASE}${topicId}.json`);
+    if (!res.ok) return [];
+    const json = await res.json();
+    const processed = safeArray(json).map(g => {
+      const normalizedItem = normalize(g);
+      if (normalizedItem && g.engine) normalizedItem.engine = g.engine.toLowerCase().trim();
+      return normalizedItem;
+    }).filter(Boolean);
+
+    CACHED_TOPICS_RAW[topicId] = processed;
+    return processed;
+  } catch (e) {
+    return [];
+  }
+}
+
+async function resolveActiveTopicsData() {
+  if (ACTIVE_TOPICS.has("none") || ACTIVE_TOPICS.size === 0) return [];
+  
+  const targetIds = new Set();
+  
+  ACTIVE_TOPICS.forEach(id => {
+    targetIds.add(id);
+    const meta = TOPIC_METADATA.find(t => t.id === id);
+    if (meta && meta.include) {
+      meta.include.split(",").forEach(inc => {
+        const cleaned = inc.trim().toLowerCase();
+        if (cleaned) targetIds.add(cleaned);
+      });
+    }
+  });
+
+  const arrays = await Promise.all(Array.from(targetIds).map(id => fetchTopicData(id)));
+  return dedupeGames(arrays.flat());
+}
+
 function applyFilter(list, query) {
   const q = (query || "").toLowerCase().trim();
-  return dedupeGames(list).filter(g => g?.name?.toLowerCase().includes(q));
+  return list.filter(g => g?.name?.toLowerCase().includes(q));
 }
 
 function getCombinedAllFromMap(map) {
@@ -645,7 +587,6 @@ function createCard(g) {
   const img = document.createElement("img");
   img.loading = "lazy";
   img.src = g.img || FALLBACK_IMG;
-
   img.onerror = () => {
     if (g.altImg && !img.dataset.retried) {
       img.dataset.retried = "true";
@@ -685,13 +626,11 @@ function renderSectionGrid(target, list, options = {}) {
   list.slice(0, limit).forEach(g => {
     frag.appendChild(createCard(g));
   });
-
   target.appendChild(frag);
 }
 
 function renderMain(reset = false) {
   if (!grid) return;
-
   if (reset) {
     grid.innerHTML = "";
     RENDERED = 0;
@@ -708,9 +647,7 @@ function renderMain(reset = false) {
   grid.appendChild(frag);
   RENDERED += slice.length;
 
-  if (RENDERED < valid.length) {
-    setupObserver();
-  }
+  if (RENDERED < valid.length) setupObserver();
 }
 
 function setupObserver() {
@@ -735,20 +672,20 @@ function RESET_RENDER() {
 
 function updateCount() {
   if (count) {
-    count.textContent = FILTERED.length + " games";
+    count.textContent = (FILTERED.length + FILTERED_TOPICS.length) + " games";
   }
 }
 
 function renderEverything() {
-  renderSectionGrid(featuredGrid, FILTERED_FEATURED, {
-    limit: FEATURED_LIMIT,
-    emptyText: "No featured games found."
-  });
+  if (ACTIVE_TOPICS.has("none") || FILTERED_TOPICS.length === 0) {
+    topicsSection.style.display = "none";
+  } else {
+    topicsSection.style.display = "";
+    renderSectionGrid(topicsGrid, FILTERED_TOPICS, { emptyText: "No matching engine games for this topic." });
+  }
 
-  renderSectionGrid(recommendedGrid, FILTERED_RECOMMENDED, {
-    limit: RECOMMENDED_LIMIT,
-    emptyText: "No recommended games found."
-  });
+  renderSectionGrid(featuredGrid, FILTERED_FEATURED, { limit: FEATURED_LIMIT, emptyText: "No popular games found." });
+  renderSectionGrid(recommendedGrid, FILTERED_RECOMMENDED, { limit: RECOMMENDED_LIMIT, emptyText: "No recommended games found." });
 
   RESET_RENDER();
   updateCount();
@@ -759,21 +696,133 @@ function renderEverything() {
   allSection.style.display = "";
 }
 
-function setCurrentCategoryData(cat) {
-  if (cat === "all") {
-    CURRENT = getCombinedAllFromMap(DATA);
-    CURRENT_FEATURED = getCombinedAllFromMap(FEATURED);
-    CURRENT_RECOMMENDED = getCombinedAllFromMap(RECOMMENDED);
+async function pipelineUpdate() {
+  const query = search ? search.value : "";
+
+  let combinedRaw = [];
+  let combinedFeatured = [];
+  let combinedRecommended = [];
+
+  if (ACTIVE_LIBS.has("all")) {
+    combinedRaw = getCombinedAllFromMap(DATA);
+    combinedFeatured = getCombinedAllFromMap(FEATURED);
+    combinedRecommended = getCombinedAllFromMap(RECOMMENDED);
   } else {
-    CURRENT = dedupeGames(DATA[cat] || []);
-    CURRENT_FEATURED = dedupeGames(FEATURED[cat] || []);
-    CURRENT_RECOMMENDED = dedupeGames(RECOMMENDED[cat] || []);
+    ACTIVE_LIBS.forEach(libKey => {
+      if (DATA[libKey]) combinedRaw.push(...DATA[libKey]);
+      if (FEATURED[libKey]) combinedFeatured.push(...FEATURED[libKey]);
+      if (RECOMMENDED[libKey]) combinedRecommended.push(...RECOMMENDED[libKey]);
+    });
+    combinedRaw = dedupeGames(combinedRaw);
+    combinedFeatured = dedupeGames(combinedFeatured);
+    combinedRecommended = dedupeGames(combinedRecommended);
   }
 
-  const query = search ? search.value : "";
-  FILTERED = applyFilter(CURRENT, query);
-  FILTERED_FEATURED = applyFilter(CURRENT_FEATURED, query);
-  FILTERED_RECOMMENDED = applyFilter(CURRENT_RECOMMENDED, query);
+  let topicsRaw = await resolveActiveTopicsData();
+  if (!ACTIVE_LIBS.has("all") && ACTIVE_LIBS.size > 0) {
+    topicsRaw = topicsRaw.filter(game => game.engine && ACTIVE_LIBS.has(game.engine));
+  }
+
+  FILTERED = applyFilter(combinedRaw, query);
+  FILTERED_FEATURED = applyFilter(combinedFeatured, query);
+  FILTERED_RECOMMENDED = applyFilter(combinedRecommended, query);
+  FILTERED_TOPICS = applyFilter(topicsRaw, query);
+
+  renderEverything();
+}
+
+function buildDynamicCategoryLayouts() {
+  librariesContainer.innerHTML = "";
+  
+  const allEl = document.createElement("div");
+  allEl.className = `cat ${ACTIVE_LIBS.has("all") ? "active" : ""}`;
+  allEl.textContent = "All";
+  allEl.dataset.cat = "all";
+  allEl.onclick = async () => {
+    RESET_RENDER();
+    ACTIVE_LIBS.clear();
+    ACTIVE_LIBS.add("all");
+    await loadAllCategories();
+    syncUISelectedClasses();
+    await pipelineUpdate();
+  };
+  librariesContainer.appendChild(allEl);
+
+  const libraryKeys = [
+    { id: "blox", name: "Bloxcraft UBG" }, { id: "gn", name: "GN-Math" }, { id: "elite", name: "Elite Gamez" },
+    { id: "sea", name: "Sea Bean" }, { id: "ugs", name: "Ultimate Game Stash" }, { id: "seraph", name: "Seraph" },
+    { id: "ckv", name: "Chicken Kings Vault" }, { id: "hydra", name: "Hydra" }, { id: "ccported", name: "CCPorted" },
+    { id: "googleclass", name: "Google Class" }, { id: "truffled", name: "Truffled" }, { id: "nowgg", name: "Now.GG" },
+    { id: "alexrworlds", name: "Alexr's World" }, { id: "lupine", name: "LupineVault" }, { id: "3kh0", name: "3kh0" },
+    { id: "3kh0lite", name: "3kh0 Lite" }, { id: "tglsc", name: "TGLSC" }, { id: "selenite", name: "Selenite" },
+    { id: "velera", name: "Velera" }, { id: "frogies", name: "Frogie's Arcade" }, { id: "ubg42", name: "UBG42" },
+    { id: "epicway", name: "Epicway" }, { id: "noahh", name: "Noah's Tutoring Hub" }, { id: "youtube", name: "YouTube Playables" }
+  ];
+
+  libraryKeys.forEach(lib => {
+    const el = document.createElement("div");
+    el.className = `cat ${ACTIVE_LIBS.has(lib.id) ? "active" : ""}`;
+    el.textContent = lib.name;
+    el.dataset.cat = lib.id;
+    el.onclick = async () => {
+      RESET_RENDER();
+      if (ACTIVE_LIBS.has("all")) ACTIVE_LIBS.delete("all");
+      
+      if (ACTIVE_LIBS.has(lib.id)) {
+        ACTIVE_LIBS.delete(lib.id);
+        if (ACTIVE_LIBS.size === 0) ACTIVE_LIBS.add("blox"); 
+      } else {
+        ACTIVE_LIBS.add(lib.id);
+      }
+
+      await Promise.all(Array.from(ACTIVE_LIBS).map(c => loadCategory(c)));
+      syncUISelectedClasses();
+      await pipelineUpdate();
+    };
+    librariesContainer.appendChild(el);
+  });
+
+  topicsContainer.innerHTML = "";
+  const noneEl = document.createElement("div");
+  noneEl.className = `cat ${ACTIVE_TOPICS.has("none") ? "active" : ""}`;
+  noneEl.textContent = "None";
+  noneEl.dataset.topic = "none";
+  noneEl.onclick = () => {
+    ACTIVE_TOPICS.clear();
+    ACTIVE_TOPICS.add("none");
+    syncUISelectedClasses();
+    pipelineUpdate();
+  };
+  topicsContainer.appendChild(noneEl);
+
+  TOPIC_METADATA.forEach(topic => {
+    const el = document.createElement("div");
+    el.className = `cat ${ACTIVE_TOPICS.has(topic.id) ? "active" : ""}`;
+    el.textContent = topic.name;
+    el.dataset.topic = topic.id;
+    el.onclick = async () => {
+      if (ACTIVE_TOPICS.has("none")) ACTIVE_TOPICS.delete("none");
+
+      if (ACTIVE_TOPICS.has(topic.id)) {
+        ACTIVE_TOPICS.delete(topic.id);
+        if (ACTIVE_TOPICS.size === 0) ACTIVE_TOPICS.add("none");
+      } else {
+        ACTIVE_TOPICS.add(topic.id);
+      }
+      syncUISelectedClasses();
+      await pipelineUpdate();
+    };
+    topicsContainer.appendChild(el);
+  });
+}
+
+function syncUISelectedClasses() {
+  document.querySelectorAll("#librariesContainer .cat").forEach(el => {
+    el.classList.toggle("active", ACTIVE_LIBS.has(el.dataset.cat));
+  });
+  document.querySelectorAll("#topicsContainer .cat").forEach(el => {
+    el.classList.toggle("active", ACTIVE_TOPICS.has(el.dataset.topic));
+  });
 }
 
 function toggleSection(sectionEl, forceExpanded) {
@@ -792,51 +841,27 @@ document.querySelectorAll(".section-header").forEach(btn => {
   });
 });
 
-document.querySelectorAll(".cat").forEach(el => {
-  el.onclick = async () => {
-    document.querySelectorAll(".cat").forEach(c => c.classList.remove("active"));
-    el.classList.add("active");
-
-    const cat = el.dataset.cat;
-
-    CURRENT = [];
-    CURRENT_FEATURED = [];
-    CURRENT_RECOMMENDED = [];
-    FILTERED = [];
-    FILTERED_FEATURED = [];
-    FILTERED_RECOMMENDED = [];
-    RESET_RENDER();
-
-    if (cat === "all") {
-      await loadAllCategories();
-    } else {
-      await loadCategory(cat);
-    }
-
-    setCurrentCategoryData(cat);
-    renderEverything();
-  };
-});
-
 if (search) {
   search.oninput = () => {
-    const activeTab = document.querySelector(".cat.active");
-    const cat = activeTab ? activeTab.dataset.cat : "blox";
-    setCurrentCategoryData(cat);
-    renderEverything();
+    pipelineUpdate();
   };
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const activeTab = document.querySelector(".cat.active");
-  const cat = activeTab ? activeTab.dataset.cat : "blox";
-
-  if (cat === "all") {
-    await loadAllCategories();
-  } else {
-    await loadCategory(cat);
+  try {
+    const res = await fetch("/games/topics.json");
+    if (res.ok) TOPIC_METADATA = safeArray(await res.json());
+  } catch(e) {
+    TOPIC_METADATA = [];
   }
 
-  setCurrentCategoryData(cat);
-  renderEverything();
+  buildDynamicCategoryLayouts();
+  
+  if (ACTIVE_LIBS.has("all")) {
+    await loadAllCategories();
+  } else {
+    await Promise.all(Array.from(ACTIVE_LIBS).map(c => loadCategory(c)));
+  }
+
+  await pipelineUpdate();
 });
