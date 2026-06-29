@@ -134,7 +134,12 @@ function renderExtraOverlay(){
 
   const offlineWrapper = document.createElement("div");
   offlineWrapper.style = "margin-bottom: 25px; display: flex; flex-direction: column; gap: 5px;";
-  offlineWrapper.innerHTML = `<label style="font-size:13px; color:#e4e4e7;">Enable Offline Use:</label>`;
+offlineWrapper.innerHTML = `
+  <label style="font-size:13px; color:#e4e4e7;">Enable Offline Use:</label>
+  <div style="font-size:11px; color:#a1a1aa; margin-top: 2px; line-height: 1.4;">
+    It only loads the pages you already did and it will only show the latest version you loaded.
+  </div>
+`;
 
   const offlineSelect = document.createElement("select");
   offlineSelect.style = "padding: 6px; background: #27272a; border: 1px solid #3f3f46; border-radius: 4px; color: #fff; font-size: 13px; cursor: pointer;";
