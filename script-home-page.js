@@ -137,8 +137,9 @@ function renderExtraOverlay(){
 offlineWrapper.innerHTML = `
   <label style="font-size:13px; color:#e4e4e7;">Enable Offline Use:</label>
   <div style="font-size:11px; color:#a1a1aa; margin-top: 2px; line-height: 1.4;">
-    It only loads the pages you already did and it will only show the latest version you loaded.
+    It only loads the pages you already did<br>and it will only show the latest version you loaded.
   </div>
+`;
 `;
 
   const offlineSelect = document.createElement("select");
