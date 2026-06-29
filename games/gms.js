@@ -653,7 +653,7 @@ function RESET_RENDER() {
 
 function updateCount() {
   if (count) {
-    count.textContent = (FILTERED.length + FILTERED_TOPICS.length) + " games";
+   count.textContent = FILTERED.length + " games";
   }
 }
 
