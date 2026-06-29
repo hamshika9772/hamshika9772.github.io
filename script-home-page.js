@@ -140,7 +140,6 @@ offlineWrapper.innerHTML = `
     It only loads the pages you already did<br>and it will only show the latest version you loaded.
   </div>
 `;
-`;
 
   const offlineSelect = document.createElement("select");
   offlineSelect.style = "padding: 6px; background: #27272a; border: 1px solid #3f3f46; border-radius: 4px; color: #fff; font-size: 13px; cursor: pointer;";
