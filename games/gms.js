@@ -22,7 +22,7 @@ const DATA = {
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
   nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
   tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
-  noahh: [], youtube: []
+  noahh: [], youtube: [], solo: []
 };
 
 const FEATURED = JSON.parse(JSON.stringify(DATA));
@@ -489,6 +489,20 @@ async function loadYoutube() {
   } catch (e) {}
 }
 
+async function loadSolo() {
+  try {
+    const r = await fetch("https://stromg-quests.dk-ubg.workers.dev/g.json");
+    if (!r.ok) return;
+    const d = await r.json();
+    DATA.solo = dedupeGames(safeArray(d).map(g => {
+      if (!g || !g.alt || !g.url) return null;
+      let imgUrl = ("https://stromg-quests.dk-ubg.workers.dev/" + (g.img || "")).replace(/([^:]\/)\/+/g, "$1");
+      let finalUrl = ("/sail/embed/#play.qatual.com/" + (g.url || "")).replace(/([^:]\/)\/+/g, "$1");
+      return { name: g.alt, img: imgUrl, url: finalUrl };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
 const LOADER_MAP = {
   blox: loadBlox, gn: loadGN, elite: loadElite, ugs: loadUGS,
   seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
@@ -496,7 +510,7 @@ const LOADER_MAP = {
   alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
   "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
   velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42, epicway: loadEpicway,
-  noahh: loadNoahh, youtube: loadYoutube
+  noahh: loadNoahh, youtube: loadYoutube, solo: loadSolo
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
@@ -737,7 +751,8 @@ function buildDynamicCategoryLayouts() {
     { id: "alexrworlds", name: "Alexr's World" }, { id: "lupine", name: "LupineVault" }, { id: "3kh0", name: "3kh0" },
     { id: "3kh0lite", name: "3kh0 Lite" }, { id: "tglsc", name: "TGLSC" }, { id: "selenite", name: "Selenite" },
     { id: "velera", name: "Velera" }, { id: "frogies", name: "Frogie's Arcade" }, { id: "ubg42", name: "UBG42" },
-    { id: "epicway", name: "Epicway" }, { id: "noahh", name: "Noah's Tutoring Hub" }, { id: "youtube", name: "YouTube Playables" }
+    { id: "epicway", name: "Epicway" }, { id: "noahh", name: "Noah's Tutoring Hub" }, { id: "youtube", name: "YouTube Playables" },
+    { id: "solo", name: "Solo Central" }
   ];
 
   libraryKeys.forEach(lib => {
