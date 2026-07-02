@@ -291,64 +291,65 @@ body {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 
-.fav-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  z-index: 5;
-  width: 34px;
-  height: 34px;
-  background: rgba(5, 6, 13, 0.75);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  border: 1px solid rgba(124, 92, 255, 0.3);
-  border-radius: 8px; 
-  color: rgba(207, 214, 255, 0.4);
-  font-size: 16px;
+.game-card .fav-btn {
+  position: absolute !important;
+  top: 10px;
+  right: 10px;
+  z-index: 10; 
+  width: 36px;
+  height: 36px;
+  border-radius: 50% !important; 
+  background: rgba(5, 6, 13, 0.55) !important; 
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.8); 
+  font-size: 18px;
   line-height: 1;
-  cursor: pointer;
-  display: flex;
+  display: flex !important;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   pointer-events: none;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  padding: 0;
+  margin: 0;
 }
 
 .game-card:hover .fav-btn,
-.fav-btn.active {
-  opacity: 1;
-  pointer-events: auto;
+.game-card .fav-btn.active {
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
-.fav-btn:hover {
-  transform: scale(1.05);
+.game-card .fav-btn:hover {
+  transform: scale(1.1);
+  background: rgba(5, 6, 13, 0.75) !important;
+  border-color: rgba(255, 255, 255, 0.5);
   color: #fff;
-  background: rgba(13, 16, 37, 0.9);
-  border-color: rgba(124, 92, 255, 0.6);
 }
 
-.fav-btn.active {
-  color: #ffcc00; 
-  background: rgba(255, 204, 0, 0.12);
-  border-color: rgba(255, 204, 0, 0.5);
-  text-shadow: 0 0 8px rgba(255, 204, 0, 0.7);
-  box-shadow: 0 0 12px rgba(255, 204, 0, 0.25);
+.game-card .fav-btn.active {
+  color: #ffd700 !important; 
+  background: rgba(5, 6, 13, 0.75) !important; 
+  border-color: rgba(255, 215, 0, 0.6) !important;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
 }
 
-.fav-btn:active {
+.game-card .fav-btn:active {
   transform: scale(0.92);
 }
 
 @media (max-width: 700px) {
-  .fav-btn {
-    opacity: 1;
-    pointer-events: auto;
-    width: 30px;
-    height: 30px;
+  .game-card .fav-btn {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    width: 32px;
+    height: 32px;
     top: 8px;
     right: 8px;
-    font-size: 14px;
+    font-size: 16px;
   }
 }
