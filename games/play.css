@@ -290,4 +290,52 @@ body {
   .grid {
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
+
+.fav-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  background: rgba(5, 6, 13, 0.7);
+  border: 1px solid rgba(124, 92, 255, 0.2);
+  color: rgba(207, 214, 255, 0.4);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  opacity: 0;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.game-card:hover .fav-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.fav-btn:hover {
+  transform: scale(1.15);
+  color: #fff;
+  border-color: rgba(124, 92, 255, 0.5);
+  background: rgba(13, 16, 37, 0.9);
+}
+
+.fav-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+  color: #ffca28;
+  text-shadow: 0 0 8px rgba(255, 202, 40, 0.6);
+  border-color: rgba(255, 202, 40, 0.4);
+}
+
+@media (max-width: 700px) {
+  .fav-btn {
+    opacity: 1;
+    pointer-events: auto;
+  }
 }
