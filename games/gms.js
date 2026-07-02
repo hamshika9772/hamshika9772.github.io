@@ -706,7 +706,7 @@ function updateCount() {
 
 function renderEverything() {
   const query = search ? search.value : "";
-
+  
   if (ACTIVE_TOPICS.has("none") || FILTERED_TOPICS.length === 0) {
     topicsSection.style.display = "none";
   } else {
@@ -716,13 +716,15 @@ function renderEverything() {
 
   const filteredFavs = applyFilter(FAVORITES, query);
   const filteredRecents = applyFilter(RECENTLY_PLAYED, query);
+  const uniqueRecents = filteredRecents.filter(recent => 
+    !filteredFavs.some(fav => fav.name === recent.name && fav.url === recent.url)
+  );
 
-  if (filteredFavs.length === 0 && filteredRecents.length === 0) {
+  if (filteredFavs.length === 0 && uniqueRecents.length === 0) {
     favoritesRecentSection.style.display = "none";
   } else {
     favoritesRecentSection.style.display = "";
-
-    renderSectionGrid(favoritesRecentGrid, [...filteredFavs, ...filteredRecents]);
+    renderSectionGrid(favoritesRecentGrid, [...filteredFavs, ...uniqueRecents]);
   }
 
   renderSectionGrid(featuredGrid, FILTERED_FEATURED, { limit: FEATURED_LIMIT, emptyText: "No popular games found." });
