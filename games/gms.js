@@ -18,12 +18,35 @@ const RECOMMENDED_LIMIT = 100000;
 const FALLBACK_IMG = "/1f3ae.png";
 const LIB_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/";
 const TOPIC_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/topics/";
+
 const DATA = {
-  blox: [], gn: [], elite: [], ugs: [], seraph: [],
-  ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
-  nowgg: [], alexrworlds: [], lupine: [], "3kh0": [], "3kh0lite": [],
-  tglsc: [], selenite: [], velera: [], frogies: [], ubg42: [], epicway: [],
-  noahh: [], youtube: [], solo: []
+  blox: [], 
+  gn: [], 
+  elite: [], 
+  ugs: [], 
+  seraph: [],
+  ckv: [], 
+  hydra: [], 
+  ccported: [], 
+  googleclass: [], 
+  truffled: [],
+  nowgg: [], 
+  alexrworlds: [], 
+  lupine: [], 
+  "3kh0": [], 
+  "3kh0lite": [],
+  tglsc: [], 
+  selenite: [], 
+  velera: [], 
+  frogies: [], 
+  ubg42: [], 
+  epicway: [],
+  noahh: [], 
+  youtube: [], 
+  solo: [], 
+  degloveed: [], 
+  kruated: [], 
+  pizzalite: []
 };
 
 const FEATURED = JSON.parse(JSON.stringify(DATA));
@@ -155,7 +178,7 @@ async function loadElite() {
     const d = await r.json();
     DATA.elite = dedupeGames(safeArray(d).map(g => ({
       name: g.title || "Unknown",
-      img: "https://cdn.jsdelivr.net/gh/tharuniscool/elite-gamez.github.io@main/" + g.image,
+      img: "https://cdn.jsdelivr.gh/tharuniscool/elite-gamez.github.io@main/" + g.image,
       url: "/app-viewer/elite-gamez?url=" + encodeURIComponent(g.url)
     })));
   } catch (e) {}
@@ -383,9 +406,9 @@ async function loadSelenite() {
     const r = await fetch("https://math-quests-cc.dk-ubg.workers.dev/resources/games.json");
     if (!r.ok) return;
     const d = await r.json();
+    const dir = String(g.directory).replace(/^\/+/, "").replace(/\/+$/, "");
     DATA.selenite = dedupeGames(safeArray(d).map(g => {
       if (!g?.name || !g?.image || !g?.directory) return null;
-      const dir = String(g.directory).replace(/^\/+/, "").replace(/\/+$/, "");
       return {
         name: g.name,
         img: "https://math-quests-cc.dk-ubg.workers.dev/resources/semag/" + dir + "/" + g.image,
@@ -516,14 +539,82 @@ async function loadSolo() {
   } catch (e) {}
 }
 
+async function loadDegloved() {
+  try {
+    const r = await fetch("/games/data/json/degloved.json");
+    if (!r.ok) return;
+    const d = await r.json();
+    DATA.degloveed = dedupeGames(safeArray(d).map(g => {
+      if (!g || !g.name || !g.url) return null;
+      return {
+        name: g.name,
+        img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/" + (g.thumbnail || ""),
+        url: "/sail/embed/#" + g.url
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
+async function loadKruated() {
+  try {
+    const r = await fetch("/games/data/json/kruated.json");
+    if (!r.ok) return;
+    const d = await r.json();
+    DATA.kruated = dedupeGames(safeArray(d).map(g => {
+      if (!g || !g.name || !g.url) return null;
+      return {
+        name: g.name,
+        img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/" + (g.thumbnail || ""),
+        url: "/sail/embed/#" + g.url
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
+async function loadPizzalite() {
+  try {
+    const r = await fetch("/games/data/json/petezah.json");
+    if (!r.ok) return;
+    const d = await r.json();
+    DATA.pizzalite = dedupeGames(safeArray(d).map(g => {
+      if (!g || !g.name || !g.url) return null;
+      return {
+        name: g.name,
+        img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/" + (g.thumbnail || ""),
+        url: "/sail/embed/#" + g.url
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
 const LOADER_MAP = {
-  blox: loadBlox, gn: loadGN, elite: loadElite, ugs: loadUGS,
-  seraph: loadSeraph, ckv: loadCKV, hydra: loadHydra, ccported: loadCCPorted,
-  googleclass: loadGoogleClass, truffled: loadTruffled, nowgg: loadNowGG,
-  alexrworlds: loadAlexrworlds, lupine: loadLupine, "3kh0": load3kh0,
-  "3kh0lite": load3kh0Lite, tglsc: loadTGLSC, selenite: loadSelenite,
-  velera: loadVelera, frogies: loadFrogies, ubg42: loadUbg42, epicway: loadEpicway,
-  noahh: loadNoahh, youtube: loadYoutube, solo: loadSolo
+  blox: loadBlox, 
+  gn: loadGN, 
+  elite: loadElite, 
+  ugs: loadUGS,
+  seraph: loadSeraph, 
+  ckv: loadCKV, 
+  hydra: loadHydra, 
+  ccported: loadCCPorted,
+  googleclass: loadGoogleClass, 
+  truffled: loadTruffled, 
+  nowgg: loadNowGG,
+  alexrworlds: loadAlexrworlds, 
+  lupine: loadLupine, 
+  "3kh0": load3kh0,
+  "3kh0lite": load3kh0Lite, 
+  tglsc: loadTGLSC, 
+  selenite: loadSelenite,
+  velera: loadVelera, 
+  frogies: loadFrogies, 
+  ubg42: loadUbg42, 
+  epicway: loadEpicway,
+  noahh: loadNoahh, 
+  youtube: loadYoutube, 
+  solo: loadSolo,
+  degloveed: loadDegloved, 
+  kruated: loadKruated, 
+  pizzalite: loadPizzalite
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
@@ -807,15 +898,33 @@ function buildDynamicCategoryLayouts() {
   librariesContainer.appendChild(allEl);
 
   const libraryKeys = [
-    { id: "blox", name: "Bloxcraft UBG" }, { id: "gn", name: "GN-Math" }, { id: "elite", name: "Elite Gamez" },
-    { id: "ugs", name: "Ultimate Game Stash" }, { id: "seraph", name: "Seraph" },
-    { id: "ckv", name: "Chicken Kings Vault" }, { id: "hydra", name: "Hydra" }, { id: "ccported", name: "CCPorted" },
-    { id: "googleclass", name: "Google Class" }, { id: "truffled", name: "Truffled" }, { id: "nowgg", name: "Now.GG" },
-    { id: "alexrworlds", name: "Alexr's World" }, { id: "lupine", name: "LupineVault" }, { id: "3kh0", name: "3kh0" },
-    { id: "3kh0lite", name: "3kh0 Lite" }, { id: "tglsc", name: "TGLSC" }, { id: "selenite", name: "Selenite" },
-    { id: "velera", name: "Velera" }, { id: "frogies", name: "Frogie's Arcade" }, { id: "ubg42", name: "UBG42" },
-    { id: "epicway", name: "Epicway" }, { id: "noahh", name: "Noah's Tutoring Hub" }, { id: "youtube", name: "YouTube Playables" },
-    { id: "solo", name: "Solo Central" }
+    { id: "blox", name: "Bloxcraft UBG" }, 
+    { id: "gn", name: "GN-Math" }, 
+    { id: "elite", name: "Elite Gamez" },
+    { id: "ugs", name: "Ultimate Game Stash" }, 
+    { id: "seraph", name: "Seraph" },
+    { id: "ckv", name: "Chicken Kings Vault" }, 
+    { id: "hydra", name: "Hydra" }, 
+    { id: "ccported", name: "CCPorted" },
+    { id: "googleclass", name: "Google Class" }, 
+    { id: "truffled", name: "Truffled" }, 
+    { id: "nowgg", name: "Now.GG" },
+    { id: "alexrworlds", name: "Alexr's World" }, 
+    { id: "lupine", name: "LupineVault" }, 
+    { id: "3kh0", name: "3kh0" },
+    { id: "3kh0lite", name: "3kh0 Lite" }, 
+    { id: "tglsc", name: "TGLSC" }, 
+    { id: "selenite", name: "Selenite" },
+    { id: "velera", name: "Velera" }, 
+    { id: "frogies", name: "Frogie's Arcade" }, 
+    { id: "ubg42", name: "UBG42" },
+    { id: "epicway", name: "Epicway" }, 
+    { id: "noahh", name: "Noah's Tutoring Hub" }, 
+    { id: "youtube", name: "YouTube Playables" },
+    { id: "solo", name: "Solo Central" },
+    { id: "degloveed", name: "Degloved" }, 
+    { id: "kruated", name: "Kruated Phear" }, 
+    { id: "pizzalite", name: "Petezah Lite" }
   ];
 
   libraryKeys.forEach(lib => {
