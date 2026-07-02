@@ -2,9 +2,11 @@ const grid = document.getElementById("grid");
 const featuredGrid = document.getElementById("featuredGrid");
 const recommendedGrid = document.getElementById("recommendedGrid");
 const topicsGrid = document.getElementById("topicsGrid");
+const favoritesRecentGrid = document.getElementById("favoritesRecentGrid");
 const featuredSection = document.getElementById("featuredSection");
 const recommendedSection = document.getElementById("recommendedSection");
 const topicsSection = document.getElementById("topicsSection");
+const favoritesRecentSection = document.getElementById("favoritesRecentSection");
 const allSection = document.getElementById("allSection");
 const search = document.getElementById("search");
 const count = document.getElementById("count");
@@ -16,7 +18,6 @@ const RECOMMENDED_LIMIT = 100000;
 const FALLBACK_IMG = "/1f3ae.png";
 const LIB_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/";
 const TOPIC_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/topics/";
-
 const DATA = {
   blox: [], gn: [], elite: [], ugs: [], seraph: [],
   ckv: [], hydra: [], ccported: [], googleclass: [], truffled: [],
@@ -27,23 +28,20 @@ const DATA = {
 
 const FEATURED = JSON.parse(JSON.stringify(DATA));
 const RECOMMENDED = JSON.parse(JSON.stringify(DATA));
-
 const CACHED_TOPICS_RAW = {}; 
 let TOPIC_METADATA = [];
-
 let ACTIVE_LIBS = new Set(["all"]);
 let ACTIVE_TOPICS = new Set(["none"]);
-
 let CURRENT = [];
 let CURRENT_FEATURED = [];
 let CURRENT_RECOMMENDED = [];
 let CURRENT_TOPICS = [];
-
 let FILTERED = [];
 let FILTERED_FEATURED = [];
 let FILTERED_RECOMMENDED = [];
 let FILTERED_TOPICS = [];
-
+let FAVORITES = JSON.parse(localStorage.getItem("ubg_favorites")) || [];
+let RECENTLY_PLAYED = JSON.parse(localStorage.getItem("ubg_recent")) || [];
 let RENDERED = 0;
 let OBSERVER_SENTINEL = null;
 
@@ -579,6 +577,31 @@ function createCard(g) {
   const card = document.createElement("div");
   card.className = "game-card";
 
+  const favBtn = document.createElement("button");
+  favBtn.className = "fav-btn";
+  favBtn.type = "button";
+  favBtn.innerHTML = "★";
+  favBtn.setAttribute("aria-label", "Favorite Game");
+
+  const isFav = FAVORITES.some(f => f.name === g.name && f.url === g.url);
+  if (isFav) favBtn.classList.add("active");
+
+  favBtn.onclick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const index = FAVORITES.findIndex(f => f.name === g.name && f.url === g.url);
+    if (index > -1) {
+      FAVORITES.splice(index, 1);
+      favBtn.classList.remove("active");
+    } else {
+      FAVORITES.push(g);
+      favBtn.classList.add("active");
+    }
+    localStorage.setItem("ubg_favorites", JSON.stringify(FAVORITES));
+    pipelineUpdate();
+  };
+
   const img = document.createElement("img");
   img.loading = "lazy";
   img.src = g.img || FALLBACK_IMG;
@@ -598,8 +621,18 @@ function createCard(g) {
   link.className = "play-btn";
   link.href = g.url;
   link.textContent = "Play";
+  
+  link.onclick = () => {
+    RECENTLY_PLAYED = RECENTLY_PLAYED.filter(r => !(r.name === g.name && r.url === g.url));
+    RECENTLY_PLAYED.unshift(g);
+    if (RECENTLY_PLAYED.length > 15) {
+      RECENTLY_PLAYED = RECENTLY_PLAYED.slice(0, 15);
+    }
+    localStorage.setItem("ubg_recent", JSON.stringify(RECENTLY_PLAYED));
+    pipelineUpdate();
+  };
 
-  card.append(img, title, link);
+  card.append(favBtn, img, title, link);
   return card;
 }
 
@@ -667,16 +700,29 @@ function RESET_RENDER() {
 
 function updateCount() {
   if (count) {
-   count.textContent = FILTERED.length + " games";
+    count.textContent = FILTERED.length + " games";
   }
 }
 
 function renderEverything() {
+  const query = search ? search.value : "";
+
   if (ACTIVE_TOPICS.has("none") || FILTERED_TOPICS.length === 0) {
     topicsSection.style.display = "none";
   } else {
     topicsSection.style.display = "";
     renderSectionGrid(topicsGrid, FILTERED_TOPICS, { emptyText: "No matching engine games for this topic." });
+  }
+
+  const filteredFavs = applyFilter(FAVORITES, query);
+  const filteredRecents = applyFilter(RECENTLY_PLAYED, query);
+
+  if (filteredFavs.length === 0 && filteredRecents.length === 0) {
+    favoritesRecentSection.style.display = "none";
+  } else {
+    favoritesRecentSection.style.display = "";
+
+    renderSectionGrid(favoritesRecentGrid, [...filteredFavs, ...filteredRecents]);
   }
 
   renderSectionGrid(featuredGrid, FILTERED_FEATURED, { limit: FEATURED_LIMIT, emptyText: "No popular games found." });
