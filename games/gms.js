@@ -162,22 +162,37 @@ async function loadElite() {
 }
 
 async function loadUGS() {
-  const repos = ["tharun9772/ugs-1", "tharun9772/ugs-2", "tharun9772/ugs-3"];
-  const results = await Promise.all(repos.map(async repo => {
-    try {
-      const r = await fetch("https://cdn.jsdelivr.net/gh/tharun9772/game-assets/api_generated/github/" + repo + "/file.json");
-      if (!r.ok) return [];
-      const d = await r.json();
-      return safeArray(d)
-        .filter(f => f.type === "file" && f.name?.startsWith("cl") && f.name?.endsWith(".html"))
-        .map(f => ({
-          name: f.name.replace(/^cl/, "").replace(".html", ""),
+  try {
+    const r = await fetch("https://raw.githack.com/bubbls/ugs-singlefile/main/games.js");
+    if (!r.ok) return;
+    const text = await r.text();
+    const arrayMatch = text.match(/let\s+files\s*=\s*\[([\s\S]*?)\];/);
+    if (!arrayMatch) return;
+    const arrayContent = arrayMatch[1];
+    const stringRegex = /"([^"\\]*(?:\\.[^"\\]*)*)"|'([^'\\]*(?:\\.[^'\\]*)*)'/g;
+    let match;
+    const extractedFiles = [];
+
+    while ((match = stringRegex.exec(arrayContent)) !== null) {
+      extractedFiles.push(match[1] || match[2]);
+    }
+    
+    DATA.ugs = dedupeGames(extractedFiles
+      .filter(f => f && f.toLowerCase().startsWith("cl"))
+      .map(f => {
+        const normalizedName = f.includes(".") && f.lastIndexOf(".") > 0 ? f : f + ".html";
+        const displayName = f.replace(/^cl/i, "").replace(/\.html$/i, "");
+
+        return {
+          name: displayName || f,
           img: "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/5968517.png",
-          url: "/app-viewer/ugs-files?view=" + encodeURIComponent(f.name)
-        }));
-    } catch (e) { return []; }
-  }));
-  DATA.ugs = dedupeGames(results.flat());
+          url: "/app-viewer/ugs-files?view=" + encodeURIComponent(normalizedName)
+        };
+      })
+    );
+  } catch (e) {
+    console.error("Error parsing external UGS files:", e);
+  }
 }
 
 async function loadSeraph() {
