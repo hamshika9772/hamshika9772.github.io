@@ -18,7 +18,6 @@ const RECOMMENDED_LIMIT = 100000;
 const FALLBACK_IMG = "/1f3ae.png";
 const LIB_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/libraries/";
 const TOPIC_BASE = "https://cdn.jsdelivr.net/gh/tharun9772/game-assets@main/topics/";
-
 const DATA = {
   blox: [], 
   gn: [], 
