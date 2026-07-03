@@ -1,4 +1,4 @@
-// IMG base is https://strongdog.com/img/{$imgSrc}
+// IMG base is https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/https://strongdog.com/img/{$imgSrc}
 export default [
   { href: 'Human-or-not', imgSrc: 'human or not.png', name: 'Human or not', 'page': 1, 'id': 53429, og: true },
   // { href: 'lolbeans.io', imgSrc: 'lolbeans.jpeg', name: 'Lolbeans.io', 'page': 1, 'id': 53430, og: true },
