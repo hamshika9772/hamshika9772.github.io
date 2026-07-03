@@ -633,7 +633,7 @@ function processStrongdogData(d) {
     return {
       name: g.name,
       img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/https://strongdog.com/img/" + (g.imgSrc || ""),
-      url: "/sail/embed/#https://strongdog/" + urlParam
+      url: "/sail/embed/#https://strongdog.com/" + urlParam
     };
   }).filter(Boolean));
 }
