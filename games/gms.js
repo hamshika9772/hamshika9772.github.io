@@ -46,7 +46,9 @@ const DATA = {
   degloveed: [], 
   kruated: [], 
   pizzalite: [],
-  strongdog: []
+  strongdog: [],
+  maz: [],
+  shuttleproxy: []
 };
 
 const FEATURED = JSON.parse(JSON.stringify(DATA));
@@ -67,7 +69,6 @@ let FAVORITES = JSON.parse(localStorage.getItem("ubg_favorites")) || [];
 let RECENTLY_PLAYED = JSON.parse(localStorage.getItem("ubg_recent")) || [];
 let RENDERED = 0;
 let OBSERVER_SENTINEL = null;
-
 const OBSERVER = new IntersectionObserver(entries => {
   if (entries[0].isIntersecting) {
     RESET_OBSERVER_ONLY();
@@ -589,14 +590,12 @@ async function loadPizzalite() {
 
 async function loadStrongdog() {
   try {
-
     const module = await import("/games/data/js/strongdog.js");
     const d = module.default;
     processStrongdogData(d);
   } catch (e) {
     console.warn("Dynamic import failed, attempting text-parse fallback for strongdog.js:", e);
     try {
-
       const r = await fetch("/games/data/js/strongdog.js");
       if (!r.ok) return;
       let text = await r.text();
@@ -637,6 +636,42 @@ function processStrongdogData(d) {
   }).filter(Boolean));
 }
 
+async function loadMaz() {
+  try {
+    const r = await fetch("/games/data/json/the-marz-lib.json");
+    if (!r.ok) return;
+    const d = await r.json();
+    DATA.maz = dedupeGames(safeArray(d).map(g => {
+      if (!g || !g.title || !g.url) return null;
+      return {
+        name: g.title,
+        img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/https://themarzlibrary.org" + g.img,
+        url: "/sail/embed/#https://themarzlibrary.org" + g.url
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
+async function loadShuttleProxy() {
+  try {
+    const r = await fetch("/games/data/json/shuttleproxy.json");
+    if (!r.ok) return;
+    const d = await r.json();
+    DATA.shuttleproxy = dedupeGames(safeArray(d).map(g => {
+      if (!g || !g.name || !g.root) return null;
+      
+      const cleanRoot = g.root.endsWith('/') ? g.root : g.root + '/';
+      const cleanImg = g.img ? (g.img.startsWith('/') ? g.img.slice(1) : g.img) : '';
+      
+      return {
+        name: g.name,
+        img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/https://assets.shuttlemath.com/" + cleanRoot + cleanImg,
+        url: "/sail/embed/#https://assets.shuttlemath.com/" + g.root
+      };
+    }).filter(Boolean));
+  } catch (e) {}
+}
+
 const LOADER_MAP = {
   blox: loadBlox, 
   gn: loadGN, 
@@ -665,7 +700,9 @@ const LOADER_MAP = {
   degloveed: loadDegloved, 
   kruated: loadKruated, 
   pizzalite: loadPizzalite,
-  strongdog: loadStrongdog
+  strongdog: loadStrongdog,
+  maz: loadMaz,
+  shuttleproxy: loadShuttleProxy
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
@@ -976,7 +1013,9 @@ function buildDynamicCategoryLayouts() {
     { id: "degloveed", name: "Degloved" }, 
     { id: "kruated", name: "Kruated Phear" }, 
     { id: "pizzalite", name: "Petezah Lite" },
-    { id: "strongdog", name: "Strongdog" }
+    { id: "strongdog", name: "Strongdog" },
+    { id: "maz", name: "The Marz Library" },
+    { id: "shuttleproxy", name: "Shuttle Math" }
   ];
 
   libraryKeys.forEach(lib => {
