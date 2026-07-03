@@ -46,7 +46,8 @@ const DATA = {
   solo: [], 
   degloveed: [], 
   kruated: [], 
-  pizzalite: []
+  pizzalite: [],
+  strongdog: []
 };
 
 const FEATURED = JSON.parse(JSON.stringify(DATA));
@@ -178,7 +179,7 @@ async function loadElite() {
     const d = await r.json();
     DATA.elite = dedupeGames(safeArray(d).map(g => ({
       name: g.title || "Unknown",
-      img: "https://cdn.jsdelivr.gh/tharuniscool/elite-gamez.github.io@main/" + g.image,
+      img: "https://cdn.jsdelivr.net/gh/tharuniscool/elite-gamez.github.io@main/" + g.image,
       url: "/app-viewer/elite-gamez?url=" + encodeURIComponent(g.url)
     })));
   } catch (e) {}
@@ -406,9 +407,9 @@ async function loadSelenite() {
     const r = await fetch("https://math-quests-cc.dk-ubg.workers.dev/resources/games.json");
     if (!r.ok) return;
     const d = await r.json();
-    const dir = String(g.directory).replace(/^\/+/, "").replace(/\/+$/, "");
     DATA.selenite = dedupeGames(safeArray(d).map(g => {
       if (!g?.name || !g?.image || !g?.directory) return null;
+      const dir = String(g.directory).replace(/^\/+/, "").replace(/\/+$/, "");
       return {
         name: g.name,
         img: "https://math-quests-cc.dk-ubg.workers.dev/resources/semag/" + dir + "/" + g.image,
@@ -587,6 +588,56 @@ async function loadPizzalite() {
   } catch (e) {}
 }
 
+async function loadStrongdog() {
+  try {
+
+    const module = await import("/games/data/js/strongdog.js");
+    const d = module.default;
+    processStrongdogData(d);
+  } catch (e) {
+    console.warn("Dynamic import failed, attempting text-parse fallback for strongdog.js:", e);
+    try {
+
+      const r = await fetch("/games/data/js/strongdog.js");
+      if (!r.ok) return;
+      let text = await r.text();
+      text = text.replace(/export\s+default\s+/, "");
+      
+      const parseJSArray = new Function(`return (${text});`);
+      const d = parseJSArray();
+      processStrongdogData(d);
+    } catch (err) {
+      console.error("Failed to load Strongdog engine via both methods:", err);
+    }
+  }
+}
+
+function processStrongdogData(d) {
+  DATA.strongdog = dedupeGames(safeArray(d).map(g => {
+    if (!g || !g.name || !g.href) return null;
+    
+    let cleanHref = g.href;
+    if (g.page && g.page !== 1) {
+      if (cleanHref.startsWith('./')) {
+        cleanHref = './' + g.page + '/' + cleanHref.slice(2);
+      } else {
+        cleanHref = g.page + '/' + cleanHref;
+      }
+    }
+    
+    let urlParam = cleanHref;
+    if (urlParam.startsWith('./')) {
+      urlParam = urlParam.slice(2);
+    }
+    
+    return {
+      name: g.name,
+      img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/https://strongdog.com/img/" + (g.imgSrc || ""),
+      url: "/sail/embed/#https://strongdog/" + urlParam
+    };
+  }).filter(Boolean));
+}
+
 const LOADER_MAP = {
   blox: loadBlox, 
   gn: loadGN, 
@@ -614,7 +665,8 @@ const LOADER_MAP = {
   solo: loadSolo,
   degloveed: loadDegloved, 
   kruated: loadKruated, 
-  pizzalite: loadPizzalite
+  pizzalite: loadPizzalite,
+  strongdog: loadStrongdog
 };
 
 const CATEGORY_KEYS = Object.keys(DATA);
@@ -924,7 +976,8 @@ function buildDynamicCategoryLayouts() {
     { id: "solo", name: "Solo Central" },
     { id: "degloveed", name: "Degloved" }, 
     { id: "kruated", name: "Kruated Phear" }, 
-    { id: "pizzalite", name: "Petezah Lite" }
+    { id: "pizzalite", name: "Petezah Lite" },
+    { id: "strongdog", name: "Strongdog" }
   ];
 
   libraryKeys.forEach(lib => {
