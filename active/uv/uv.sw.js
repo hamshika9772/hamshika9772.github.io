@@ -167,6 +167,7 @@
       <li>Restarting your server</li>
       <li>Updating Ultraviolet</li>
       <li>Troubleshooting the error on the <a href="https://github.com/titaniumnetwork-dev/Ultraviolet" target="_blank">GitHub repository</a></li>
+      <li>Please note BloxProxy does not own or run Ultraviolet
     </ul>
     
     <button id="reload" onclick="window.location.reload()">Reload Page</button>
