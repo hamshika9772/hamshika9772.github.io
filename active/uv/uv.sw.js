@@ -173,7 +173,7 @@
     <button id="reload" onclick="window.location.reload()">Reload Page</button>
     
     <div class="footer">
-      <p><i>Ultraviolet v<span id="uvVersion"></span></i></p>
+      <p><i>Ultraviolet v<span id="uvVersion"></span></i> <i>BloxProxy (ReMake) 2.3.2</i></p>
     </div>
   </div>
 
