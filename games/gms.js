@@ -621,19 +621,6 @@ function processStrongdogData(d) {
     };
   }).filter(Boolean));
 }
-    
-    let urlParam = cleanHref;
-    if (urlParam.startsWith('./')) {
-      urlParam = urlParam.slice(2);
-    }
-    
-    return {
-      name: g.name,
-      img: "https://winf-dictionary.dk-ubg.workers.dev/cdn/proxy/image/https://strongdog.com/img/" + (g.imgSrc || ""),
-      url: "/sail/embed/#https://strongdog.com/" + urlParam
-    };
-  }).filter(Boolean));
-}
 
 async function loadMaz() {
   try {
