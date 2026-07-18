@@ -150,7 +150,7 @@ async function loadLibraryExtras(cat) {
 
 async function loadBlox() {
   try {
-    const r = await fetch("/games/gms.json");
+    const r = await fetch("/games/blockers.json");
     if (!r.ok) return;
     DATA.blox = dedupeGames(safeArray(await r.json()).map(normalize).filter(Boolean));
   } catch (e) {}
