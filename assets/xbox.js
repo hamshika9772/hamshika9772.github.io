@@ -439,27 +439,28 @@
     } catch (err) {}
   }
 
-  function setupIframeObserver(doc) {
-    if (!doc) return;
-    doc.querySelectorAll('iframe').forEach(iframe => {
-      iframe.addEventListener('load', () => injectReceiver(iframe));
-      injectReceiver(iframe);
-    });
+function setupIframeObserver(doc) {
+  if (!doc) return;
 
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        mutation.addedNodes.forEach((node) => {
-          if (node.tagName === 'IFRAME') {
-            node.addEventListener('load', () => injectReceiver(node));
-            injectReceiver(node);
-          }
-        });
+  doc.querySelectorAll('iframe').forEach(iframe => {
+    iframe.addEventListener('load', () => injectReceiver(iframe));
+    injectReceiver(iframe);
+  });
+
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      mutation.addedNodes.forEach((node) => {
+        if (node && node.tagName === 'IFRAME') {
+          node.addEventListener('load', () => injectReceiver(node));
+          injectReceiver(node);
+        }
       });
     });
+  });
 
-    const target = doc.body || doc.documentElement;
-    if (target) observer.observe(target, { childList: true, subtree: true });
-  }
+  const target = doc.body || doc.documentElement;
+  if (target) observer.observe(target, { childList: true, subtree: true });
+}
 
   let posX = window.innerWidth / 2;
   let posY = window.innerHeight / 2;
