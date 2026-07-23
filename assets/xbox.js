@@ -212,12 +212,13 @@
     controlsModal.innerHTML = `
       <div class="xbox-modal-header">Controller Controls</div>
       <div class="xbox-control-row"><span>Move Cursor</span> <span class="xbox-key-tag">Joysticks</span></div>
-      <div class="xbox-control-row"><span>Click / Select</span> <span class="xbox-key-tag">RT / A Button</span></div>
+      <div class="xbox-control-row"><span>Snap to Nearest Target</span> <span class="xbox-key-tag">A Button</span></div>
+      <div class="xbox-control-row"><span>Click / Select</span> <span class="xbox-key-tag">RT</span></div>
       <div class="xbox-control-row"><span>Right Click</span> <span class="xbox-key-tag">LT</span></div>
       <div class="xbox-control-row"><span>Scroll Page</span> <span class="xbox-key-tag">LB / RB</span></div>
       <div class="xbox-control-row"><span>Toggle Keyboard</span> <span class="xbox-key-tag">Y Button</span></div>
       <div class="xbox-control-row"><span>Navigate Keyboard</span> <span class="xbox-key-tag">D-PAD</span></div>
-      <div class="xbox-control-row"><span>Type Highlighted Key</span> <span class="xbox-key-tag">A Button</span></div>
+      <div class="xbox-control-row"><span>Type Key</span> <span class="xbox-key-tag">A Button</span></div>
       <div class="xbox-control-row"><span>Toggle Fullscreen</span> <span class="xbox-key-tag">X Button</span></div>
       <div class="xbox-control-row"><span>Toggle Controls Menu</span> <span class="xbox-key-tag">B Button</span></div>
     `;
@@ -236,24 +237,34 @@
     });
 
     renderKeyboard();
-    setupIframeObserver();
+    setupIframeObserver(document);
   }
 
-  const layout = [
+  const layoutAlpha = [
     ['q','w','e','r','t','y','u','i','o','p'],
     ['a','s','d','f','g','h','j','k','l'],
     ['Shift','z','x','c','v','b','n','m','⌫'],
     ['123', ',', 'Space', '.', '↵']
   ];
 
+  const layoutNum = [
+    ['1','2','3','4','5','6','7','8','9','0'],
+    ['@','#','$','%','&','-','+','(',')'],
+    ['Shift','*','"','\'',':',';','!','?','⌫'],
+    ['ABC', ',', 'Space', '.', '↵']
+  ];
+
   let kbdRow = 0;
   let kbdCol = 0;
   let isShift = false;
+  let isNumbers = false;
 
   function renderKeyboard() {
     if (!keyboardContainer) return;
     keyboardContainer.innerHTML = '';
-    layout.forEach((row, rIdx) => {
+    const activeLayout = isNumbers ? layoutNum : layoutAlpha;
+
+    activeLayout.forEach((row, rIdx) => {
       const rowEl = document.createElement('div');
       rowEl.className = 'gboard-row';
       row.forEach((key, cIdx) => {
@@ -262,7 +273,7 @@
         if (isShift && key.length === 1) displayKey = key.toUpperCase();
 
         keyEl.className = 'gboard-key';
-        if (['Shift', '⌫', '↵', '123'].includes(key)) keyEl.classList.add('wide');
+        if (['Shift', '⌫', '↵', '123', 'ABC'].includes(key)) keyEl.classList.add('wide');
         if (key === 'Space') keyEl.classList.add('space');
         if (rIdx === kbdRow && cIdx === kbdCol) keyEl.classList.add('active');
 
@@ -294,7 +305,7 @@
       target.dispatchEvent(new PointerEvent('pointerup', opts));
       target.dispatchEvent(new MouseEvent('mouseup', opts));
       
-      const clickableTarget = target.closest('a, button, [onclick], input[type="submit"], input[type="button"]') || target;
+      const clickableTarget = target.closest('a, button, [onclick], input, textarea, select, [role="button"]') || target;
       clickableTarget.dispatchEvent(new MouseEvent('click', opts));
       
       if (typeof clickableTarget.click === 'function') {
@@ -334,7 +345,7 @@
           target.dispatchEvent(new MouseEvent('mousedown', opts));
           target.dispatchEvent(new PointerEvent('pointerup', opts));
           target.dispatchEvent(new MouseEvent('mouseup', opts));
-          const clickableTarget = target.closest('a, button, [onclick], input[type="submit"], input[type="button"]') || target;
+          const clickableTarget = target.closest('a, button, [onclick], input, textarea, select, [role="button"]') || target;
           clickableTarget.dispatchEvent(new MouseEvent('click', opts));
           if (typeof clickableTarget.click === 'function') clickableTarget.click();
           if (typeof target.focus === 'function') target.focus();
@@ -345,6 +356,41 @@
           target.dispatchEvent(new MouseEvent('mouseup', opts));
           target.dispatchEvent(new MouseEvent('contextmenu', opts));
         }
+      }
+
+      function setupRecursiveFrames(doc) {
+        if (!doc) return;
+        doc.querySelectorAll('iframe').forEach(iframe => {
+          iframe.addEventListener('load', () => inject(iframe));
+          inject(iframe);
+        });
+
+        const observer = new MutationObserver((mutations) => {
+          mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+              if (node.tagName === 'IFRAME') {
+                node.addEventListener('load', () => inject(node));
+                inject(node);
+              }
+            });
+          });
+        });
+
+        const target = doc.body || doc.documentElement;
+        if (target) observer.observe(target, { childList: true, subtree: true });
+      }
+
+      function inject(iframe) {
+        try {
+          const doc = iframe.contentDocument || iframe.contentWindow?.document;
+          if (doc && !doc.querySelector('#xbox-iframe-receiver')) {
+            const script = doc.createElement('script');
+            script.id = 'xbox-iframe-receiver';
+            script.textContent = '(' + arguments.callee.caller.toString() + ')();';
+            (doc.head || doc.body || doc.documentElement).appendChild(script);
+            setupRecursiveFrames(doc);
+          }
+        } catch (e) {}
       }
 
       window.addEventListener('message', (event) => {
@@ -375,6 +421,8 @@
           document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true }));
         }
       });
+
+      setupRecursiveFrames(document);
     }.toString()})();
   `;
 
@@ -386,12 +434,14 @@
         script.id = 'xbox-iframe-receiver';
         script.textContent = iframeReceiverScript;
         (doc.head || doc.body || doc.documentElement).appendChild(script);
+        setupIframeObserver(doc);
       }
     } catch (err) {}
   }
 
-  function setupIframeObserver() {
-    document.querySelectorAll('iframe').forEach(iframe => {
+  function setupIframeObserver(doc) {
+    if (!doc) return;
+    doc.querySelectorAll('iframe').forEach(iframe => {
       iframe.addEventListener('load', () => injectReceiver(iframe));
       injectReceiver(iframe);
     });
@@ -407,7 +457,7 @@
       });
     });
 
-    const target = document.body || document.documentElement;
+    const target = doc.body || doc.documentElement;
     if (target) observer.observe(target, { childList: true, subtree: true });
   }
 
@@ -416,6 +466,48 @@
   const cursorSpeed = 8;
   const buttonStates = {};
   let kbdOpen = false;
+
+  function snapToNearestObject() {
+    const selector = 'a, button, input, textarea, select, [role="button"], [tabindex], [onclick], img, div[onclick]';
+    const elements = Array.from(document.querySelectorAll(selector));
+    
+    const currentElem = document.elementFromPoint(posX, posY);
+
+    let nearest = null;
+    let minDistance = Infinity;
+
+    elements.forEach(el => {
+      if (currentElem && (el === currentElem || currentElem.contains(el) || el.contains(currentElem))) return;
+      
+      const rect = el.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      if (rect.bottom < 0 || rect.right < 0 || rect.top > window.innerHeight || rect.left > window.innerWidth) return;
+
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const dist = Math.hypot(centerX - posX, centerY - posY);
+
+      if (dist < minDistance) {
+        minDistance = dist;
+        nearest = { x: centerX, y: centerY };
+      }
+    });
+
+    if (nearest) {
+      posX = Math.max(0, Math.min(window.innerWidth, nearest.x));
+      posY = Math.max(0, Math.min(window.innerHeight, nearest.y));
+
+      if (cursor) {
+        cursor.style.left = posX + 'px';
+        cursor.style.top = posY + 'px';
+      }
+      if (!isCursorVisible && cursor) {
+        isCursorVisible = true;
+        cursor.classList.add('visible');
+      }
+    }
+  }
 
   function getActiveGamepad() {
     const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
@@ -442,7 +534,9 @@
   function broadcast(action, payload = {}) {
     const msg = { type: 'XBOX_ACTION', action, x: posX, y: posY, ...payload };
     window.postMessage(msg, '*');
-    document.querySelectorAll('iframe').forEach(frame => {
+    
+    const allFrames = document.querySelectorAll('iframe');
+    allFrames.forEach(frame => {
       try { frame.contentWindow?.postMessage(msg, '*'); } catch (e) {}
     });
 
@@ -487,18 +581,25 @@
     const down = isPressed(13, gp);
     const left = isPressed(14, gp);
     const right = isPressed(15, gp);
+    const currentLayout = isNumbers ? layoutNum : layoutAlpha;
 
-    if (justPressed('d_up', up)) { kbdRow = Math.max(0, kbdRow - 1); kbdCol = Math.min(kbdCol, layout[kbdRow].length - 1); }
-    if (justPressed('d_down', down)) { kbdRow = Math.min(layout.length - 1, kbdRow + 1); kbdCol = Math.min(kbdCol, layout[kbdRow].length - 1); }
+    if (justPressed('d_up', up)) { kbdRow = Math.max(0, kbdRow - 1); kbdCol = Math.min(kbdCol, currentLayout[kbdRow].length - 1); }
+    if (justPressed('d_down', down)) { kbdRow = Math.min(currentLayout.length - 1, kbdRow + 1); kbdCol = Math.min(kbdCol, currentLayout[kbdRow].length - 1); }
     if (justPressed('d_left', left)) { kbdCol = Math.max(0, kbdCol - 1); }
-    if (justPressed('d_right', right)) { kbdCol = Math.min(layout[kbdRow].length - 1, kbdCol + 1); }
+    if (justPressed('d_right', right)) { kbdCol = Math.min(currentLayout[kbdRow].length - 1, kbdCol + 1); }
 
     if (up || down || left || right) renderKeyboard();
 
     if (justPressed('k_select', isPressed(0, gp) || isPressed(7, gp))) {
-      let char = layout[kbdRow][kbdCol];
+      let char = currentLayout[kbdRow][kbdCol];
       if (char === 'Shift') {
         isShift = !isShift;
+      } else if (char === '123') {
+        isNumbers = true;
+        kbdRow = 0; kbdCol = 0;
+      } else if (char === 'ABC') {
+        isNumbers = false;
+        kbdRow = 0; kbdCol = 0;
       } else {
         if (isShift && char.length === 1) char = char.toUpperCase();
         broadcast('TYPE', { key: char });
@@ -562,14 +663,18 @@
       if (kbdOpen) {
         handleDpadKeyboard(gp);
       } else {
-        if (justPressed('btn_7', isPressed(7, gp)) || justPressed('btn_0', isPressed(0, gp))) {
+        if (justPressed('btn_0', isPressed(0, gp))) {
+          snapToNearestObject();
+        }
+
+        if (justPressed('btn_7', isPressed(7, gp))) {
           broadcast('LEFT_CLICK');
         }
 
         if (justPressed('btn_6', isPressed(6, gp))) broadcast('RIGHT_CLICK');
 
-        if (isPressed(4, gp)) broadcast('SCROLL', { amount: -35 });
-        if (isPressed(5, gp)) broadcast('SCROLL', { amount: 35 });
+        if (isPressed(4, gp)) broadcast('SCROLL', { amount: -110 });
+        if (isPressed(5, gp)) broadcast('SCROLL', { amount: 110 });
 
         if (justPressed('btn_2', isPressed(2, gp))) {
           if (!document.fullscreenElement) {
