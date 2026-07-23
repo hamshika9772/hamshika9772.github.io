@@ -430,6 +430,14 @@
     })();
   `;
 
+  let posX = window.innerWidth / 2;
+  let posY = window.innerHeight / 2;
+  const cursorSpeed = 8;
+  const buttonStates = {};
+  let kbdOpen = false;
+  let lastClickTime = 0;
+  const clickInterval = 100; 
+
   function injectReceiver(iframe) {
     try {
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
@@ -671,9 +679,13 @@
           snapToNearestObject();
         }
 
-      if (isPressed(7, gp)) {
-         broadcast('LEFT_CLICK');
-      }
+        if (isPressed(7, gp)) {
+          const now = Date.now();
+          if (now - lastClickTime >= clickInterval) {
+            broadcast('LEFT_CLICK');
+            lastClickTime = now;
+          }
+        }
 
 
         if (isPressed(6, gp)) {
