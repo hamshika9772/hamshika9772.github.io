@@ -273,36 +273,109 @@
     });
   }
 
-  const iframeReceiverScript = `
-    window.addEventListener('message', (event) => {
-      const data = event.data;
-      if (!data || data.type !== 'XBOX_ACTION') return;
+  function simulateFullClick(target, x, y, button = 0) {
+    if (!target) return;
 
-      const rect = window.frameElement ? window.frameElement.getBoundingClientRect() : { left: 0, top: 0 };
-      const localX = data.x - rect.left;
-      const localY = data.y - rect.top;
-      const el = document.elementFromPoint(localX, localY) || document.activeElement;
+    const opts = {
+      bubbles: true,
+      cancelable: true,
+      view: window,
+      clientX: x,
+      clientY: y,
+      screenX: x,
+      screenY: y,
+      button: button,
+      buttons: button === 0 ? 1 : 2
+    };
 
-      if (data.action === 'LEFT_CLICK' && el) {
-        el.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, clientX: localX, clientY: localY }));
-        el.focus?.();
-      } else if (data.action === 'RIGHT_CLICK' && el) {
-        el.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true, clientX: localX, clientY: localY }));
-      } else if (data.action === 'SCROLL') {
-        window.scrollBy({ top: data.amount, behavior: 'smooth' });
-      } else if (data.action === 'TYPE') {
-        const active = document.activeElement;
-        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
-          if (data.key === '⌫') active.value = active.value.slice(0, -1);
-          else if (data.key === 'Space') active.value += ' ';
-          else if (data.key === '↵') active.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
-          else if (data.key.length === 1) active.value += data.key;
-          active.dispatchEvent(new Event('input', { bubbles: true }));
-        }
-      } else if (data.action === 'ESC') {
-        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true }));
+    if (button === 0) {
+      target.dispatchEvent(new PointerEvent('pointerdown', opts));
+      target.dispatchEvent(new MouseEvent('mousedown', opts));
+      target.dispatchEvent(new PointerEvent('pointerup', opts));
+      target.dispatchEvent(new MouseEvent('mouseup', opts));
+      
+      const clickableTarget = target.closest('a, button, [onclick], input[type="submit"], input[type="button"]') || target;
+      clickableTarget.dispatchEvent(new MouseEvent('click', opts));
+      
+      if (typeof clickableTarget.click === 'function') {
+        clickableTarget.click();
       }
-    });
+      
+      if (typeof target.focus === 'function') {
+        target.focus();
+      }
+    } else if (button === 2) {
+      target.dispatchEvent(new PointerEvent('pointerdown', opts));
+      target.dispatchEvent(new MouseEvent('mousedown', opts));
+      target.dispatchEvent(new PointerEvent('pointerup', opts));
+      target.dispatchEvent(new MouseEvent('mouseup', opts));
+      target.dispatchEvent(new MouseEvent('contextmenu', opts));
+    }
+  }
+
+  const iframeReceiverScript = `
+    (${function () {
+      function simulateFullClick(target, x, y, button = 0) {
+        if (!target) return;
+        const opts = {
+          bubbles: true,
+          cancelable: true,
+          view: window,
+          clientX: x,
+          clientY: y,
+          screenX: x,
+          screenY: y,
+          button: button,
+          buttons: button === 0 ? 1 : 2
+        };
+
+        if (button === 0) {
+          target.dispatchEvent(new PointerEvent('pointerdown', opts));
+          target.dispatchEvent(new MouseEvent('mousedown', opts));
+          target.dispatchEvent(new PointerEvent('pointerup', opts));
+          target.dispatchEvent(new MouseEvent('mouseup', opts));
+          const clickableTarget = target.closest('a, button, [onclick], input[type="submit"], input[type="button"]') || target;
+          clickableTarget.dispatchEvent(new MouseEvent('click', opts));
+          if (typeof clickableTarget.click === 'function') clickableTarget.click();
+          if (typeof target.focus === 'function') target.focus();
+        } else if (button === 2) {
+          target.dispatchEvent(new PointerEvent('pointerdown', opts));
+          target.dispatchEvent(new MouseEvent('mousedown', opts));
+          target.dispatchEvent(new PointerEvent('pointerup', opts));
+          target.dispatchEvent(new MouseEvent('mouseup', opts));
+          target.dispatchEvent(new MouseEvent('contextmenu', opts));
+        }
+      }
+
+      window.addEventListener('message', (event) => {
+        const data = event.data;
+        if (!data || data.type !== 'XBOX_ACTION') return;
+
+        const rect = window.frameElement ? window.frameElement.getBoundingClientRect() : { left: 0, top: 0 };
+        const localX = data.x - rect.left;
+        const localY = data.y - rect.top;
+        const el = document.elementFromPoint(localX, localY) || document.activeElement;
+
+        if (data.action === 'LEFT_CLICK' && el) {
+          simulateFullClick(el, localX, localY, 0);
+        } else if (data.action === 'RIGHT_CLICK' && el) {
+          simulateFullClick(el, localX, localY, 2);
+        } else if (data.action === 'SCROLL') {
+          window.scrollBy({ top: data.amount, behavior: 'smooth' });
+        } else if (data.action === 'TYPE') {
+          const active = document.activeElement;
+          if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
+            if (data.key === '⌫') active.value = active.value.slice(0, -1);
+            else if (data.key === 'Space') active.value += ' ';
+            else if (data.key === '↵') active.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 13, bubbles: true }));
+            else if (data.key.length === 1) active.value += data.key;
+            active.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        } else if (data.action === 'ESC') {
+          document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, bubbles: true }));
+        }
+      });
+    }.toString()})();
   `;
 
   function injectReceiver(iframe) {
@@ -372,6 +445,13 @@
     document.querySelectorAll('iframe').forEach(frame => {
       try { frame.contentWindow?.postMessage(msg, '*'); } catch (e) {}
     });
+
+    if (action === 'LEFT_CLICK' || action === 'RIGHT_CLICK') {
+      let target = document.elementFromPoint(posX, posY);
+      if (target && target.tagName !== 'IFRAME') {
+        simulateFullClick(target, posX, posY, action === 'LEFT_CLICK' ? 0 : 2);
+      }
+    }
   }
 
   function updateCursorState() {
