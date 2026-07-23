@@ -287,40 +287,29 @@
   function simulateFullClick(target, x, y, button = 0) {
     if (!target) return;
 
-    const opts = {
-      bubbles: true,
-      cancelable: true,
-      view: window,
-      clientX: x,
-      clientY: y,
-      screenX: x,
-      screenY: y,
-      button: button,
-      buttons: button === 0 ? 1 : 2
-    };
+    const clickable = target.closest('a, button, [onclick], input, textarea, select, [role="button"]') || target;
 
     if (button === 0) {
-      target.dispatchEvent(new PointerEvent('pointerdown', opts));
-      target.dispatchEvent(new MouseEvent('mousedown', opts));
-      target.dispatchEvent(new PointerEvent('pointerup', opts));
-      target.dispatchEvent(new MouseEvent('mouseup', opts));
-      
-      const clickableTarget = target.closest('a, button, [onclick], input, textarea, select, [role="button"]') || target;
-      clickableTarget.dispatchEvent(new MouseEvent('click', opts));
-      
-      if (typeof clickableTarget.click === 'function') {
-        clickableTarget.click();
-      }
-      
-      if (typeof target.focus === 'function') {
-        target.focus();
+      clickable.dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        clientX: x,
+        clientY: y
+      }));
+      if (typeof clickable.focus === 'function') {
+        clickable.focus();
       }
     } else if (button === 2) {
-      target.dispatchEvent(new PointerEvent('pointerdown', opts));
-      target.dispatchEvent(new MouseEvent('mousedown', opts));
-      target.dispatchEvent(new PointerEvent('pointerup', opts));
-      target.dispatchEvent(new MouseEvent('mouseup', opts));
-      target.dispatchEvent(new MouseEvent('contextmenu', opts));
+      clickable.dispatchEvent(new MouseEvent('contextmenu', {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        clientX: x,
+        clientY: y,
+        button: 2,
+        buttons: 2
+      }));
     }
   }
 
@@ -328,33 +317,26 @@
     (function receiverInit() {
       function simulateFullClick(target, x, y, button = 0) {
         if (!target) return;
-        const opts = {
-          bubbles: true,
-          cancelable: true,
-          view: window,
-          clientX: x,
-          clientY: y,
-          screenX: x,
-          screenY: y,
-          button: button,
-          buttons: button === 0 ? 1 : 2
-        };
-
+        const clickable = target.closest('a, button, [onclick], input, textarea, select, [role="button"]') || target;
         if (button === 0) {
-          target.dispatchEvent(new PointerEvent('pointerdown', opts));
-          target.dispatchEvent(new MouseEvent('mousedown', opts));
-          target.dispatchEvent(new PointerEvent('pointerup', opts));
-          target.dispatchEvent(new MouseEvent('mouseup', opts));
-          const clickableTarget = target.closest('a, button, [onclick], input, textarea, select, [role="button"]') || target;
-          clickableTarget.dispatchEvent(new MouseEvent('click', opts));
-          if (typeof clickableTarget.click === 'function') clickableTarget.click();
-          if (typeof target.focus === 'function') target.focus();
+          clickable.dispatchEvent(new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y
+          }));
+          if (typeof clickable.focus === 'function') clickable.focus();
         } else if (button === 2) {
-          target.dispatchEvent(new PointerEvent('pointerdown', opts));
-          target.dispatchEvent(new MouseEvent('mousedown', opts));
-          target.dispatchEvent(new PointerEvent('pointerup', opts));
-          target.dispatchEvent(new MouseEvent('mouseup', opts));
-          target.dispatchEvent(new MouseEvent('contextmenu', opts));
+          clickable.dispatchEvent(new MouseEvent('contextmenu', {
+            bubbles: true,
+            cancelable: true,
+            view: window,
+            clientX: x,
+            clientY: y,
+            button: 2,
+            buttons: 2
+          }));
         }
       }
 
@@ -471,8 +453,8 @@
   const buttonStates = {};
   let kbdOpen = false;
 
-  let lastClickTime = 0;
-  const clickInterval = 10; 
+  let clickTimer = null;
+  const clickSpeedMs = 10;
 
   function snapToNearestObject() {
     const selector = 'a, button, input, textarea, select, [role="button"], [tabindex], [onclick], img, div[onclick]';
@@ -675,10 +657,16 @@
         }
 
         if (isPressed(7, gp)) {
-          const now = Date.now();
-          if (now - lastClickTime >= clickInterval) {
+          if (!clickTimer) {
             broadcast('LEFT_CLICK');
-            lastClickTime = now;
+            clickTimer = setInterval(() => {
+              broadcast('LEFT_CLICK');
+            }, clickSpeedMs);
+          }
+        } else {
+          if (clickTimer) {
+            clearInterval(clickTimer);
+            clickTimer = null;
           }
         }
 
