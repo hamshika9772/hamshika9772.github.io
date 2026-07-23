@@ -472,7 +472,7 @@
   let kbdOpen = false;
 
   let lastClickTime = 0;
-  const clickInterval = 100; 
+  const clickInterval = 10; 
 
   function snapToNearestObject() {
     const selector = 'a, button, input, textarea, select, [role="button"], [tabindex], [onclick], img, div[onclick]';
