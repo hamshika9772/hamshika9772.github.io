@@ -671,11 +671,14 @@
           snapToNearestObject();
         }
 
-        if (justPressed('btn_7', isPressed(7, gp))) {
-          broadcast('LEFT_CLICK');
-        }
+      if (isPressed(7, gp)) {
+         broadcast('LEFT_CLICK');
+      }
 
-        if (justPressed('btn_6', isPressed(6, gp))) broadcast('RIGHT_CLICK');
+
+        if (isPressed(6, gp)) {
+         broadcast('RIGHT_CLICK'');
+      }
 
         if (isPressed(4, gp)) broadcast('SCROLL', { amount: -110 });
         if (isPressed(5, gp)) broadcast('SCROLL', { amount: 110 });
