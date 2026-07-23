@@ -430,14 +430,6 @@
     })();
   `;
 
-  let posX = window.innerWidth / 2;
-  let posY = window.innerHeight / 2;
-  const cursorSpeed = 8;
-  const buttonStates = {};
-  let kbdOpen = false;
-  let lastClickTime = 0;
-  const clickInterval = 100; 
-
   function injectReceiver(iframe) {
     try {
       const doc = iframe.contentDocument || iframe.contentWindow?.document;
@@ -478,6 +470,9 @@
   const cursorSpeed = 8;
   const buttonStates = {};
   let kbdOpen = false;
+
+  let lastClickTime = 0;
+  const clickInterval = 100; 
 
   function snapToNearestObject() {
     const selector = 'a, button, input, textarea, select, [role="button"], [tabindex], [onclick], img, div[onclick]';
@@ -687,10 +682,7 @@
           }
         }
 
-
-        if (isPressed(6, gp)) {
-         broadcast('RIGHT_CLICK'');
-      }
+        if (justPressed('btn_6', isPressed(6, gp))) broadcast('RIGHT_CLICK');
 
         if (isPressed(4, gp)) broadcast('SCROLL', { amount: -110 });
         if (isPressed(5, gp)) broadcast('SCROLL', { amount: 110 });
