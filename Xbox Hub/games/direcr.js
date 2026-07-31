@@ -1,6 +1,6 @@
 (function() {
 const _0x4f22 = ["\x64\x65\x62\x75\x67", "\x69\x6E\x69\x74"];
-const UI_THEME_MODE_DEFAULT = 'light'; 
+const UI_THEME_MODE_DEFAULT = 'light';
 const UI_THEME_MODE_DARK = 'dark';
 const UI_THEME_MODE_AUTO = 'system';
 const UI_ELEMENT_MIN_WIDTH_PIXELS = 0;
@@ -380,7 +380,7 @@ const startupContent = `
         <input id="search" class="search focusable" placeholder="Search games...">
         <div class="header-right" style="display: flex; align-items: center; gap: 16px;">
             <div id="count" class="count" style="color: #a0a0a0; font-weight: 600;">0 Games</div>
-            <a href="/Xbox Hub/" class="back-btn focusable" style="background: transparent; border: 1.5px solid #107C10; color: white; display: flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 4px; text-decoration: none; font-weight: 600;">
+            <a href="#" onclick="location.href='/Xbox Hub/'; return false;" class="back-btn focusable" style="background: transparent; border: 1.5px solid #107C10; color: white; display: flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 4px; text-decoration: none; font-weight: 600;">
                 <svg class="back-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="16" height="16" fill="currentColor">
                     <path d="M73.4 297.4C60.9 309.9 60.9 330.2 73.4 342.7L233.4 502.7C245.9 515.2 266.2 515.2 278.7 502.7C291.2 490.2 291.2 469.9 278.7 457.4L173.3 352L544 352C561.7 352 576 337.7 576 320C576 302.3 561.7 288 544 288L173.3 288L278.7 182.6C291.2 170.1 291.2 149.8 278.7 137.3C266.2 124.8 245.9 124.8 233.4 137.3L73.4 297.3z"/>
                 </svg>
@@ -454,7 +454,7 @@ const startupContent = `
       </div>
     `;
 
-    const uiContent = startupContent + "\n\n" + appContent;
+const uiContent = startupContent + "\n\n" + appContent;
 
     const self = document.currentScript;
     if (self) {
@@ -535,7 +535,7 @@ const startupContent = `
                 activeEl.click();
             }
         }
-        })();
+    });
 
     let lastGamepadState = {};
     function pollGamepads() {
@@ -592,7 +592,6 @@ const startupContent = `
         setTimeout(() => updateFocus(0), 500);
         requestAnimationFrame(pollGamepads);
     });
-})();
 
 console.log("<--Bloxcraft UBG--->");
     console.log("The one game site with 8000+ Games!");
